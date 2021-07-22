@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
+using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.Repository.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,8 +30,13 @@ namespace Learn2CodeAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
 
             services.AddControllers();
+            services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
+           
+
+            
 
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper(typeof(Learn2CodeMapper));
