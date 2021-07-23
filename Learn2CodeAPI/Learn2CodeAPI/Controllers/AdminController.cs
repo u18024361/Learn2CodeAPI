@@ -97,7 +97,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("DeleteUniversity/{UniversityId}")]
         public async Task<IActionResult> DeleteUniversity(int UniversityId)
         {
-            var result = await universityGenRepo.Delete(id);
+            var result = await universityGenRepo.Delete(UniversityId);
             return Ok(result);
         }
 
