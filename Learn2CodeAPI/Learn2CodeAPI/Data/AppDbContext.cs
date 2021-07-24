@@ -21,7 +21,7 @@ namespace Learn2CodeAPI.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<StudentModule>()
-                .HasKey(bc => new { bc.StudentId, bc.ModuleId });
+                .HasKey(bc => new { bc.StudentId});
             modelBuilder.Entity<StudentModule>()
                 .HasOne(bc => bc.Student)
                 .WithMany(b => b.StudentModule)
