@@ -5,21 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\LoginDto\" />
+    <Folder Include="Dtos\LoginDto\IdentityDto\" />
     <Folder Include="Dtos\ReportDto\" />
     <Folder Include="Dtos\TutorDto\" />
-    <Folder Include="Dtos\StudentDto\" />
     <Folder Include="IRepository\IRepositoryAdmin\" />
     <Folder Include="IRepository\IRepositoryTutor\" />
-    <Folder Include="IRepository\IRepositoryStudent\" />
     <Folder Include="IRepository\IRepositoryLogin\" />
     <Folder Include="IRepository\IRepositoryReport\" />
-    <Folder Include="Models\Login\" />
     <Folder Include="Models\Report\" />
     <Folder Include="Models\Tutor\" />
-    <Folder Include="Models\Student\" />
     <Folder Include="Repository\RepositoryReport\" />
-    <Folder Include="Repository\RepositoryStudent\" />
     <Folder Include="Repository\RepositoryTutor\" />
     <Folder Include="Repository\RepositoryLogin\" />
     <Folder Include="Repository\RepositoryAdmin\" />
@@ -28,6 +23,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.8">

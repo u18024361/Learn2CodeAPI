@@ -5,10 +5,14 @@ using System.Threading.Tasks;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.IRepository.IRepositoryStudent;
+using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Repository.Generic;
+using Learn2CodeAPI.Repository.RepositoryStudent;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,10 +37,12 @@ namespace Learn2CodeAPI
             
 
             services.AddControllers();
+            services.AddScoped<IStudent, StudentRepository>();
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
-           
+            services.AddIdentity<AppUser, IdentityRole>()
+                     .AddEntityFrameworkStores<AppDbContext>();
 
-            
+
 
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAutoMapper(typeof(Learn2CodeMapper));
