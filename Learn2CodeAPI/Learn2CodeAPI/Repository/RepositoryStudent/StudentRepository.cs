@@ -5,6 +5,7 @@ using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,31 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             {
                 return null;
             }
+        }
+
+        public async Task<Student> UpdateProfile(UpdateStudent dto)
+        {
+            //student table
+            var student = db.Students.Where(zz => zz.Id == dto.StudentId).FirstOrDefault();
+            student.StudentCell = dto.StudentCell;
+            student.StudentName = dto.StudentName;
+            student.StudentSurname = dto.StudentSurname;
+            student.UserId = student.UserId;
+
+            //StudentModule
+            var studentModule = db.StudentModule.Where(zz => zz.StudentId == dto.StudentId).FirstOrDefault();
+            studentModule.ModuleId = dto.ModuleId;
+            studentModule.StudentId = dto.StudentId;
+
+            //user table
+            var user = db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefault();
+            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, dto.Password);
+            user.Email = dto.Email;
+            user.NormalizedEmail = dto.Email.ToUpper();
+            user.NormalizedUserName = dto.UserName.ToUpper();
+            user.UserName = dto.UserName;
+            await db.SaveChangesAsync();
+            return student;
         }
     }
 }

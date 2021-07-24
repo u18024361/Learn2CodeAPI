@@ -74,6 +74,25 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        [HttpPut]
+        [Route("updatestudent")]
+        public async Task<IActionResult> UpdateStudentAsync([FromBody] UpdateStudent dto)
+        {
+
+            var result = await studentRepo.UpdateProfile(dto);
+            if (result == null)
+            {
+                return BadRequest("Unable to Create student");
+            }
+            else
+            {
+                return Ok("student updated Succesffully");
+            }
+
+
+        }
+
+
 
     }
 }

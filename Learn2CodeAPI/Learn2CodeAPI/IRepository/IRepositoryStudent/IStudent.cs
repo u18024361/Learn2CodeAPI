@@ -11,5 +11,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
     public interface IStudent
     {
         Task<Student> Register(AppUser userIdentity, RegistrationDto model);
+
+        Task<Student> UpdateProfile(UpdateStudent dto);
     }
 }
