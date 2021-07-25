@@ -78,7 +78,6 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
             //user table
             var user = db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefault();
-            user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, dto.Password);
             user.Email = dto.Email;
             user.NormalizedEmail = dto.Email.ToUpper();
             user.NormalizedUserName = dto.UserName.ToUpper();

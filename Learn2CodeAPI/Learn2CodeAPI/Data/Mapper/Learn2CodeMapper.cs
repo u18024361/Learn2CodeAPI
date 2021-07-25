@@ -15,7 +15,10 @@ namespace Learn2CodeAPI.Data.Mapper
         public Learn2CodeMapper()
         {
             CreateMap<University, UniversityDto>().ReverseMap();
-            CreateMap<RegistrationDto, AppUser>();
+            CreateMap<RegistrationDto, AppUser>().ReverseMap();
+            CreateMap<DegreeDto, Degree>().ReverseMap();
+            CreateMap<ModuleDto, Module>().ReverseMap();
+
 
         }
     }

@@ -16,7 +16,6 @@ namespace Learn2CodeAPI.Dtos.StudentDto
 
         public string Email { get; set; }
 
-        public string Password { get; set; }
 
         public int ModuleId { get; set; }
 
