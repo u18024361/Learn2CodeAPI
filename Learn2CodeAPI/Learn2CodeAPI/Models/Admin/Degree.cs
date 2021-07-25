@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Learn2CodeAPI.Models.Admin
@@ -12,11 +13,13 @@ namespace Learn2CodeAPI.Models.Admin
         public Degree() { }
         public string DegreeName { get; set; }
 
+        [JsonIgnore]
         public int UniversityId { get; set; }
 
         [ForeignKey("UniversityId")]
         public University University{ get; set; }
 
+        
         public ICollection<Module> Module { get; set; }
     }
 }

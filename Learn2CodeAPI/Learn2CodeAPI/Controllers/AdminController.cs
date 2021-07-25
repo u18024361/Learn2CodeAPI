@@ -19,12 +19,22 @@ namespace Learn2CodeAPI.Controllers
         
         private  IMapper mapper;
         private IGenRepository<University> universityGenRepo;
+        private IGenRepository<Degree> DegreeGenRepo;
+        private IGenRepository<Module> ModuleGenRepo;
         public AdminController(
-             IMapper _mapper,
-            IGenRepository<University> _universityGenRepo)
+            IMapper _mapper,
+            IGenRepository<University> _universityGenRepo,
+            IGenRepository<Degree> _DegreeGenRepo,
+             IGenRepository<Module> _ModuleGenRepo
+            )
+        
+
+        
         {
             universityGenRepo = _universityGenRepo;
-            mapper = _mapper; 
+            mapper = _mapper;
+            DegreeGenRepo = _DegreeGenRepo;
+            ModuleGenRepo = _ModuleGenRepo;
         }
 
         #region University
@@ -49,7 +59,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPost]
         [Route("CreateUniversity")]
-        public async Task<IActionResult> CreateApplication([FromBody] UniversityDto dto)
+        public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto dto)
         {
             University entity = mapper.Map<University>(dto);
            
@@ -63,7 +73,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPut]
         [Route("EditUniversity")]
-        public async Task<IActionResult> EditApplication([FromBody] UniversityDto dto)
+        public async Task<IActionResult> EditUniversity([FromBody] UniversityDto dto)
         {
             University entity = mapper.Map<University>(dto);
 
@@ -101,8 +111,159 @@ namespace Learn2CodeAPI.Controllers
             return Ok(result);
         }
 
+        #endregion
+
+        #region Degree
+
+        [HttpGet]
+        [Route("GetDegreebyId/{DegreeId}")]
+        public async Task<IActionResult> GetDegreebyId(int DegreeId)
+        {
+            var entity = await DegreeGenRepo.Get(DegreeId);
+            //var entity = db.Degrees.Where(zz => zz.Id == DegreeId).Include(zz => zz.University).FirstOrDefault();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllDegrees")]
+        public async Task<IActionResult> GetAllDegrees()
+        {
+            var degrees = await DegreeGenRepo.GetAll();
+            return Ok(degrees);
+
+        }
+
+        [HttpPost]
+        [Route("CreateDegree")]
+        public async Task<IActionResult> CreateDegree([FromBody] DegreeDto dto)
+        {
+            Degree entity = mapper.Map<Degree>(dto);
 
 
+            dynamic result = await DegreeGenRepo.Add(entity);
+
+
+            return Ok(result);
+
+        }
+
+        [HttpPut]
+        [Route("EditDegree")]
+        public async Task<IActionResult> EditDegree([FromBody] DegreeDto dto)
+        {
+            Degree entity = mapper.Map<Degree>(dto);
+
+            dynamic result = await DegreeGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        //[HttpPost]
+        //[Route("DeleteApplication")]
+        //public async Task<IActionResult> DeleteApplication([FromBody] ApplicationDto dto)
+        //{
+        //    if (dto.Id == 0)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    dynamic result = await ppmsService.DeleteApplicationAsync(dto);
+        //    if (result.ok)
+        //    {
+        //        return Ok(result);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(result.message);
+        //    }
+        //}
+
+        [HttpDelete]
+        [Route("DeleteDegree/{DegreeId}")]
+        public async Task<IActionResult> DeleteDegree(int DegreeId)
+        {
+            var result = await DegreeGenRepo.Delete(DegreeId);
+            return Ok(result);
+        }
+
+        #endregion
+
+        #region Module
+
+        [HttpGet]
+        [Route("GetModulebyId/{ModuleId}")]
+        public async Task<IActionResult> GetModulebyId(int ModuleId)
+        {
+            var entity = await ModuleGenRepo.Get(ModuleId);
+            //var entity = db.Degrees.Where(zz => zz.Id == DegreeId).Include(zz => zz.University).FirstOrDefault();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllModules")]
+        public async Task<IActionResult> GetAllModules()
+        {
+            var modules = await ModuleGenRepo.GetAll();
+            return Ok(modules);
+
+        }
+
+        [HttpPost]
+        [Route("CreateModule")]
+        public async Task<IActionResult> CreateModule([FromBody] Module dto)
+        {
+            Module entity = mapper.Map<Module>(dto);
+
+
+            dynamic result = await ModuleGenRepo.Add(entity);
+
+
+            return Ok(result);
+
+        }
+
+        [HttpPut]
+        [Route("EditModule")]
+        public async Task<IActionResult> EditModule([FromBody] Module dto)
+        {
+            Module entity = mapper.Map<Module>(dto);
+
+            dynamic result = await ModuleGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        //[HttpPost]
+        //[Route("DeleteApplication")]
+        //public async Task<IActionResult> DeleteApplication([FromBody] ApplicationDto dto)
+        //{
+        //    if (dto.Id == 0)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    dynamic result = await ppmsService.DeleteApplicationAsync(dto);
+        //    if (result.ok)
+        //    {
+        //        return Ok(result);
+        //    }
+        //    else
+        //    {
+        //        return BadRequest(result.message);
+        //    }
+        //}
+
+        [HttpDelete]
+        [Route("DeleteModule/{ModuleId}")]
+        public async Task<IActionResult> DeleteModule(int ModuleId)
+        {
+            var result = await ModuleGenRepo.Delete(ModuleId);
+            return Ok(result);
+        }
 
         #endregion
     }

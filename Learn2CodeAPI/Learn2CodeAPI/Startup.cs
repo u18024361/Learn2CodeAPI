@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.IRepository.IRepositoryLogin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Repository.Generic;
+using Learn2CodeAPI.Repository.RepositoryLogin;
 using Learn2CodeAPI.Repository.RepositoryStudent;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -34,10 +36,15 @@ namespace Learn2CodeAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            
+            services.AddControllersWithViews().AddNewtonsoftJson(x =>
+            {
+                x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            });
 
             services.AddControllers();
             services.AddScoped<IStudent, StudentRepository>();
+            services.AddScoped<ILogin, LoginRepo>();
+
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
             services.AddIdentity<AppUser, IdentityRole>()
                      .AddEntityFrameworkStores<AppDbContext>();
