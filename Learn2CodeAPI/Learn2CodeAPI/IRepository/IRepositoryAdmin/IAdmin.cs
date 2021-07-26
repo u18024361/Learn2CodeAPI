@@ -14,5 +14,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
         Task<Degree> GetByDegreeName(string Name);
 
         Task<Module> GetByModuleName(string Name);
+
+        Task<CourseFolder> GetByCourseFolderName(string Name);
     }
 }

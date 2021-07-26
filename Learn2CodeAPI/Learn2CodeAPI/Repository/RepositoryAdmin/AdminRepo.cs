@@ -61,9 +61,17 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             var modules = await db.Modules.Where(zz => zz.DegreeId == DegreeId).ToListAsync();
             return modules;
         }
+
+
         #endregion
 
-
+        #region CourseFolder
+        public async Task<CourseFolder> GetByCourseFolderName(string Name)
+        {
+            var Coursefolder = await db.courseFolders.Where(zz => zz.CourseFolderName == Name).FirstOrDefaultAsync(); ;
+            return Coursefolder;
+        }
+        #endregion
 
 
 

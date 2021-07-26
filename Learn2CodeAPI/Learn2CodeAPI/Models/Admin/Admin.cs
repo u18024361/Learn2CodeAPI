@@ -13,5 +13,7 @@ namespace Learn2CodeAPI.Models.Admin
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public AppUser Identity { get; set; }
+
+        public ICollection<CourseFolder> courseFolder { get; set; }
     }
 }

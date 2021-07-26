@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210726144401_coursefolder")]
+    partial class coursefolder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,12 +48,17 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("AdminId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CourseFolderId")
+                        .HasColumnType("int");
+
                     b.Property<string>("CourseFolderName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AdminId");
+
+                    b.HasIndex("CourseFolderId");
 
                     b.ToTable("courseFolders");
                 });
@@ -363,10 +370,14 @@ namespace Learn2CodeAPI.Migrations
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.CourseFolder", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Admin.Admin", "admin")
-                        .WithMany("courseFolder")
+                        .WithMany()
                         .HasForeignKey("AdminId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Learn2CodeAPI.Models.Admin.CourseFolder", null)
+                        .WithMany("courseFolder")
+                        .HasForeignKey("CourseFolderId");
 
                     b.Navigation("admin");
                 });
@@ -472,7 +483,7 @@ namespace Learn2CodeAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Admin", b =>
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.CourseFolder", b =>
                 {
                     b.Navigation("courseFolder");
                 });

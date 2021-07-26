@@ -13,7 +13,7 @@ namespace Learn2CodeAPI.Models.Admin
         public Degree() { }
         public string DegreeName { get; set; }
 
-        [JsonIgnore]
+        
         public int UniversityId { get; set; }
 
         [ForeignKey("UniversityId")]
