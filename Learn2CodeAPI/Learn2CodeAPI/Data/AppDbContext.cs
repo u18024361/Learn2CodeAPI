@@ -37,5 +37,6 @@ namespace Learn2CodeAPI.Data
         public DbSet<Module> Modules { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<StudentModule> StudentModule { get; set; }
+        public DbSet<Admin> Admin { get; set; }
     }
 }
