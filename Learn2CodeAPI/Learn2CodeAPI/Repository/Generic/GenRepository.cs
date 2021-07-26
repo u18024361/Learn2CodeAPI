@@ -50,6 +50,7 @@ namespace Learn2CodeAPI.Repository.Generic
             return await db.Set<TEntity>().ToListAsync();
         }
 
+
         public async Task<TEntity> Update(TEntity entity)
         {
             db.Entry(entity).State = EntityState.Modified;

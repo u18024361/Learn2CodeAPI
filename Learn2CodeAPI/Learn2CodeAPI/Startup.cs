@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryLogin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Repository.Generic;
+using Learn2CodeAPI.Repository.RepositoryAdmin;
 using Learn2CodeAPI.Repository.RepositoryLogin;
 using Learn2CodeAPI.Repository.RepositoryStudent;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +45,7 @@ namespace Learn2CodeAPI
 
             services.AddControllers();
             services.AddScoped<IStudent, StudentRepository>();
+            services.AddScoped<IAdmin, AdminRepo>();
             services.AddScoped<ILogin, LoginRepo>();
 
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));

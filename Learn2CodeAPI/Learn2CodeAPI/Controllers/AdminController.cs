@@ -6,6 +6,8 @@ using AutoMapper;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.IRepository.IRepositoryAdmin;
+using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Admin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +23,13 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
+        private IAdmin AdminRepo;
         public AdminController(
             IMapper _mapper,
             IGenRepository<University> _universityGenRepo,
             IGenRepository<Degree> _DegreeGenRepo,
-             IGenRepository<Module> _ModuleGenRepo
+             IGenRepository<Module> _ModuleGenRepo,
+             IAdmin _AdminRepo
             )
         
 
@@ -35,6 +39,7 @@ namespace Learn2CodeAPI.Controllers
             mapper = _mapper;
             DegreeGenRepo = _DegreeGenRepo;
             ModuleGenRepo = _ModuleGenRepo;
+            AdminRepo = _AdminRepo;
         }
 
         #region University
@@ -44,6 +49,15 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult>GetUniversitybyId(int UniversityId)
         {
             var entity  = await universityGenRepo.Get(UniversityId);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("SearchUniversity/{UniversityName}")]
+        public async Task<IActionResult> SearchUniversity(string UniversityName)
+        {
+            var entity = await AdminRepo.GetByName(UniversityName);
 
             return Ok(entity);
         }
@@ -126,10 +140,20 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllDegrees")]
-        public async Task<IActionResult> GetAllDegrees()
+        [Route("SearchDegree/{DegreeName}")]
+        public async Task<IActionResult> SearchDegree(string DegreeName)
         {
-            var degrees = await DegreeGenRepo.GetAll();
+            var entity = await AdminRepo.GetByDegreeName(DegreeName);
+
+            return Ok(entity);
+        }
+
+
+        [HttpGet]
+        [Route("GetAllDegrees/{UniversityId}")]
+        public async Task<IActionResult> GetAllDegrees(int UniversityId)
+        {
+            var degrees = await AdminRepo.GetAllDegrees(UniversityId);
             return Ok(degrees);
 
         }
@@ -193,6 +217,15 @@ namespace Learn2CodeAPI.Controllers
         #region Module
 
         [HttpGet]
+        [Route("SearchModule/{ModuleName}")]
+        public async Task<IActionResult> SearchModule(string ModuleName)
+        {
+            var entity = await AdminRepo.GetByModuleName(ModuleName);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
         [Route("GetModulebyId/{ModuleId}")]
         public async Task<IActionResult> GetModulebyId(int ModuleId)
         {
@@ -202,11 +235,13 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+
+
         [HttpGet]
-        [Route("GetAllModules")]
-        public async Task<IActionResult> GetAllModules()
+        [Route("GetAllModules/{DegreeId}")]
+        public async Task<IActionResult> GetAllModules(int DegreeId)
         {
-            var modules = await ModuleGenRepo.GetAll();
+            var modules = await AdminRepo.GetAllModules(DegreeId);
             return Ok(modules);
 
         }
