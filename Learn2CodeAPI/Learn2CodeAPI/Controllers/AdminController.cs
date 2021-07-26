@@ -23,13 +23,16 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
+        private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IAdmin AdminRepo;
         public AdminController(
             IMapper _mapper,
             IGenRepository<University> _universityGenRepo,
             IGenRepository<Degree> _DegreeGenRepo,
              IGenRepository<Module> _ModuleGenRepo,
+              IGenRepository<CourseFolder> _CourseFolderGenRepo,
              IAdmin _AdminRepo
+
             )
         
 
@@ -40,6 +43,7 @@ namespace Learn2CodeAPI.Controllers
             DegreeGenRepo = _DegreeGenRepo;
             ModuleGenRepo = _ModuleGenRepo;
             AdminRepo = _AdminRepo;
+            CourseFolderGenRepo = _CourseFolderGenRepo;
         }
 
         #region University
@@ -299,6 +303,62 @@ namespace Learn2CodeAPI.Controllers
             var result = await ModuleGenRepo.Delete(ModuleId);
             return Ok(result);
         }
+
+        #endregion
+
+        #region CourseFolder
+
+        [HttpPost]
+        [Route("CreateCourseFolder")]
+        public async Task<IActionResult> CreateCourseFolder([FromBody] CourseFolderDto dto)
+        {
+            CourseFolder entity = mapper.Map<CourseFolder>(dto);
+             
+
+            dynamic result = await CourseFolderGenRepo.Add(entity);
+
+            return Ok(result);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllCourseFolder")]
+        public async Task<IActionResult> GetAllCourseFolder()
+        {
+            var entity = await CourseFolderGenRepo.GetAll();
+            return Ok(entity);
+
+        }
+
+        [HttpGet]
+        [Route("SearchCourseFolder/{CourseFolderName}")]
+        public async Task<IActionResult> SearchCourseFolder(string CourseFolderName)
+        {
+            var entity = await AdminRepo.GetByCourseFolderName(CourseFolderName);
+
+            return Ok(entity);
+        }
+
+        [HttpPut]
+        [Route("EditCourseFolder")]
+        public async Task<IActionResult> EditCourseFolder([FromBody] CourseFolderDto dto)
+        {
+            CourseFolder entity = mapper.Map<CourseFolder>(dto);
+
+            dynamic result = await CourseFolderGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteCourseFolder/{CourseFolderId}")]
+        public async Task<IActionResult> DeleteCourseFolder(int CourseFolderId)
+        {
+            var result = await CourseFolderGenRepo.Delete(CourseFolderId);
+            return Ok(result);
+        }
+
 
         #endregion
     }
