@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -86,13 +87,21 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateUniversity")]
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto dto)
         {
-            University entity = mapper.Map<University>(dto);
-           
-
-            dynamic result = await universityGenRepo.Add(entity);
-          
-            
+            dynamic result = new ExpandoObject();
+            try
+            {
+                University entity = mapper.Map<University>(dto);
+                var data = await universityGenRepo.Add(entity);
+                result.data = data;
+                result.message = "university created";
                 return Ok(result);
+            }
+            catch 
+            {
+
+                result.message = "something went wrong creating the university";
+                return BadRequest(result.message);
+            }
           
         }
 
