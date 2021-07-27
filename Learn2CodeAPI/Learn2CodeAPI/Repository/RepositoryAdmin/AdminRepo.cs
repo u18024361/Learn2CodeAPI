@@ -2,6 +2,7 @@
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
+using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -71,8 +72,18 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             var Coursefolder = await db.courseFolders.Where(zz => zz.CourseFolderName == Name).FirstOrDefaultAsync(); ;
             return Coursefolder;
         }
+
+
         #endregion
 
+        #region Students
+        public async Task<IEnumerable<Student>> GetAllStudents()
+        {
+
+            var Students = await db.Students.Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Module.Degree.University).ToListAsync(); 
+            return Students;
+        }
+        #endregion
 
 
 

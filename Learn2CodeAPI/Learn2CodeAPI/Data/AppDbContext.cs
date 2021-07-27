@@ -20,10 +20,10 @@ namespace Learn2CodeAPI.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
             modelBuilder.Entity<StudentModule>()
-                .HasKey(bc => new { bc.StudentId});
-            modelBuilder.Entity<StudentModule>()
-                .HasOne(bc => bc.Student)
+                .HasOne(bc => bc.Students)
                 .WithMany(b => b.StudentModule)
                 .HasForeignKey(bc => bc.StudentId);
             modelBuilder.Entity<StudentModule>()
