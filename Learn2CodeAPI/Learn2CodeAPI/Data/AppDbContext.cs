@@ -39,5 +39,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<StudentModule> StudentModule { get; set; }
         public DbSet<Admin> Admin { get; set; }
         public DbSet<CourseFolder> courseFolders { get; set; }
+        public DbSet<SessionContentCategory> SessionContentCategory { get; set; }
+
     }
 }

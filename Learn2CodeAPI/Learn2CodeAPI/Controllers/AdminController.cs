@@ -9,6 +9,7 @@ using Learn2CodeAPI.IRepository.Generic;
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Admin;
+using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,15 +24,19 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
+        private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
+        private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
         private IAdmin AdminRepo;
         public AdminController(
             IMapper _mapper,
             IGenRepository<University> _universityGenRepo,
             IGenRepository<Degree> _DegreeGenRepo,
-             IGenRepository<Module> _ModuleGenRepo,
-              IGenRepository<CourseFolder> _CourseFolderGenRepo,
-             IAdmin _AdminRepo
+            IGenRepository<Module> _ModuleGenRepo,
+            IGenRepository<CourseFolder> _CourseFolderGenRepo,
+             IGenRepository<Student> _StudentGenRepo,
+              IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+            IAdmin _AdminRepo
 
             )
         
@@ -44,6 +49,8 @@ namespace Learn2CodeAPI.Controllers
             ModuleGenRepo = _ModuleGenRepo;
             AdminRepo = _AdminRepo;
             CourseFolderGenRepo = _CourseFolderGenRepo;
+            StudentGenRepo = _StudentGenRepo;
+            SessionContentCategoryRepo = _SessionContentCategoryRepo;
         }
 
         #region University
@@ -371,6 +378,64 @@ namespace Learn2CodeAPI.Controllers
 
             return Ok(entity);
         }
+
+
+        [HttpDelete]
+        [Route("DeleteStudent/{StudentId}")]
+        public async Task<IActionResult> DeleteStudent(int StudentId)
+        {
+            var result = await StudentGenRepo.Delete(StudentId);
+            return Ok(result);
+        }
+
+
+
         #endregion
+
+        #region SessionContentCategory
+        [HttpGet]
+        [Route("GetAllSessionContentCategory")]
+        public async Task<IActionResult> GetAllSessionContentCategory()
+        {
+            var Universities = await SessionContentCategoryRepo.GetAll();
+            return Ok(Universities);
+
+        }
+
+        [HttpPost]
+        [Route("CreateSessionContentCategory")]
+        public async Task<IActionResult> CreateSessionContentCategory([FromBody] SessionContentCategoryDto dto)
+        {
+            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+
+
+            dynamic result = await SessionContentCategoryRepo.Add(entity);
+
+
+            return Ok(result);
+
+        }
+
+        [HttpPut]
+        [Route("EditSessionContentCategory")]
+        public async Task<IActionResult> EditSessionContentCategory([FromBody] SessionContentCategoryDto dto)
+        {
+            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+
+            dynamic result = await SessionContentCategoryRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteSessionContentCategory/{SessionContentCategoryId}")]
+        public async Task<IActionResult> DeleteSessionContentCategory(int SessionContentCategoryId)
+        {
+            var result = await SessionContentCategoryRepo.Delete(SessionContentCategoryId);
+            return Ok(result);
+        }
+        #endregion
+
     }
 }
