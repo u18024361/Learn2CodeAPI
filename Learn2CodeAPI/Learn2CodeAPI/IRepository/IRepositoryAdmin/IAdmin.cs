@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Models.Admin;
+using Learn2CodeAPI.Models.Student;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,9 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
         Task<Module> GetByModuleName(string Name);
 
         Task<CourseFolder> GetByCourseFolderName(string Name);
+
+        Task<IEnumerable<Student>> GetAllStudents();
+
+
     }
 }

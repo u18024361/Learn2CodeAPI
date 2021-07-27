@@ -361,5 +361,16 @@ namespace Learn2CodeAPI.Controllers
 
 
         #endregion
+
+        #region Student
+        [HttpGet]
+        [Route("GeAllStudents")]
+        public async Task<IActionResult> GeAllStudents()
+        {
+            var entity = await AdminRepo.GetAllStudents();
+
+            return Ok(entity);
+        }
+        #endregion
     }
 }

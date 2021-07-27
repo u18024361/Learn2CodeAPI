@@ -204,18 +204,22 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.StudentModule", b =>
                 {
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
                     b.Property<int>("Id")
-                        .HasColumnType("int");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.HasKey("StudentId");
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ModuleId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("StudentModule");
                 });
@@ -410,7 +414,7 @@ namespace Learn2CodeAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "Student")
+                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "Students")
                         .WithMany("StudentModule")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -418,7 +422,7 @@ namespace Learn2CodeAPI.Migrations
 
                     b.Navigation("Module");
 
-                    b.Navigation("Student");
+                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
