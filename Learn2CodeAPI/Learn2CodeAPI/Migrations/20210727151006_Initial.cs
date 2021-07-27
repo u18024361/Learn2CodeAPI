@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Learn2CodeAPI.Migrations
 {
-    public partial class inital : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -247,6 +247,26 @@ namespace Learn2CodeAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SessionContentCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SessionContentCategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SessionContentCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SessionContentCategory_Admin_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admin",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Modules",
                 columns: table => new
                 {
@@ -352,6 +372,11 @@ namespace Learn2CodeAPI.Migrations
                 column: "DegreeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SessionContentCategory_AdminId",
+                table: "SessionContentCategory",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudentModule_ModuleId",
                 table: "StudentModule",
                 column: "ModuleId");
@@ -386,6 +411,9 @@ namespace Learn2CodeAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "courseFolders");
+
+            migrationBuilder.DropTable(
+                name: "SessionContentCategory");
 
             migrationBuilder.DropTable(
                 name: "StudentModule");

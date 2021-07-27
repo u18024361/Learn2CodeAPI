@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210727093130_inital")]
-    partial class inital
+    [Migration("20210727151006_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -96,6 +96,26 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("DegreeId");
 
                     b.ToTable("Modules");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionContentCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SessionContentCategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("SessionContentCategory");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.University", b =>
@@ -397,6 +417,17 @@ namespace Learn2CodeAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Degree");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionContentCategory", b =>
+                {
+                    b.HasOne("Learn2CodeAPI.Models.Admin.Admin", "admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("admin");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
