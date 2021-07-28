@@ -4,6 +4,7 @@ using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.IRepository.Generic;
@@ -27,7 +28,9 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Module> ModuleGenRepo;
         private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
+        private IGenRepository<CourseSubCategory> CourseSubCategoryGenRepo;
         private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
+        private readonly AppDbContext db;
         private IAdmin AdminRepo;
         public AdminController(
             IMapper _mapper,
@@ -35,15 +38,19 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Degree> _DegreeGenRepo,
             IGenRepository<Module> _ModuleGenRepo,
             IGenRepository<CourseFolder> _CourseFolderGenRepo,
-             IGenRepository<Student> _StudentGenRepo,
-              IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
-            IAdmin _AdminRepo
+             IGenRepository<CourseSubCategory> _CourseSubCategoryGenRepo,
+            IGenRepository<Student> _StudentGenRepo,
+            IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+            IAdmin _AdminRepo,
+            AppDbContext _db
 
             )
         
 
         
         {
+            db = _db;
+            CourseSubCategoryGenRepo = _CourseSubCategoryGenRepo;
             universityGenRepo = _universityGenRepo;
             mapper = _mapper;
             DegreeGenRepo = _DegreeGenRepo;
@@ -389,14 +396,16 @@ namespace Learn2CodeAPI.Controllers
         }
 
 
+        
+        //userid is in the aspnet users table
         [HttpDelete]
-        [Route("DeleteStudent/{StudentId}")]
-        public async Task<IActionResult> DeleteStudent(int StudentId)
-        {
-            var result = await StudentGenRepo.Delete(StudentId);
-            return Ok(result);
+        [Route("DeleteStudent/{userId}")]
+        public IActionResult search(string userId) {
+            var x = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
+            db.Remove(x);
+            db.SaveChanges();
+            return Ok(x);
         }
-
 
 
         #endregion
@@ -444,6 +453,61 @@ namespace Learn2CodeAPI.Controllers
             var result = await SessionContentCategoryRepo.Delete(SessionContentCategoryId);
             return Ok(result);
         }
+        #endregion
+
+        #region CourseContentCategory
+        [HttpGet]
+        [Route("GetAllCourseSubCategory")]
+        public async Task<IActionResult> GetAllCourseSubCategory()
+        {
+            var subcategories = await CourseSubCategoryGenRepo.GetAll();
+            return Ok(subcategories);
+
+        }
+
+
+        [HttpPost]
+        [Route("CreateCourseSubCategory")]
+        public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            try
+            {
+                CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+                var data = await CourseSubCategoryGenRepo.Add(entity);
+                result.data = data;
+                result.message = "course subcategory created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong creating the category";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("EditCourseSubCategory")]
+        public async Task<IActionResult> EditCourseSubCategory([FromBody] CoursSubCategoryDto dto)
+        {
+            CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+
+            dynamic result = await CourseSubCategoryGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteCourseSubCategory/{CourseSubCategoryId}")]
+        public async Task<IActionResult> DeleteCourseSubCategory(int CourseSubCategoryId)
+        {
+            var result = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
+            return Ok(result);
+        }
+
         #endregion
 
     }
