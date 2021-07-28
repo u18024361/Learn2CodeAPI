@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210724110730_studentUser")]
-    partial class studentUser
+    [Migration("20210727151006_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -20,6 +20,43 @@ namespace Learn2CodeAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("ProductVersion", "5.0.8")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Admin");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.CourseFolder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CourseFolderName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("courseFolders");
+                });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Degree", b =>
                 {
@@ -59,6 +96,26 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("DegreeId");
 
                     b.ToTable("Modules");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionContentCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdminId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SessionContentCategoryName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("SessionContentCategory");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.University", b =>
@@ -169,18 +226,22 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.StudentModule", b =>
                 {
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int>("ModuleId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
+                    b.Property<int>("StudentId")
                         .HasColumnType("int");
 
-                    b.HasKey("StudentId", "ModuleId");
+                    b.HasKey("Id");
 
                     b.HasIndex("ModuleId");
+
+                    b.HasIndex("StudentId");
 
                     b.ToTable("StudentModule");
                 });
@@ -316,6 +377,26 @@ namespace Learn2CodeAPI.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Admin", b =>
+                {
+                    b.HasOne("Learn2CodeAPI.Models.Login.Identity.AppUser", "Identity")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Identity");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.CourseFolder", b =>
+                {
+                    b.HasOne("Learn2CodeAPI.Models.Admin.Admin", "admin")
+                        .WithMany("courseFolder")
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("admin");
+                });
+
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Degree", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Admin.University", "University")
@@ -338,6 +419,17 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Degree");
                 });
 
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionContentCategory", b =>
+                {
+                    b.HasOne("Learn2CodeAPI.Models.Admin.Admin", "admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("admin");
+                });
+
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Login.Identity.AppUser", "Identity")
@@ -355,7 +447,7 @@ namespace Learn2CodeAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "Student")
+                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "Students")
                         .WithMany("StudentModule")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -363,7 +455,7 @@ namespace Learn2CodeAPI.Migrations
 
                     b.Navigation("Module");
 
-                    b.Navigation("Student");
+                    b.Navigation("Students");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -415,6 +507,11 @@ namespace Learn2CodeAPI.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Admin", b =>
+                {
+                    b.Navigation("courseFolder");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Degree", b =>

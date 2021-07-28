@@ -3,23 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Learn2CodeAPI.Models.Admin
 {
-    public class Degree : BaseEntity
+    public class CourseFolder : BaseEntity
     {
-        public Degree() { }
-        public string DegreeName { get; set; }
+        public CourseFolder() { }
+        public string CourseFolderName { get; set; }
 
-        
-        public int UniversityId { get; set; }
+        public int AdminId { get; set; }
 
-        [ForeignKey("UniversityId")]
-        public University University{ get; set; }
+        [ForeignKey("AdminId")]
+        public Admin admin { get; set; }
 
-        
         public ICollection<Module> Module { get; set; }
+
     }
 }

@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.IRepository.Generic;
+using Learn2CodeAPI.IRepository.IRepositoryAdmin;
+using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Admin;
+using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,20 +26,39 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
+        private IGenRepository<Student> StudentGenRepo;
+        private IGenRepository<CourseFolder> CourseFolderGenRepo;
+        private IGenRepository<CourseSubCategory> CourseSubCategoryGenRepo;
+        private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
+        private readonly AppDbContext db;
+        private IAdmin AdminRepo;
         public AdminController(
             IMapper _mapper,
             IGenRepository<University> _universityGenRepo,
             IGenRepository<Degree> _DegreeGenRepo,
-             IGenRepository<Module> _ModuleGenRepo
+            IGenRepository<Module> _ModuleGenRepo,
+            IGenRepository<CourseFolder> _CourseFolderGenRepo,
+             IGenRepository<CourseSubCategory> _CourseSubCategoryGenRepo,
+            IGenRepository<Student> _StudentGenRepo,
+            IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+            IAdmin _AdminRepo,
+            AppDbContext _db
+
             )
         
 
         
         {
+            db = _db;
+            CourseSubCategoryGenRepo = _CourseSubCategoryGenRepo;
             universityGenRepo = _universityGenRepo;
             mapper = _mapper;
             DegreeGenRepo = _DegreeGenRepo;
             ModuleGenRepo = _ModuleGenRepo;
+            AdminRepo = _AdminRepo;
+            CourseFolderGenRepo = _CourseFolderGenRepo;
+            StudentGenRepo = _StudentGenRepo;
+            SessionContentCategoryRepo = _SessionContentCategoryRepo;
         }
 
         #region University
@@ -44,6 +68,15 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult>GetUniversitybyId(int UniversityId)
         {
             var entity  = await universityGenRepo.Get(UniversityId);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("SearchUniversity/{UniversityName}")]
+        public async Task<IActionResult> SearchUniversity(string UniversityName)
+        {
+            var entity = await AdminRepo.GetByName(UniversityName);
 
             return Ok(entity);
         }
@@ -61,13 +94,21 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateUniversity")]
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto dto)
         {
-            University entity = mapper.Map<University>(dto);
-           
-
-            dynamic result = await universityGenRepo.Add(entity);
-          
-            
+            dynamic result = new ExpandoObject();
+            try
+            {
+                University entity = mapper.Map<University>(dto);
+                var data = await universityGenRepo.Add(entity);
+                result.data = data;
+                result.message = "university created";
                 return Ok(result);
+            }
+            catch 
+            {
+
+                result.message = "something went wrong creating the university";
+                return BadRequest(result.message);
+            }
           
         }
 
@@ -126,10 +167,20 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllDegrees")]
-        public async Task<IActionResult> GetAllDegrees()
+        [Route("SearchDegree/{DegreeName}")]
+        public async Task<IActionResult> SearchDegree(string DegreeName)
         {
-            var degrees = await DegreeGenRepo.GetAll();
+            var entity = await AdminRepo.GetByDegreeName(DegreeName);
+
+            return Ok(entity);
+        }
+
+
+        [HttpGet]
+        [Route("GetAllDegrees/{UniversityId}")]
+        public async Task<IActionResult> GetAllDegrees(int UniversityId)
+        {
+            var degrees = await AdminRepo.GetAllDegrees(UniversityId);
             return Ok(degrees);
 
         }
@@ -193,6 +244,15 @@ namespace Learn2CodeAPI.Controllers
         #region Module
 
         [HttpGet]
+        [Route("SearchModule/{ModuleName}")]
+        public async Task<IActionResult> SearchModule(string ModuleName)
+        {
+            var entity = await AdminRepo.GetByModuleName(ModuleName);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
         [Route("GetModulebyId/{ModuleId}")]
         public async Task<IActionResult> GetModulebyId(int ModuleId)
         {
@@ -202,11 +262,13 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+
+
         [HttpGet]
-        [Route("GetAllModules")]
-        public async Task<IActionResult> GetAllModules()
+        [Route("GetAllModules/{DegreeId}")]
+        public async Task<IActionResult> GetAllModules(int DegreeId)
         {
-            var modules = await ModuleGenRepo.GetAll();
+            var modules = await AdminRepo.GetAllModules(DegreeId);
             return Ok(modules);
 
         }
@@ -266,5 +328,187 @@ namespace Learn2CodeAPI.Controllers
         }
 
         #endregion
+
+        #region CourseFolder
+
+        [HttpPost]
+        [Route("CreateCourseFolder")]
+        public async Task<IActionResult> CreateCourseFolder([FromBody] CourseFolderDto dto)
+        {
+            CourseFolder entity = mapper.Map<CourseFolder>(dto);
+             
+
+            dynamic result = await CourseFolderGenRepo.Add(entity);
+
+            return Ok(result);
+
+        }
+
+        [HttpGet]
+        [Route("GetAllCourseFolder")]
+        public async Task<IActionResult> GetAllCourseFolder()
+        {
+            var entity = await CourseFolderGenRepo.GetAll();
+            return Ok(entity);
+
+        }
+
+        [HttpGet]
+        [Route("SearchCourseFolder/{CourseFolderName}")]
+        public async Task<IActionResult> SearchCourseFolder(string CourseFolderName)
+        {
+            var entity = await AdminRepo.GetByCourseFolderName(CourseFolderName);
+
+            return Ok(entity);
+        }
+
+        [HttpPut]
+        [Route("EditCourseFolder")]
+        public async Task<IActionResult> EditCourseFolder([FromBody] CourseFolderDto dto)
+        {
+            CourseFolder entity = mapper.Map<CourseFolder>(dto);
+
+            dynamic result = await CourseFolderGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteCourseFolder/{CourseFolderId}")]
+        public async Task<IActionResult> DeleteCourseFolder(int CourseFolderId)
+        {
+            var result = await CourseFolderGenRepo.Delete(CourseFolderId);
+            return Ok(result);
+        }
+
+
+        #endregion
+
+        #region Student
+        [HttpGet]
+        [Route("GeAllStudents")]
+        public async Task<IActionResult> GeAllStudents()
+        {
+            var entity = await AdminRepo.GetAllStudents();
+
+            return Ok(entity);
+        }
+
+
+        
+        //userid is in the aspnet users table
+        [HttpDelete]
+        [Route("DeleteStudent/{userId}")]
+        public IActionResult search(string userId) {
+            var x = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
+            db.Remove(x);
+            db.SaveChanges();
+            return Ok(x);
+        }
+
+
+        #endregion
+
+        #region SessionContentCategory
+        [HttpGet]
+        [Route("GetAllSessionContentCategory")]
+        public async Task<IActionResult> GetAllSessionContentCategory()
+        {
+            var Universities = await SessionContentCategoryRepo.GetAll();
+            return Ok(Universities);
+
+        }
+
+        [HttpPost]
+        [Route("CreateSessionContentCategory")]
+        public async Task<IActionResult> CreateSessionContentCategory([FromBody] SessionContentCategoryDto dto)
+        {
+            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+
+
+            dynamic result = await SessionContentCategoryRepo.Add(entity);
+
+
+            return Ok(result);
+
+        }
+
+        [HttpPut]
+        [Route("EditSessionContentCategory")]
+        public async Task<IActionResult> EditSessionContentCategory([FromBody] SessionContentCategoryDto dto)
+        {
+            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+
+            dynamic result = await SessionContentCategoryRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteSessionContentCategory/{SessionContentCategoryId}")]
+        public async Task<IActionResult> DeleteSessionContentCategory(int SessionContentCategoryId)
+        {
+            var result = await SessionContentCategoryRepo.Delete(SessionContentCategoryId);
+            return Ok(result);
+        }
+        #endregion
+
+        #region CourseContentCategory
+        [HttpGet]
+        [Route("GetAllCourseSubCategory")]
+        public async Task<IActionResult> GetAllCourseSubCategory()
+        {
+            var subcategories = await CourseSubCategoryGenRepo.GetAll();
+            return Ok(subcategories);
+
+        }
+
+
+        [HttpPost]
+        [Route("CreateCourseSubCategory")]
+        public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            try
+            {
+                CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+                var data = await CourseSubCategoryGenRepo.Add(entity);
+                result.data = data;
+                result.message = "course subcategory created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong creating the category";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("EditCourseSubCategory")]
+        public async Task<IActionResult> EditCourseSubCategory([FromBody] CoursSubCategoryDto dto)
+        {
+            CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+
+            dynamic result = await CourseSubCategoryGenRepo.Update(entity);
+
+
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        [Route("DeleteCourseSubCategory/{CourseSubCategoryId}")]
+        public async Task<IActionResult> DeleteCourseSubCategory(int CourseSubCategoryId)
+        {
+            var result = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
+            return Ok(result);
+        }
+
+        #endregion
+
     }
 }

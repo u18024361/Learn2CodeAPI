@@ -3,54 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Learn2CodeAPI.Migrations
 {
-    public partial class studentUser : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Degree_University_UniversityId",
-                table: "Degree");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Module_Degree_DegreeId",
-                table: "Module");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Module",
-                table: "Module");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Degree",
-                table: "Degree");
-
-            migrationBuilder.RenameTable(
-                name: "Module",
-                newName: "Modules");
-
-            migrationBuilder.RenameTable(
-                name: "Degree",
-                newName: "Degrees");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Module_DegreeId",
-                table: "Modules",
-                newName: "IX_Modules_DegreeId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Degree_UniversityId",
-                table: "Degrees",
-                newName: "IX_Degrees_UniversityId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Modules",
-                table: "Modules",
-                column: "Id");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Degrees",
-                table: "Degrees",
-                column: "Id");
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -91,6 +47,19 @@ namespace Learn2CodeAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "University",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UniversityName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_University", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -109,6 +78,25 @@ namespace Learn2CodeAPI.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Admin",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Admin", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Admin_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -215,20 +203,101 @@ namespace Learn2CodeAPI.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Degrees",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DegreeName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UniversityId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Degrees", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Degrees_University_UniversityId",
+                        column: x => x.UniversityId,
+                        principalTable: "University",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "courseFolders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CourseFolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_courseFolders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_courseFolders_Admin_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admin",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SessionContentCategory",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SessionContentCategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdminId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SessionContentCategory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SessionContentCategory_Admin_AdminId",
+                        column: x => x.AdminId,
+                        principalTable: "Admin",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Modules",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ModuleCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DegreeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Modules", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Modules_Degrees_DegreeId",
+                        column: x => x.DegreeId,
+                        principalTable: "Degrees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "StudentModule",
                 columns: table => new
                 {
-                    StudentId = table.Column<int>(type: "int", nullable: false),
-                    ModuleId = table.Column<int>(type: "int", nullable: false),
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StudentId = table.Column<int>(type: "int", nullable: false),
+                    ModuleId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StudentModule", x => new { x.StudentId, x.ModuleId });
+                    table.PrimaryKey("PK_StudentModule", x => x.Id);
                     table.ForeignKey(
                         name: "FK_StudentModule_Modules_ModuleId",
                         column: x => x.ModuleId,
@@ -242,6 +311,11 @@ namespace Learn2CodeAPI.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Admin_UserId",
+                table: "Admin",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -283,42 +357,43 @@ namespace Learn2CodeAPI.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_courseFolders_AdminId",
+                table: "courseFolders",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Degrees_UniversityId",
+                table: "Degrees",
+                column: "UniversityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Modules_DegreeId",
+                table: "Modules",
+                column: "DegreeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SessionContentCategory_AdminId",
+                table: "SessionContentCategory",
+                column: "AdminId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StudentModule_ModuleId",
                 table: "StudentModule",
                 column: "ModuleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StudentModule_StudentId",
+                table: "StudentModule",
+                column: "StudentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Students_UserId",
                 table: "Students",
                 column: "UserId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Degrees_University_UniversityId",
-                table: "Degrees",
-                column: "UniversityId",
-                principalTable: "University",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Modules_Degrees_DegreeId",
-                table: "Modules",
-                column: "DegreeId",
-                principalTable: "Degrees",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Degrees_University_UniversityId",
-                table: "Degrees");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Modules_Degrees_DegreeId",
-                table: "Modules");
-
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -335,68 +410,34 @@ namespace Learn2CodeAPI.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "courseFolders");
+
+            migrationBuilder.DropTable(
+                name: "SessionContentCategory");
+
+            migrationBuilder.DropTable(
                 name: "StudentModule");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Admin");
+
+            migrationBuilder.DropTable(
+                name: "Modules");
+
+            migrationBuilder.DropTable(
                 name: "Students");
+
+            migrationBuilder.DropTable(
+                name: "Degrees");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Modules",
-                table: "Modules");
-
-            migrationBuilder.DropPrimaryKey(
-                name: "PK_Degrees",
-                table: "Degrees");
-
-            migrationBuilder.RenameTable(
-                name: "Modules",
-                newName: "Module");
-
-            migrationBuilder.RenameTable(
-                name: "Degrees",
-                newName: "Degree");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Modules_DegreeId",
-                table: "Module",
-                newName: "IX_Module_DegreeId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Degrees_UniversityId",
-                table: "Degree",
-                newName: "IX_Degree_UniversityId");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Module",
-                table: "Module",
-                column: "Id");
-
-            migrationBuilder.AddPrimaryKey(
-                name: "PK_Degree",
-                table: "Degree",
-                column: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Degree_University_UniversityId",
-                table: "Degree",
-                column: "UniversityId",
-                principalTable: "University",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Module_Degree_DegreeId",
-                table: "Module",
-                column: "DegreeId",
-                principalTable: "Degree",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+            migrationBuilder.DropTable(
+                name: "University");
         }
     }
 }

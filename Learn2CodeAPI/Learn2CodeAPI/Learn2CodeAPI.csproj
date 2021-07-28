@@ -8,14 +8,12 @@
     <Folder Include="Dtos\LoginDto\IdentityDto\" />
     <Folder Include="Dtos\ReportDto\" />
     <Folder Include="Dtos\TutorDto\" />
-    <Folder Include="IRepository\IRepositoryAdmin\" />
     <Folder Include="IRepository\IRepositoryTutor\" />
     <Folder Include="IRepository\IRepositoryReport\" />
     <Folder Include="Models\Report\" />
     <Folder Include="Models\Tutor\" />
     <Folder Include="Repository\RepositoryReport\" />
     <Folder Include="Repository\RepositoryTutor\" />
-    <Folder Include="Repository\RepositoryAdmin\" />
   </ItemGroup>
 
   <ItemGroup>
