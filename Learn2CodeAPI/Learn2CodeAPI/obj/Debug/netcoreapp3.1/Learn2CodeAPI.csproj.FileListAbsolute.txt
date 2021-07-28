@@ -148,7 +148,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.pdb
 <<<<<<< Updated upstream
 =======
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.csprojAssemblyReference.cache
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\appsettings.Development.json
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\appsettings.json
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
