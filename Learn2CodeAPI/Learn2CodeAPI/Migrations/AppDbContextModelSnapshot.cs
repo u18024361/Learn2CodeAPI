@@ -260,13 +260,20 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("ModuleId")
+                    b.Property<int>("Id")
                         .HasColumnType("int");
 
+<<<<<<< Updated upstream
                     b.Property<int>("StudentId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+=======
+                    b.Property<int>("ModuleId")
+                        .HasColumnType("int");
+
+                    b.HasKey("StudentId");
+>>>>>>> Stashed changes
 
                     b.HasIndex("ModuleId");
 
