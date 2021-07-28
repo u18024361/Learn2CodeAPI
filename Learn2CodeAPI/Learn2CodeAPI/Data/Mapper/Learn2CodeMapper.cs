@@ -19,6 +19,7 @@ namespace Learn2CodeAPI.Data.Mapper
             CreateMap<DegreeDto, Degree>().ReverseMap();
             CreateMap<ModuleDto, Module>().ReverseMap();
             CreateMap<CourseFolderDto, CourseFolder>().ReverseMap();
+            CreateMap<CoursSubCategoryDto, CourseSubCategory>().ReverseMap();
             CreateMap<SessionContentCategoryDto, SessionContentCategory>().ReverseMap();
 
 
