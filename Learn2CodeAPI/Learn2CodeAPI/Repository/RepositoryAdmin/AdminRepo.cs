@@ -3,6 +3,7 @@ using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -84,10 +85,19 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             return Students;
         }
 
-      
+
+
         #endregion
 
-        
+        #region Tutor
+        public async Task<IEnumerable<Tutor>> GetAllApplications()
+        {
+
+            var Applicants = await db.Tutor.Include(zz => zz.TutorStatus).Include(zz =>zz.File).Where(zz => zz.TutorStatus.TutorStatusDesc == "Applied").ToListAsync();
+            return Applicants;
+        }
+
+        #endregion
 
 
 

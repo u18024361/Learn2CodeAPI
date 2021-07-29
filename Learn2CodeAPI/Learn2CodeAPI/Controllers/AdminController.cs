@@ -12,6 +12,7 @@ using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,6 +31,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<CourseSubCategory> CourseSubCategoryGenRepo;
         private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
+        private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
         private IAdmin AdminRepo;
         public AdminController(
@@ -40,6 +42,7 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<CourseFolder> _CourseFolderGenRepo,
              IGenRepository<CourseSubCategory> _CourseSubCategoryGenRepo,
             IGenRepository<Student> _StudentGenRepo,
+             IGenRepository<Tutor> _TutorGenRepo,
             IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
             IAdmin _AdminRepo,
             AppDbContext _db
@@ -58,6 +61,7 @@ namespace Learn2CodeAPI.Controllers
             AdminRepo = _AdminRepo;
             CourseFolderGenRepo = _CourseFolderGenRepo;
             StudentGenRepo = _StudentGenRepo;
+            TutorGenRepo = _TutorGenRepo;
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
         }
 
@@ -465,7 +469,7 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
-        //dddd
+        
         [HttpPost]
         [Route("CreateCourseSubCategory")]
         public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
@@ -507,6 +511,30 @@ namespace Learn2CodeAPI.Controllers
             var result = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
             return Ok(result);
         }
+
+        #endregion
+
+        #region Tutor
+        [HttpGet]
+        [Route("GetAllAplications")]
+        public async Task<IActionResult> GetAllAplications()
+        {
+            var applications = await AdminRepo.GetAllApplications();
+            return Ok(applications);
+
+        }
+
+
+        [HttpGet]
+        [Route("GetAllTutors")]
+        public async Task<IActionResult> GetAllTutors()
+        {
+            var applications = await TutorGenRepo.GetAll();
+            return Ok(applications);
+
+        }
+
+
 
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,10 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
 
         Task<IEnumerable<Student>> GetAllStudents();
 
-       
+        Task<IEnumerable<Tutor>> GetAllApplications();
+
+
+
 
 
     }

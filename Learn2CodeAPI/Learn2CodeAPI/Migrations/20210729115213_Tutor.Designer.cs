@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210729115213_Tutor")]
+    partial class Tutor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -282,10 +284,15 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("FileName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("FileName")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("TutorId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TutorId");
 
                     b.ToTable("File");
                 });
@@ -296,9 +303,6 @@ namespace Learn2CodeAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("FileId")
-                        .HasColumnType("int");
 
                     b.Property<string>("TutorAbout")
                         .HasColumnType("nvarchar(max)");
@@ -325,8 +329,6 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FileId");
 
                     b.HasIndex("TutorStatusId");
 
@@ -577,14 +579,19 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Students");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Tutor", b =>
+            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.File", b =>
                 {
-                    b.HasOne("Learn2CodeAPI.Models.Tutor.File", "File")
+                    b.HasOne("Learn2CodeAPI.Models.Tutor.Tutor", "Tutor")
                         .WithMany()
-                        .HasForeignKey("FileId")
+                        .HasForeignKey("TutorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Tutor");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Tutor", b =>
+                {
                     b.HasOne("Learn2CodeAPI.Models.Tutor.TutorStatus", "TutorStatus")
                         .WithMany("Tutors")
                         .HasForeignKey("TutorStatusId")
@@ -594,8 +601,6 @@ namespace Learn2CodeAPI.Migrations
                     b.HasOne("Learn2CodeAPI.Models.Login.Identity.AppUser", "Identity")
                         .WithMany()
                         .HasForeignKey("UserId");
-
-                    b.Navigation("File");
 
                     b.Navigation("Identity");
 
