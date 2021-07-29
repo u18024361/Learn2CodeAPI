@@ -1,6 +1,7 @@
 ﻿using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -42,6 +43,10 @@ namespace Learn2CodeAPI.Data
 
         public DbSet<CourseSubCategory> courseSubCategory { get; set; }
         public DbSet<SessionContentCategory> SessionContentCategory { get; set; }
+
+        public DbSet<Tutor> Tutor{ get; set; }
+        public DbSet<TutorStatus> TutorStatus { get; set; }
+        public DbSet<File> File { get; set; }
 
     }
 }
