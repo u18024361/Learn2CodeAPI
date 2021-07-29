@@ -8916,19 +8916,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\vraje\\.nuget\\packages\\": {}
+    "C:\\Users\\kylajones\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\vraje\\Documents\\Vraj Local\\Tuks\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
+      "projectUniqueName": "C:\\Learn2Code\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
       "projectName": "Learn2CodeAPI",
-      "projectPath": "C:\\Users\\vraje\\Documents\\Vraj Local\\Tuks\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
-      "packagesPath": "C:\\Users\\vraje\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\vraje\\Documents\\Vraj Local\\Tuks\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\obj\\",
+      "projectPath": "C:\\Learn2Code\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
+      "packagesPath": "C:\\Users\\kylajones\\.nuget\\packages\\",
+      "outputPath": "C:\\Learn2Code\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\vraje\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\kylajones\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9005,7 +9005,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.301\\RuntimeIdentifierGraph.json"
       }
     }
   }
