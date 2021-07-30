@@ -71,7 +71,7 @@ namespace Learn2CodeAPI.Migrations
                 column: "TutorId",
                 principalTable: "Tutor",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
         }
     }
 }

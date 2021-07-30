@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Data;
+using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
@@ -95,6 +96,39 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
 
             var Applicants = await db.Tutor.Include(zz => zz.TutorStatus).Include(zz =>zz.File).Where(zz => zz.TutorStatus.TutorStatusDesc == "Applied").ToListAsync();
             return Applicants;
+        }
+
+        public async Task<IEnumerable<Tutor>> GetAllTutors()
+        {
+
+            var Tutors = await db.Tutor.Where(zz => zz.TutorStatus.TutorStatusDesc == "Accepted").ToListAsync();
+            return Tutors;
+        }
+
+        public async Task<Tutor> Reject(Tutor tutor)
+        {
+            var tutorreject = await db.Tutor.Where(zz => zz.Id == tutor.Id).FirstOrDefaultAsync();
+            tutorreject.TutorStatusId =3;
+           await db.SaveChangesAsync();
+           return tutorreject;
+
+        }
+
+        public async Task<Tutor> CreateTutor(AppUser userIdentity, CreateTutorDto tutor)
+        {
+            
+            var result = await  _userManager.CreateAsync(userIdentity, tutor.Password);
+
+            if (!result.Succeeded)
+            {
+                return null;
+            }
+
+            var AcceptedTutor = await db.Tutor.Where(zz => zz.Id == tutor.Id).FirstOrDefaultAsync();
+            AcceptedTutor.UserId = userIdentity.Id;
+            AcceptedTutor.TutorStatusId = 2;
+           await db.SaveChangesAsync();
+            return AcceptedTutor;
         }
 
         #endregion
