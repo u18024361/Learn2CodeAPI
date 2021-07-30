@@ -1,4 +1,5 @@
-﻿using Learn2CodeAPI.Models.Admin;
+﻿using Learn2CodeAPI.Dtos.AdminDto;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
@@ -24,7 +25,11 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
 
         Task<IEnumerable<Tutor>> GetAllApplications();
 
+        Task<Tutor> Reject(Tutor tutor);
 
+        Task<Tutor> CreateTutor(AppUser userIdentity,CreateTutorDto tutor);
+
+        Task<IEnumerable<Tutor>> GetAllTutors();
 
 
 
