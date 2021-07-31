@@ -2,6 +2,7 @@
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -31,7 +32,34 @@ namespace Learn2CodeAPI.Data
                 .HasOne(bc => bc.Module)
                 .WithMany(c => c.StudentModule)
                 .HasForeignKey(bc => bc.ModuleId);
+
+            //create user
+            var appUser = new AppUser
+            {
+                Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
+                Email = "Admin@gmail.com",
+                UserName = "Admin",
+                NormalizedUserName ="ADMIN",
+                NormalizedEmail = "ADMIN@GMAIL.COM"
+            };
+            //set user password
+            PasswordHasher<AppUser> ph = new PasswordHasher<AppUser>();
+            appUser.PasswordHash = ph.HashPassword(appUser, "TutorDevOpsAdmin21!");
+
+            //seed user
+            modelBuilder.Entity<AppUser>().HasData(appUser);
+
+
+            modelBuilder.Entity<Admin>() .HasData(
+             new
+             {
+                 Id = 1,
+                 UserId = "02174cf0–9412–4cfe - afbf - 59f706d72cf6"
+             });
+
+
         }
+
 
         public DbSet<University> University { get; set; }
         public DbSet<Degree> Degrees { get; set; }

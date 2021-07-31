@@ -17,6 +17,7 @@ using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -67,6 +68,15 @@ namespace Learn2CodeAPI.Controllers
             StudentGenRepo = _StudentGenRepo;
             TutorGenRepo = _TutorGenRepo;
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
+        }
+
+        [HttpGet]
+        [Route("GetAdmin")]
+        public async Task<IActionResult> GetAdmin()
+        {
+            var Admin = await db.Admin.Include(zz => zz.Identity).FirstOrDefaultAsync();
+            return Ok(Admin);
+
         }
 
         #region University
