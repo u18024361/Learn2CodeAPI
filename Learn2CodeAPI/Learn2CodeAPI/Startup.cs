@@ -71,7 +71,7 @@ namespace Learn2CodeAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext context, UserManager<AppUser> userManeger)
         {
             if (env.IsDevelopment())
             {
@@ -83,6 +83,8 @@ namespace Learn2CodeAPI
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
+            SeedHelpers.SeedDb(context, userManeger);
             app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
