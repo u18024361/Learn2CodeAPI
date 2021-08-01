@@ -30,6 +30,6 @@ namespace Learn2CodeAPI.Models.Tutor
         [ForeignKey("TutorStatusId")]
         public TutorStatus TutorStatus { get; set; }
 
-
+        public ICollection<Message> message { get; set; }
     }
 }

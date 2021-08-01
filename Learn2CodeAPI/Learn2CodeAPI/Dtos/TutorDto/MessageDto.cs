@@ -12,9 +12,9 @@ namespace Learn2CodeAPI.Dtos.TutorDto
 
         public string ReceiverId { get; set; }
         public string MessageSent { get; set; }
-       
 
-        public string UserId { get; set; }
+        public int StudentId { get; set; }
+        public int TutorId { get; set; }
        
 
     }

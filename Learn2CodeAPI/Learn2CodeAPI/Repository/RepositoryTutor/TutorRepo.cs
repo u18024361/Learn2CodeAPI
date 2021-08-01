@@ -35,13 +35,10 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             var date = DateTime.Now;
             string timestring = date.ToString("g");
             newmessage.TimeStamp = timestring;
-           
-
-
+            newmessage.StudentId = model.StudentId;
+            newmessage.TutorId = model.TutorId;
             newmessage.SenderId = model.SenderId;
             newmessage.ReceiverId = model.ReceiverId;
-            newmessage.UserId = model.UserId;
-
             await db.Message.AddAsync(newmessage);
             await db.SaveChangesAsync();
             return newmessage;
@@ -55,13 +52,18 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return student;
         }
 
-        public async Task<IEnumerable<Student>> GetSentMessages(string UserId)
+        public async Task<IEnumerable<Message>> GetRecievedMessages(string UserId)
         {
-            var x = await db.Message.ToListAsync();
-            var messages = await db.Students.Include(zz => zz.Identity).ThenInclude(zz => zz.Message).ToListAsync();
-            List<Message> z = await db.Message.ToListAsync();
-          
-            return messages;
+            var message = await db.Message.Where(zz => zz.ReceiverId == UserId).Include(zz => zz.student).ThenInclude(zz => zz.Identity).ToListAsync();
+
+            return message;
+        }
+
+        public async Task<IEnumerable<Message>> GetSentMessages(string UserId)
+        {
+            var message = await db.Message.Where(zz => zz.SenderId == UserId).Include(zz => zz.student).ThenInclude(zz => zz.Identity).ToListAsync();
+
+            return message;
         }
 
         #endregion

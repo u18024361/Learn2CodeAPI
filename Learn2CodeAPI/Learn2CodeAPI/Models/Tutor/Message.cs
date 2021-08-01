@@ -16,9 +16,13 @@ namespace Learn2CodeAPI.Models.Tutor
         public string MessageSent { get; set; }
         public string TimeStamp { get; set; }
 
-        public string UserId { get; set; }
-        [ForeignKey("UserId")]
-        public AppUser Identity { get; set; }
+        public int TutorId { get; set; }
+        [ForeignKey("TutorId")]
+        public Tutor tutor { get; set; }
+
+        public int StudentId { get; set; }
+        [ForeignKey("StudentId")]
+        public Student.Student student { get; set; }
 
 
 

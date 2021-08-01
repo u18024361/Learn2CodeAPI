@@ -11,7 +11,8 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
     public interface ITutor
     {
         Task<IEnumerable<Student>> GetAllStudents();
-        Task<IEnumerable<Student>> GetSentMessages(string UserId);
+        Task<IEnumerable<Message>> GetSentMessages(string UserId);
         Task<Message> CreateMessage(MessageDto model);
+        Task<IEnumerable<Message>> GetRecievedMessages(string UserId);
     }
 }
