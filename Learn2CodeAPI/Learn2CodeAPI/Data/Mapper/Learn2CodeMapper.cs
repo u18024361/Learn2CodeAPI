@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.Dtos.StudentDto;
+using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
+using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
 using System;
 using System.Collections.Generic;
@@ -24,7 +26,9 @@ namespace Learn2CodeAPI.Data.Mapper
             CreateMap<CoursSubCategoryDto, CourseSubCategory>().ReverseMap();
             CreateMap<SessionContentCategoryDto, SessionContentCategory>().ReverseMap();
             CreateMap<TutorDto, Tutor>().ReverseMap();
-
+            CreateMap<SentMessageDto, Message>().ReverseMap();
+            
+            //CreateMap<(Student, Message), SentMessageDto>().ReverseMap();
 
         }
     }

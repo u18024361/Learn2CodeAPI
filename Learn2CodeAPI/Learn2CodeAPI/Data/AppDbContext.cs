@@ -77,5 +77,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<TutorStatus> TutorStatus { get; set; }
         public DbSet<File> File { get; set; }
 
+        public DbSet<Message> Message { get; set; }
+
     }
 }
