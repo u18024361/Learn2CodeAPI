@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210801085245_Message")]
-    partial class Message
+    [Migration("20210801172543_Messaging")]
+    partial class Messaging
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -240,15 +240,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ba43595e-4769-4412-bead-b73e4e57ef51",
+                            ConcurrencyStamp = "2928804a-3fe9-4f63-9ef3-1c1f20a32069",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEHsHacege3zZKk12iD2veQVeJvsKaDWr6V6JE7sRRN3RwETAizImMGn0UaUuLenZ7Q==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELZ+nY2cxiPB8pskNIwmzbK1/CzYy3iebcwKd70ZQs8B3Y5wa7pmUOchEEAssu4ZNA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "843cc9c7-6618-4b47-8e09-03a489f424c5",
+                            SecurityStamp = "09bacfae-8f8d-4252-a4a9-913ebe4a4b9e",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -333,15 +333,20 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<string>("SenderId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("TimeStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TutorId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TutorId");
 
                     b.ToTable("Message");
                 });
@@ -635,11 +640,21 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Message", b =>
                 {
-                    b.HasOne("Learn2CodeAPI.Models.Login.Identity.AppUser", "Identity")
-                        .WithMany("Message")
-                        .HasForeignKey("UserId");
+                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "student")
+                        .WithMany("message")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Identity");
+                    b.HasOne("Learn2CodeAPI.Models.Tutor.Tutor", "tutor")
+                        .WithMany("message")
+                        .HasForeignKey("TutorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("student");
+
+                    b.Navigation("tutor");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Tutor", b =>
@@ -743,14 +758,16 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Degree");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Login.Identity.AppUser", b =>
-                {
-                    b.Navigation("Message");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
                 {
+                    b.Navigation("message");
+
                     b.Navigation("StudentModule");
+                });
+
+            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Tutor", b =>
+                {
+                    b.Navigation("message");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.TutorStatus", b =>

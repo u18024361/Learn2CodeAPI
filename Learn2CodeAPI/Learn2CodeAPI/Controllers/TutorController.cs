@@ -37,7 +37,7 @@ namespace Learn2CodeAPI.Controllers
         //for creating a message
         [HttpGet]
         [Route("GetAllStudents")]
-        public async Task<IActionResult> GetAllDegrees()
+        public async Task<IActionResult> GetAllStudents()
         {
 
             var students = await TutorRepo.GetAllStudents();
@@ -60,8 +60,18 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetSentMessages(string UserId)
         {
 
-            var students = await TutorRepo.GetSentMessages(UserId);
-            return Ok(students);
+            var messages = await TutorRepo.GetSentMessages(UserId);
+            return Ok(messages);
+
+        }
+
+        [HttpGet]
+        [Route("GetRecievedMessages/{UserId}")]
+        public async Task<IActionResult> GetRecievedMessages(string UserId)
+        {
+
+            var messages = await TutorRepo.GetRecievedMessages(UserId);
+            return Ok(messages);
 
         }
 
