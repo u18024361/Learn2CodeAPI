@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210802183700_fixx")]
+    partial class fixx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -384,15 +386,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "645f704f-5c22-4c2d-bd30-d1f69c3fbd51",
+                            ConcurrencyStamp = "2e256b7f-b727-4ff6-97be-bfdc7586611e",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAELJ3r9cqdVuGrw2PEVH6nlXFag5Gi+gEHx9cVXmUrXpuYpV5LMIvV2BeOoA3dgN1sQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEO68odF432h31AmI/7vFpXqedMZBuKlPCYlABbfudyd94WnfUjPp7iOegMZA8NE4ZA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c11b69c-273d-4ccb-9558-3eb17fae87e8",
+                            SecurityStamp = "e4e0e17d-8bc3-4fbc-ae82-fb8e673319c2",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });

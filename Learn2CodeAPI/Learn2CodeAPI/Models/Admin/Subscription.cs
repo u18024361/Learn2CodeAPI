@@ -7,17 +7,19 @@ using System.Threading.Tasks;
 
 namespace Learn2CodeAPI.Models.Admin
 {
-    public class CourseFolder : BaseEntity
+    public class Subscription : BaseEntity
     {
-        public CourseFolder() { }
-        public string CourseFolderName { get; set; }
-
         public int AdminId { get; set; }
 
         [ForeignKey("AdminId")]
         public Admin admin { get; set; }
 
-       
+        public string SubscriptionName { get; set; }
 
+        public int Duration { get; set; }
+
+        public double price { get; set; }
+
+        public ICollection<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
     }
 }

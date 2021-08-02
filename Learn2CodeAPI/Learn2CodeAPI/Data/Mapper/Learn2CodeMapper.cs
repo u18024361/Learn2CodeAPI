@@ -27,7 +27,8 @@ namespace Learn2CodeAPI.Data.Mapper
             CreateMap<SessionContentCategoryDto, SessionContentCategory>().ReverseMap();
             CreateMap<TutorDto, Tutor>().ReverseMap();
             CreateMap<SentMessageDto, Message>().ReverseMap();
-            
+            CreateMap<SubscriptionDto, Subscription>().ReverseMap();
+
             //CreateMap<(Student, Message), SentMessageDto>().ReverseMap();
 
         }

@@ -18,6 +18,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
         Task<Degree> GetByDegreeName(string Name);
 
         Task<Module> GetByModuleName(string Name);
+        Task<Module> CreateModule(Module module);
 
         Task<CourseFolder> GetByCourseFolderName(string Name);
 
@@ -31,7 +32,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
 
         Task<IEnumerable<Tutor>> GetAllTutors();
 
-
+        Task<Subscription> CreateSubscription( SubscriptionDto subscription);
 
     }
 }
