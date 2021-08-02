@@ -78,6 +78,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<File> File { get; set; }
 
         public DbSet<Message> Message { get; set; }
+        public DbSet<CourseContent> CourseContent { get; set; }
 
     }
 }

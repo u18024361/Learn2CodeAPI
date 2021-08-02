@@ -18,5 +18,7 @@ namespace Learn2CodeAPI.Models.Admin
 
         [ForeignKey("CourseFolderId")]
         public CourseFolder courseFolder{ get; set; }
+
+        public ICollection<CourseContent> CourseContent { get; set; }
     }
 }
