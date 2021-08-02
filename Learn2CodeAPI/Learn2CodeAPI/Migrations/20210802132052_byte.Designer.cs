@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210802132052_byte")]
+    partial class @byte
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,9 +72,6 @@ namespace Learn2CodeAPI.Migrations
 
                     b.Property<int>("CourseSubCategoryId")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("DataFiles")
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Filepath")
                         .HasColumnType("nvarchar(max)");
@@ -281,15 +280,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1ca836d3-53e1-4669-acf5-bde2690092b3",
+                            ConcurrencyStamp = "e39d6c83-6cdf-4ea1-9564-33153381d417",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEBPlptz73t1n/fVo8IYDFmVe/vuuH5UCH3lJbj4dpUvWNKX+j/ap5QBN/nD91n61Ug==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFhpdUimArmEQSMpH3swgHsh/37bjUTURN/dXPkFRKTLtnsqDwXBmK6FG4h7JEtydA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "51e534d8-4bd5-48c6-af72-b53459ce8174",
+                            SecurityStamp = "8720024c-87d0-4543-91a2-d519dcbd6f76",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });

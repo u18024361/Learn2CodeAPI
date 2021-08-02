@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -26,7 +27,7 @@ namespace Learn2CodeAPI.Controllers
     public class AdminController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
-        private  IMapper mapper;
+        private IMapper mapper;
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
@@ -52,11 +53,11 @@ namespace Learn2CodeAPI.Controllers
             AppDbContext _db
 
             )
-        
 
-        
+
+
         {
-            _userManager = userManager; 
+            _userManager = userManager;
             db = _db;
             CourseSubCategoryGenRepo = _CourseSubCategoryGenRepo;
             universityGenRepo = _universityGenRepo;
@@ -83,9 +84,9 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpGet]
         [Route("GetUniversitybyId/{UniversityId}")]
-        public async Task<IActionResult>GetUniversitybyId(int UniversityId)
+        public async Task<IActionResult> GetUniversitybyId(int UniversityId)
         {
-            var entity  = await universityGenRepo.Get(UniversityId);
+            var entity = await universityGenRepo.Get(UniversityId);
 
             return Ok(entity);
         }
@@ -132,13 +133,13 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "university created";
                 return Ok(result);
             }
-            catch 
+            catch
             {
 
                 result.message = "Something went wrong creating the university";
                 return BadRequest(result.message);
             }
-          
+
         }
 
         [HttpPut]
@@ -165,19 +166,19 @@ namespace Learn2CodeAPI.Controllers
                 return Ok(result);
 
             }
-            catch  
+            catch
             {
                 result.message = "Something went wrong updating the university";
                 return BadRequest(result.message);
 
             }
-           
 
 
-            
+
+
         }
 
-       
+
 
         [HttpDelete]
         [Route("DeleteUniversity/{UniversityId}")]
@@ -195,14 +196,14 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "University deleted";
                 return Ok(result);
             }
-            catch 
+            catch
             {
 
                 result.message = "Something went wrong deleting the university";
                 return BadRequest(result.message);
             }
 
-           
+
         }
 
         #endregion
@@ -214,7 +215,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetDegreebyId(int DegreeId)
         {
             var entity = await DegreeGenRepo.Get(DegreeId);
-           
+
 
             return Ok(entity);
         }
@@ -306,8 +307,8 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
-      
-        
+
+
 
         [HttpDelete]
         [Route("DeleteDegree/{DegreeId}")]
@@ -331,7 +332,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong deleting the degree";
                 return BadRequest(result.message);
             }
-           
+
         }
 
         #endregion
@@ -352,7 +353,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetModulebyId(int ModuleId)
         {
             var entity = await ModuleGenRepo.Get(ModuleId);
-           
+
 
             return Ok(entity);
         }
@@ -434,7 +435,7 @@ namespace Learn2CodeAPI.Controllers
             }
         }
 
-       
+
 
         [HttpDelete]
         [Route("DeleteModule/{ModuleId}")]
@@ -458,7 +459,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong deleting the module";
                 return BadRequest(result.message);
             }
-          
+
         }
 
         #endregion
@@ -494,7 +495,7 @@ namespace Learn2CodeAPI.Controllers
 
                 result.message = "something went wrong creating the course folder";
                 return BadRequest(result.message);
-            } 
+            }
 
         }
 
@@ -571,8 +572,8 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong deleting the module";
                 return BadRequest(result.message);
             }
-            
-          
+
+
         }
 
 
@@ -589,11 +590,12 @@ namespace Learn2CodeAPI.Controllers
         }
 
 
-        
+
         //userid is in the aspnet users table
         [HttpDelete]
         [Route("DeleteStudent/{userId}")]
-        public IActionResult search(string userId) {
+        public IActionResult search(string userId)
+        {
 
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
@@ -615,8 +617,8 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "Something went wrong deleting the student";
                 return BadRequest(result.message);
             }
-           
-            
+
+
         }
 
 
@@ -662,7 +664,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong creating the category";
                 return BadRequest(result.message);
             }
-           
+
 
         }
 
@@ -696,7 +698,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong updating the category";
                 return BadRequest(result.message);
             }
-            
+
         }
 
         [HttpDelete]
@@ -721,7 +723,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong deleting the category";
                 return BadRequest(result.message);
             }
-           
+
         }
         #endregion
 
@@ -735,7 +737,7 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
-        
+
         [HttpPost]
         [Route("CreateCourseSubCategory")]
         public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
@@ -847,7 +849,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("RejectTutor")]
         public async Task<IActionResult> RejectTutor([FromBody] TutorDto dto)
         {
-             dynamic result = new ExpandoObject();
+            dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -866,7 +868,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong while rejectin the tutor";
                 return BadRequest(result.message);
             }
-          
+
         }
 
         [HttpPut]
@@ -901,7 +903,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "something went wrong while creating the tutor";
                 return BadRequest(result.message);
             }
-           
+
 
         }
 
@@ -910,7 +912,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetAllTutors")]
         public async Task<IActionResult> GetAllTutors()
         {
-            var Tutors= await AdminRepo.GetAllTutors();
+            var Tutors = await AdminRepo.GetAllTutors();
             return Ok(Tutors);
 
         }
@@ -948,5 +950,48 @@ namespace Learn2CodeAPI.Controllers
 
         #endregion
 
+        #region coursecontent
+        [HttpPost]
+        [Route("CreatContent")]
+        public IActionResult Index([FromForm(Name = "file")] IFormFile files)
+        {
+            //Getting FileName
+            var fileName = Path.GetFileName(files.FileName);
+            //Getting file Extension
+            var fileExtension = Path.GetExtension(fileName);
+            // concatenating  FileName + FileExtension
+            var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
+            if (files != null)
+            {
+                if (files.Length > 0)
+                {
+                 
+
+                    var objfiles = new CourseContent()
+                    {
+                        Id = 0,
+                        ContentTypeId = 1,
+                        CourseSubCategoryId = 6,
+                        Filepath = "",
+                        //FileType = fileExtension,
+                        //CreatedOn = DateTime.Now
+                    };
+
+                    using (var target = new MemoryStream())
+                    {
+                        files.CopyTo(target);
+                        objfiles.DataFiles = target.ToArray();
+                    }
+
+                    db.CourseContent.Add(objfiles);
+                    db.SaveChanges();
+
+                }
+            }
+            return Ok();
+        }
     }
+
+    #endregion
 }
+
