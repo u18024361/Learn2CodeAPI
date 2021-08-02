@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210802174628_fix")]
+    partial class fix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -210,57 +212,6 @@ namespace Learn2CodeAPI.Migrations
                     b.ToTable("SessionType");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Subscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AdminId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
-
-                    b.Property<string>("SubscriptionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("price")
-                        .HasColumnType("float");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
-
-                    b.ToTable("Subscription");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SubscriptionTutorSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubscriptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TutorSessionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubscriptionId");
-
-                    b.HasIndex("TutorSessionId");
-
-                    b.ToTable("SubscriptionTutorSession");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.TutorSession", b =>
                 {
                     b.Property<int>("Id")
@@ -384,15 +335,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "645f704f-5c22-4c2d-bd30-d1f69c3fbd51",
+                            ConcurrencyStamp = "9858e05d-7a15-43aa-b3ed-5fbd9ace631f",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAELJ3r9cqdVuGrw2PEVH6nlXFag5Gi+gEHx9cVXmUrXpuYpV5LMIvV2BeOoA3dgN1sQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEB0xy9ZdUXVspxfMevF3HqeaEXXBP76xIhY3aQK994KD4hhPsh9W2c1gD1AbwkHm4g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c11b69c-273d-4ccb-9558-3eb17fae87e8",
+                            SecurityStamp = "e1e8c0d6-fc3d-4c58-83bf-ddd1ed47babb",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -769,36 +720,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("admin");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Subscription", b =>
-                {
-                    b.HasOne("Learn2CodeAPI.Models.Admin.Admin", "admin")
-                        .WithMany()
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("admin");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SubscriptionTutorSession", b =>
-                {
-                    b.HasOne("Learn2CodeAPI.Models.Admin.Subscription", "Subscription")
-                        .WithMany("SubscriptionTutorSession")
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learn2CodeAPI.Models.Admin.TutorSession", "TutorSession")
-                        .WithMany("SubscriptionTutorSession")
-                        .HasForeignKey("TutorSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Subscription");
-
-                    b.Navigation("TutorSession");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.TutorSession", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Admin.SessionType", "SessionType")
@@ -984,15 +905,8 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("TutorSession");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.Subscription", b =>
-                {
-                    b.Navigation("SubscriptionTutorSession");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.TutorSession", b =>
                 {
-                    b.Navigation("SubscriptionTutorSession");
-
                     b.Navigation("TutorSessionModule");
                 });
 

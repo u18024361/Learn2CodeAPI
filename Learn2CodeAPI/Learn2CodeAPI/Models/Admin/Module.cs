@@ -15,6 +15,8 @@ namespace Learn2CodeAPI.Models.Admin
 
         public ICollection<StudentModule> StudentModule { get; set; }
 
+        public ICollection<TutorSessionModule> TutorSessionModule { get; set; }
+
         public int DegreeId { get; set; }
 
         [ForeignKey("DegreeId")]

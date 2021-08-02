@@ -433,7 +433,9 @@ C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcore
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.dll
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.pdb
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.genruntimeconfig.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.csprojAssemblyReference.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.Manifest.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.xml
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.MvcApplicationPartsAssemblyInfo.cache
@@ -461,7 +463,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.CSharp.Workspaces.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.Razor.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Abstractions.dll
@@ -534,7 +535,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\ru\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\cs\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\de\Microsoft.CodeAnalysis.CSharp.Workspaces.resources.dll
@@ -566,6 +566,7 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.pdb
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.pdb
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.pdb

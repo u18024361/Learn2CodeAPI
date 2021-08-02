@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210802181518_Subscription")]
+    partial class Subscription
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,11 +222,11 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("AdminId")
                         .HasColumnType("int");
 
+                    b.Property<string>("DescriptionName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Duration")
                         .HasColumnType("int");
-
-                    b.Property<string>("SubscriptionName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("price")
                         .HasColumnType("float");
@@ -384,15 +386,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "645f704f-5c22-4c2d-bd30-d1f69c3fbd51",
+                            ConcurrencyStamp = "b7591b0c-0184-4c0f-b32a-656d0f531a18",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAELJ3r9cqdVuGrw2PEVH6nlXFag5Gi+gEHx9cVXmUrXpuYpV5LMIvV2BeOoA3dgN1sQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEBd3+v7WAvIisILbuzJE3qolySBtXxzxyY1LfUbaU2DXh3hlVsDQlfCscyW3qHD3/g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c11b69c-273d-4ccb-9558-3eb17fae87e8",
+                            SecurityStamp = "69cadb07-871b-4805-acfa-ea0a996661fb",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });

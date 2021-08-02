@@ -35,6 +35,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<CourseSubCategory> CourseSubCategoryGenRepo;
         private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
+        private IGenRepository<Subscription> SubscriptionGenRepo;
         private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
         private IAdmin AdminRepo;
@@ -49,6 +50,7 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Student> _StudentGenRepo,
              IGenRepository<Tutor> _TutorGenRepo,
             IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+            IGenRepository<Subscription> _SubscriptionGenRepo,
             IAdmin _AdminRepo,
             AppDbContext _db
 
@@ -69,6 +71,7 @@ namespace Learn2CodeAPI.Controllers
             StudentGenRepo = _StudentGenRepo;
             TutorGenRepo = _TutorGenRepo;
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
+            SubscriptionGenRepo = _SubscriptionGenRepo;
         }
 
         [HttpGet]
@@ -388,7 +391,7 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
                 Module entity = mapper.Map<Module>(dto);
-                var data = await ModuleGenRepo.Add(entity);
+                var data = await AdminRepo.CreateModule(entity);
                 result.data = data;
                 result.message = "Module created";
                 return Ok(result);
@@ -581,7 +584,7 @@ namespace Learn2CodeAPI.Controllers
 
         #region Student
         [HttpGet]
-        [Route("GeAllStudents")]
+        [Route("GetAllStudents")]
         public async Task<IActionResult> GeAllStudents()
         {
             var entity = await AdminRepo.GetAllStudents();
@@ -965,7 +968,7 @@ namespace Learn2CodeAPI.Controllers
             {
                 if (files.Length > 0)
                 {
-                 
+
 
                     var objfiles = new CourseContent()
                     {
@@ -990,8 +993,56 @@ namespace Learn2CodeAPI.Controllers
             }
             return Ok();
         }
+        #endregion
+        #region Subscription
+
+        [HttpGet]
+        [Route("GetAllSubscriptions")]
+        public async Task<IActionResult> GetAllSubscriptions()
+        {
+            var Subscriptions = await SubscriptionGenRepo.GetAll();
+            return Ok(Subscriptions);
+
+        }
+
+        [HttpPost]
+        [Route("CreateSubscription")]
+        public async Task<IActionResult> CreateSubscription([FromBody] SubscriptionDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var check = db.Subscription.Where(zz => zz.SubscriptionName == dto.SubscriptionName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Subscription already exists";
+                    return BadRequest(result.message);
+                }
+               
+                var data = await AdminRepo.CreateSubscription(dto);
+                result.data = data;
+                result.message = "Subscription created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong creating the Subscription";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        #endregion
     }
 
-    #endregion
+   
+
+
 }
 

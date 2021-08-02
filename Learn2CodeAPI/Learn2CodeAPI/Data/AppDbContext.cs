@@ -33,6 +33,34 @@ namespace Learn2CodeAPI.Data
                 .WithMany(c => c.StudentModule)
                 .HasForeignKey(bc => bc.ModuleId);
 
+            base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
+            modelBuilder.Entity<TutorSessionModule>()
+                .HasOne(bc => bc.TutorSession)
+                .WithMany(b => b.TutorSessionModule)
+                .HasForeignKey(bc => bc.TutorSessionId);
+            modelBuilder.Entity<TutorSessionModule>()
+                .HasOne(bc => bc.Module)
+                .WithMany(c => c.TutorSessionModule)
+                .HasForeignKey(bc => bc.ModuleId);
+
+            base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
+            modelBuilder.Entity<SubscriptionTutorSession>()
+                .HasOne(bc => bc.TutorSession)
+                .WithMany(b => b.SubscriptionTutorSession)
+                .HasForeignKey(bc => bc.TutorSessionId);
+            modelBuilder.Entity<SubscriptionTutorSession>()
+                .HasOne(bc => bc.Subscription)
+                .WithMany(c => c.SubscriptionTutorSession)
+                .HasForeignKey(bc => bc.SubscriptionId);
+
+
+
             //create user
             var appUser = new AppUser
             {
@@ -79,6 +107,14 @@ namespace Learn2CodeAPI.Data
 
         public DbSet<Message> Message { get; set; }
         public DbSet<CourseContent> CourseContent { get; set; }
+
+        public DbSet<TutorSessionModule> TutorSessionModule { get; set; }
+        public DbSet<TutorSession> TutorSession { get; set; }
+        public DbSet<SessionType> SessionType { get; set; }
+
+        public DbSet<Subscription> Subscription { get; set; }
+        public DbSet<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
+
 
     }
 }

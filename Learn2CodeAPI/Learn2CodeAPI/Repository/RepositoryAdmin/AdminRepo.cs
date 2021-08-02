@@ -1,4 +1,5 @@
-﻿using Learn2CodeAPI.Data;
+﻿using AutoMapper;
+using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.AdminDto;
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.Models.Admin;
@@ -16,11 +17,13 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
 {
     public class AdminRepo : IAdmin
     {
+        private IMapper mapper;
         private readonly AppDbContext db;
         private readonly UserManager<AppUser> _userManager;
 
-        public AdminRepo(AppDbContext _db, UserManager<AppUser> userManager)
+        public AdminRepo(AppDbContext _db, UserManager<AppUser> userManager, IMapper _mapper)
         {
+            mapper = _mapper;
             db = _db;
             _userManager = userManager;
 
@@ -65,6 +68,26 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             return modules;
         }
 
+        public async Task<Module> CreateModule(Module module)
+        {
+            await db.Modules.AddAsync(module);
+            await db.SaveChangesAsync();
+
+            int idTrue = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == true).Select(zz => zz.Id).FirstOrDefaultAsync();
+            int idFalse = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == false).Select(zz => zz.Id).FirstOrDefaultAsync(); ;
+
+            TutorSessionModule TSM = new TutorSessionModule();
+            TSM.ModuleId = module.Id;
+            TSM.TutorSessionId = idTrue;
+            TutorSessionModule TM = new TutorSessionModule();
+            TM.ModuleId = module.Id;
+            TM.TutorSessionId = idFalse;
+            await db.TutorSessionModule.AddAsync(TSM);
+            await db.TutorSessionModule.AddAsync(TM);
+            await db.SaveChangesAsync();
+            return module;
+
+        }
 
         #endregion
 
@@ -82,7 +105,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
         public async Task<IEnumerable<Student>> GetAllStudents()
         {
 
-            var Students = await db.Students.Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Module.Degree.University).ToListAsync(); 
+            var Students = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Module.Degree.University).ToListAsync(); 
             return Students;
         }
 
@@ -131,10 +154,30 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             return AcceptedTutor;
         }
 
+
+
+
+
         #endregion
 
 
+        #region Subscription
+        public async Task<Subscription> CreateSubscription(SubscriptionDto subscription)
+        {
+            Subscription entity = mapper.Map<Subscription>(subscription);
+            await db.Subscription.AddAsync(entity);
+            await db.SaveChangesAsync();
 
+            SubscriptionTutorSession subscriptionTutorSession = new SubscriptionTutorSession();
+            subscriptionTutorSession.SubscriptionId = entity.Id;
+            subscriptionTutorSession.TutorSessionId = subscription.TutorSessionId;
+            subscriptionTutorSession.Quantity = subscription.Quantity;
+            await db.SubscriptionTutorSession.AddAsync(subscriptionTutorSession);
+            await db.SaveChangesAsync();
+
+            return entity;
+        }
+        #endregion
 
 
 
