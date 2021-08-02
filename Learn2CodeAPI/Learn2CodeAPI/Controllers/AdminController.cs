@@ -729,10 +729,10 @@ namespace Learn2CodeAPI.Controllers
 
         #region CourseContentCategory
         [HttpGet]
-        [Route("GetAllCourseSubCategory")]
-        public async Task<IActionResult> GetAllCourseSubCategory()
+        [Route("GetAllCourseSubCategory/{CourseFolderId}")]
+        public async Task<IActionResult> GetAllCourseSubCategory(int CourseFolderId)
         {
-            var subcategories = await CourseSubCategoryGenRepo.GetAll();
+            var subcategories = await db.courseSubCategory.Where(zz => zz.CourseFolderId == CourseFolderId).ToListAsync();
             return Ok(subcategories);
 
         }
