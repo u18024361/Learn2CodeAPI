@@ -31,5 +31,7 @@ namespace Learn2CodeAPI.Models.Tutor
         public TutorStatus TutorStatus { get; set; }
 
         public ICollection<Message> message { get; set; }
+
+        public ICollection<TutorModule> TutorModule { get; set; }
     }
 }

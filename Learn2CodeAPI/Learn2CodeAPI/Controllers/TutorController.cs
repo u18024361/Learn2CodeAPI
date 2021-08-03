@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -8,8 +9,10 @@ using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.Generic;
 using Learn2CodeAPI.IRepository.IRepositoryTutor;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,15 +26,19 @@ namespace Learn2CodeAPI.Controllers
         private IMapper mapper;
         private ITutor TutorRepo;
         private IGenRepository<Student> StudentGenRepo;
+        private IGenRepository<Module> ModuleRepo;
         private IGenRepository<Message> MessageGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
         private readonly AppDbContext db;
 
         public TutorController(
             IMapper _mapper,
-            ITutor _TutorRepo, 
-            IGenRepository<Student> _StudentGenRepo, 
+            ITutor _TutorRepo,
+            IWebHostEnvironment hostEnvironment,
+            IGenRepository<Student> _StudentGenRepo,
+            IGenRepository<Module> _ModuleRepo,
             IGenRepository<Message> _Message,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
             AppDbContext _db)
@@ -43,8 +50,11 @@ namespace Learn2CodeAPI.Controllers
             StudentGenRepo = _StudentGenRepo;
             MessageGenRepo = _Message;
             ResourceCategoryGenRepo = _ResourceCategoryGenRepo;
+            webHostEnvironment = hostEnvironment;
+            ModuleRepo = _ModuleRepo;
         }
 
+        #region ResourceCategory
         [HttpGet]
         [Route("GetResourceCategorybyId/{ResourceCategoryId}")]
         public async Task<IActionResult> GetResourceCategorybyId(int ResourceCategoryId)
@@ -67,7 +77,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetAllResourceCategories")]
         public async Task<IActionResult> GetAllResourceCategories()
         {
-            var ResourceCat= await ResourceCategoryGenRepo.GetAll();
+            var ResourceCat = await ResourceCategoryGenRepo.GetAll();
             return Ok(ResourceCat);
 
         }
@@ -168,6 +178,9 @@ namespace Learn2CodeAPI.Controllers
 
 
         }
+        #endregion
+
+
 
         #region Messages
         //for creating a message
@@ -274,6 +287,102 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
         #region Application
+        [HttpGet]
+        [Route("GetAllModules")]
+        public async Task<IActionResult> GetAllModules()
+        {
+
+            var students = await ModuleRepo.GetAll();
+            return Ok(students);
+
+        }
+
+        [HttpPost]
+        [Route("TutorApplication")]
+        public async Task<IActionResult> TutorApplication(TutorDtoo model)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var check = db.Tutor.Where(zz => zz.TutorEmail == model.TutorEmail).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Application already exists";
+                    return BadRequest(result.message);
+                }
+
+                string uniqueFileName = UploadedFile(model);
+                Models.Tutor.File file = new Models.Tutor.File();
+                file.FileName = "test";
+                await db.File.AddAsync(file);
+                await db.SaveChangesAsync();
+                int idpending = await db.TutorStatus.Where(zz => zz.TutorStatusDesc == "Applied").Select(zz => zz.Id).FirstOrDefaultAsync();
+                Tutor tutor = new Tutor
+                {
+                    TutorName = model.TutorName,
+                    TutorSurname = model.TutorSurname,
+                    TutorAbout = model.TutorAbout,
+                    TutorCell = model.TutorCell,
+                    TutorEmail = model.TutorEmail,
+                    FileId = file.Id,
+                    TutorStatusId = idpending,
+                    TutorPhoto = uniqueFileName,
+                };
+                await db.Tutor.AddAsync(tutor);
+                await db.SaveChangesAsync();
+
+                TutorModule tutorModule = new TutorModule();
+                tutorModule.TutorId = tutor.Id;
+                tutorModule.ModuleId = model.ModuleId;
+                await db.TutorModule.AddAsync(tutorModule);
+                await db.SaveChangesAsync();
+
+                result.data = tutor;
+                result.message = "Application sent";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong creating the application";
+                return BadRequest(result.message);
+            }
+
+        }
+
+
+
+       
+
+        private string UploadedFile(TutorDtoo model)
+        {
+            string uniqueFileName = null;
+
+            if (model.TutorPhoto != null)
+            {
+                string uploadsFolder = Path.Combine(webHostEnvironment.WebRootPath, "Images");
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + model.TutorPhoto.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    model.TutorPhoto.CopyTo(fileStream);
+                }
+            }
+            return uniqueFileName;
+        }
         #endregion
+
+
+        
+
     }
+
 }
+
+
+

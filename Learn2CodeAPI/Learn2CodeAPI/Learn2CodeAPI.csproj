@@ -9,6 +9,7 @@
     <Folder Include="Dtos\ReportDto\" />
     <Folder Include="IRepository\IRepositoryReport\" />
     <Folder Include="Models\Report\" />
+    <Folder Include="Images\" />
     <Folder Include="Repository\RepositoryReport\" />
   </ItemGroup>
 

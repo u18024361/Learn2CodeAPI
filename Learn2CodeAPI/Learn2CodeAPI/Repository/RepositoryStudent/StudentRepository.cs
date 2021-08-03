@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.StudentDto;
+using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -85,5 +87,41 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             await db.SaveChangesAsync();
             return student;
         }
+
+        #region messages
+        public async Task<Message> CreateMessage(MessageDto model)
+        {
+            Message newmessage = new Message();
+            newmessage.MessageSent = model.MessageSent;
+            var date = DateTime.Now;
+            string timestring = date.ToString("g");
+            newmessage.TimeStamp = timestring;
+            newmessage.StudentId = model.StudentId;
+            newmessage.TutorId = model.TutorId;
+            newmessage.SenderId = model.SenderId;
+            newmessage.ReceiverId = model.ReceiverId;
+            await db.Message.AddAsync(newmessage);
+            await db.SaveChangesAsync();
+            return newmessage;
+
+        }
+
+        public async Task<IEnumerable<Message>> GetRecievedMessages(string UserId)
+        {
+            var message = await db.Message.Where(zz => zz.ReceiverId == UserId).Include(zz => zz.tutor).ThenInclude(zz => zz.Identity).ToListAsync();
+
+            return message;
+        }
+
+        public async Task<IEnumerable<Message>> GetSentMessages(string UserId)
+        {
+            var message = await db.Message.Where(zz => zz.SenderId == UserId).Include(zz => zz.tutor).ThenInclude(zz => zz.Identity).ToListAsync();
+
+            return message;
+        }
+
+
+
+        #endregion
     }
 }

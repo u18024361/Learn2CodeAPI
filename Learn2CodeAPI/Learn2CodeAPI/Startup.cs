@@ -88,6 +88,7 @@ namespace Learn2CodeAPI
             app.UseAuthorization();
             app.UseAuthentication();
             SeedHelpers.SeedDb(context, userManeger);
+            app.UseStaticFiles();
             app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
