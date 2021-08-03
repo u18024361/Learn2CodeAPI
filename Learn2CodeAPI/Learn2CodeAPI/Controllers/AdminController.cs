@@ -998,10 +998,19 @@ namespace Learn2CodeAPI.Controllers
         #region Subscription
 
         [HttpGet]
+        [Route("GetAllTutorSessions")]
+        public async Task<IActionResult> GetAllTutorSessions()
+        {
+            var GetAllTutorSessions = await db.TutorSession.Include(zz => zz.SessionType).ToListAsync();
+            return Ok(GetAllTutorSessions);
+
+        }
+
+        [HttpGet]
         [Route("GetAllSubscriptions")]
         public async Task<IActionResult> GetAllSubscriptions()
         {
-            var Subscriptions = await SubscriptionGenRepo.GetAll();
+            var Subscriptions = await db.Subscription.Include(zz => zz.SubscriptionTutorSession).ToListAsync();
             return Ok(Subscriptions);
 
         }
@@ -1036,6 +1045,61 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "Something went wrong creating the Subscription";
                 return BadRequest(result.message);
             }
+
+        }
+
+        [HttpPut]
+        [Route("EditSubscription")]
+        public async Task<IActionResult> EditSubscription([FromBody]  SubscriptionDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+            
+               
+                var data = await AdminRepo.UpdateSubscription(dto);
+                result.data = data;
+                result.message = "Subscription updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the Subscription";
+                return BadRequest(result.message);
+
+            }
+
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteSubscription/{SubscriptionId}")]
+        public async Task<IActionResult> DeleteSubscription(int SubscriptionId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await SubscriptionGenRepo.Delete(SubscriptionId);
+                result.data = data;
+                result.message = "Subscription deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the Subscription";
+                return BadRequest(result.message);
+            }
+
 
         }
 
