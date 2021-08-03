@@ -34,6 +34,9 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return resourcecategory;
         }
 
+
+
+        #region Message
         public async Task<Message> CreateMessage(MessageDto model)
         {
             Message newmessage = new Message();
@@ -51,7 +54,6 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
 
         }
 
-        #region Message
         public async Task<IEnumerable<Student>> GetAllStudents()
         {
             var student = await db.Students.Include(zz => zz.Identity).ToListAsync();

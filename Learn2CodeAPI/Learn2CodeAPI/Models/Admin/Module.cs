@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 
 namespace Learn2CodeAPI.Models.Admin
 {
@@ -22,6 +23,6 @@ namespace Learn2CodeAPI.Models.Admin
         [ForeignKey("DegreeId")]
         public Degree Degree { get; set; }
 
-        
+        public ICollection<TutorModule> TutorModule { get; set; }
     }
 }
