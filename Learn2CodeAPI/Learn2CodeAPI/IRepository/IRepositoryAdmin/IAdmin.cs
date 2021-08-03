@@ -33,6 +33,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
         Task<IEnumerable<Tutor>> GetAllTutors();
 
         Task<Subscription> CreateSubscription( SubscriptionDto subscription);
+        Task<Subscription> UpdateSubscription(SubscriptionDto subscription);
 
     }
 }

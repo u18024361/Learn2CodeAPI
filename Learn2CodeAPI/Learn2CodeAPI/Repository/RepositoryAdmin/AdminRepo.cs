@@ -179,6 +179,19 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
 
             return entity;
         }
+
+        public async Task<Subscription> UpdateSubscription(SubscriptionDto subscription)
+        {
+            Subscription entity = mapper.Map<Subscription>(subscription);
+            db.Entry(entity).State = EntityState.Modified;
+            await db.SaveChangesAsync();
+
+            var tutorsession = await db.SubscriptionTutorSession.Where(zz => zz.SubscriptionId == subscription.Id).FirstOrDefaultAsync();
+            tutorsession.TutorSessionId = subscription.TutorSessionId;
+            tutorsession.Quantity = subscription.Quantity;
+            await db.SaveChangesAsync();
+            return entity;
+        }
         #endregion
 
 
