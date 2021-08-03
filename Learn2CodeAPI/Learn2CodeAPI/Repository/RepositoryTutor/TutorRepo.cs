@@ -28,6 +28,12 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
 
         }
 
+        public async Task<ResourceCategory> GetByName(string Name)
+        {
+            var resourcecategory = await db.ResourceCategory.Where(zz => zz.ResourceCategoryName == Name).FirstOrDefaultAsync(); ;
+            return resourcecategory;
+        }
+
         public async Task<Message> CreateMessage(MessageDto model)
         {
             Message newmessage = new Message();

@@ -14,5 +14,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
         Task<IEnumerable<Message>> GetSentMessages(string UserId);
         Task<Message> CreateMessage(MessageDto model);
         Task<IEnumerable<Message>> GetRecievedMessages(string UserId);
+        Task<ResourceCategory> GetByName(string name);
+
     }
 }
