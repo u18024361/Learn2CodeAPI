@@ -133,7 +133,11 @@ namespace Learn2CodeAPI.Controllers
                 return BadRequest(result.message);
             }
 
-            #endregion
+           
         }
+        #endregion
+
+        #region Application
+        #endregion
     }
 }

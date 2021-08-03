@@ -130,8 +130,9 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
 
         public async Task<Tutor> Reject(Tutor tutor)
         {
+            int idreject = await db.TutorStatus.Where(zz => zz.TutorStatusDesc == "Rejected").Select(zz => zz.Id).FirstOrDefaultAsync();
             var tutorreject = await db.Tutor.Where(zz => zz.Id == tutor.Id).FirstOrDefaultAsync();
-            tutorreject.TutorStatusId =3;
+            tutorreject.TutorStatusId = idreject;
            await db.SaveChangesAsync();
            return tutorreject;
 
@@ -146,10 +147,11 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             {
                 return null;
             }
+            int idAccepted = await db.TutorStatus.Where(zz => zz.TutorStatusDesc == "Accepted").Select(zz => zz.Id).FirstOrDefaultAsync();
 
             var AcceptedTutor = await db.Tutor.Where(zz => zz.Id == tutor.Id).FirstOrDefaultAsync();
             AcceptedTutor.UserId = userIdentity.Id;
-            AcceptedTutor.TutorStatusId = 2;
+            AcceptedTutor.TutorStatusId = idAccepted;
            await db.SaveChangesAsync();
             return AcceptedTutor;
         }
