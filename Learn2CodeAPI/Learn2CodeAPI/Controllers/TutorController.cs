@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.Generic;
@@ -19,19 +20,154 @@ namespace Learn2CodeAPI.Controllers
     [ApiController]
     public class TutorController : ControllerBase
     {
+        private IMapper mapper;
         private ITutor TutorRepo;
         private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
+
         private readonly AppDbContext db;
 
-        public TutorController(ITutor _TutorRepo, IGenRepository<Student> _StudentGenRepo, IGenRepository<Message> _Message, AppDbContext _db)
+        public TutorController(
+            IMapper _mapper,
+            ITutor _TutorRepo, 
+            IGenRepository<Student> _StudentGenRepo, 
+            IGenRepository<Message> _Message,
+            IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
+            AppDbContext _db)
+
         {
             db = _db;
+            mapper = _mapper;
             TutorRepo = _TutorRepo;
             StudentGenRepo = _StudentGenRepo;
             MessageGenRepo = _Message;
+            ResourceCategoryGenRepo = _ResourceCategoryGenRepo;
         }
 
+        [HttpGet]
+        [Route("GetResourceCategorybyId/{ResourceCategoryId}")]
+        public async Task<IActionResult> GetResourceCategorybyId(int ResourceCategoryId)
+        {
+            var entity = await ResourceCategoryGenRepo.Get(ResourceCategoryId);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("SearchResourceCategory/{ResourceCategoryName}")]
+        public async Task<IActionResult> SearchResourceCategory(string ResourceCategoryName)
+        {
+            var entity = await TutorRepo.GetByName(ResourceCategoryName);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllResourceCategories")]
+        public async Task<IActionResult> GetAllResourceCategories()
+        {
+            var ResourceCat= await ResourceCategoryGenRepo.GetAll();
+            return Ok(ResourceCat);
+
+        }
+
+        [HttpPost]
+        [Route("CreateResourceCategory")]
+        public async Task<IActionResult> CreateResourceCategory([FromBody] ResourceCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var check = db.ResourceCategory.Where(zz => zz.ResourceCategoryName == dto.ResourceCategoryName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Resource Category already exists";
+                    return BadRequest(result.message);
+                }
+                ResourceCategory entity = mapper.Map<ResourceCategory>(dto);
+                var data = await ResourceCategoryGenRepo.Add(entity);
+                result.data = data;
+                result.message = "Resource Category created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong creating the Resource Category";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("EditResourceCategory")]
+        public async Task<IActionResult> EditResourceCategory([FromBody] ResourceCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.ResourceCategory.Where(zz => zz.ResourceCategoryName == dto.ResourceCategoryName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Resource Category already exists";
+                    return BadRequest(result.message);
+                }
+                ResourceCategory entity = mapper.Map<ResourceCategory>(dto);
+                var data = await ResourceCategoryGenRepo.Update(entity);
+                result.data = data;
+                result.message = "Resource Category updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the Resource Category";
+                return BadRequest(result.message);
+
+            }
+
+
+
+
+        }
+
+
+
+        [HttpDelete]
+        [Route("DeleteResourceCategory/{ResourceCategoryId}")]
+        public async Task<IActionResult> DeleteResourceCategory(int ResourceCategoryId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await ResourceCategoryGenRepo.Delete(ResourceCategoryId);
+                result.data = data;
+                result.message = "University deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the university";
+                return BadRequest(result.message);
+            }
+
+
+        }
 
         #region Messages
         //for creating a message

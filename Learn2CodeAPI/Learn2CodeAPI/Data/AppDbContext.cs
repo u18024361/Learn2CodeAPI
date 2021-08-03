@@ -115,6 +115,8 @@ namespace Learn2CodeAPI.Data
         public DbSet<Subscription> Subscription { get; set; }
         public DbSet<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
 
+        public DbSet<ResourceCategory> ResourceCategory { get; set; }
+
 
     }
 }
