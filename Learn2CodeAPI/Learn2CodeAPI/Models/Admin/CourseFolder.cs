@@ -17,7 +17,7 @@ namespace Learn2CodeAPI.Models.Admin
         [ForeignKey("AdminId")]
         public Admin admin { get; set; }
 
-        public ICollection<Module> Module { get; set; }
+       
 
     }
 }

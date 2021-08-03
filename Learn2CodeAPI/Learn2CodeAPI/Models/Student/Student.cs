@@ -1,6 +1,7 @@
 ﻿using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Generic;
 using Learn2CodeAPI.Models.Login.Identity;
+using Learn2CodeAPI.Models.Tutor;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,5 +22,6 @@ namespace Learn2CodeAPI.Models.Student
         public AppUser Identity { get; set; }
 
         public ICollection<StudentModule> StudentModule { get; set; }
+        public ICollection<Message> message { get; set; }
     }
 }

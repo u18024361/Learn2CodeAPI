@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -11,9 +12,13 @@ using Learn2CodeAPI.IRepository.Generic;
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.Models.Admin;
+using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -21,8 +26,8 @@ namespace Learn2CodeAPI.Controllers
     [ApiController]
     public class AdminController : ControllerBase
     {
-        
-        private  IMapper mapper;
+        private readonly UserManager<AppUser> _userManager;
+        private IMapper mapper;
         private IGenRepository<University> universityGenRepo;
         private IGenRepository<Degree> DegreeGenRepo;
         private IGenRepository<Module> ModuleGenRepo;
@@ -30,9 +35,12 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<CourseSubCategory> CourseSubCategoryGenRepo;
         private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
+        private IGenRepository<Subscription> SubscriptionGenRepo;
+        private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
         private IAdmin AdminRepo;
         public AdminController(
+            UserManager<AppUser> userManager,
             IMapper _mapper,
             IGenRepository<University> _universityGenRepo,
             IGenRepository<Degree> _DegreeGenRepo,
@@ -40,15 +48,18 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<CourseFolder> _CourseFolderGenRepo,
              IGenRepository<CourseSubCategory> _CourseSubCategoryGenRepo,
             IGenRepository<Student> _StudentGenRepo,
+             IGenRepository<Tutor> _TutorGenRepo,
             IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+            IGenRepository<Subscription> _SubscriptionGenRepo,
             IAdmin _AdminRepo,
             AppDbContext _db
 
             )
-        
 
-        
+
+
         {
+            _userManager = userManager;
             db = _db;
             CourseSubCategoryGenRepo = _CourseSubCategoryGenRepo;
             universityGenRepo = _universityGenRepo;
@@ -58,16 +69,27 @@ namespace Learn2CodeAPI.Controllers
             AdminRepo = _AdminRepo;
             CourseFolderGenRepo = _CourseFolderGenRepo;
             StudentGenRepo = _StudentGenRepo;
+            TutorGenRepo = _TutorGenRepo;
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
+            SubscriptionGenRepo = _SubscriptionGenRepo;
+        }
+
+        [HttpGet]
+        [Route("GetAdmin")]
+        public async Task<IActionResult> GetAdmin()
+        {
+            var Admin = await db.Admin.Include(zz => zz.Identity).FirstOrDefaultAsync();
+            return Ok(Admin);
+
         }
 
         #region University
 
         [HttpGet]
         [Route("GetUniversitybyId/{UniversityId}")]
-        public async Task<IActionResult>GetUniversitybyId(int UniversityId)
+        public async Task<IActionResult> GetUniversitybyId(int UniversityId)
         {
-            var entity  = await universityGenRepo.Get(UniversityId);
+            var entity = await universityGenRepo.Get(UniversityId);
 
             return Ok(entity);
         }
@@ -95,61 +117,96 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> CreateUniversity([FromBody] UniversityDto dto)
         {
             dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
+
+                var check = db.University.Where(zz => zz.UniversityName == dto.UniversityName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "University already exists";
+                    return BadRequest(result.message);
+                }
                 University entity = mapper.Map<University>(dto);
                 var data = await universityGenRepo.Add(entity);
                 result.data = data;
                 result.message = "university created";
                 return Ok(result);
             }
-            catch 
+            catch
             {
 
-                result.message = "something went wrong creating the university";
+                result.message = "Something went wrong creating the university";
                 return BadRequest(result.message);
             }
-          
+
         }
 
         [HttpPut]
         [Route("EditUniversity")]
         public async Task<IActionResult> EditUniversity([FromBody] UniversityDto dto)
         {
-            University entity = mapper.Map<University>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.University.Where(zz => zz.UniversityName == dto.UniversityName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "University already exists";
+                    return BadRequest(result.message);
+                }
+                University entity = mapper.Map<University>(dto);
+                var data = await universityGenRepo.Update(entity);
+                result.data = data;
+                result.message = "university updated";
+                return Ok(result);
 
-            dynamic result = await universityGenRepo.Update(entity);
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the university";
+                return BadRequest(result.message);
+
+            }
 
 
-            return Ok(result);
+
+
         }
 
-        //[HttpPost]
-        //[Route("DeleteApplication")]
-        //public async Task<IActionResult> DeleteApplication([FromBody] ApplicationDto dto)
-        //{
-        //    if (dto.Id == 0)
-        //    {
-        //        return BadRequest();
-        //    }
 
-        //    dynamic result = await ppmsService.DeleteApplicationAsync(dto);
-        //    if (result.ok)
-        //    {
-        //        return Ok(result);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(result.message);
-        //    }
-        //}
 
         [HttpDelete]
         [Route("DeleteUniversity/{UniversityId}")]
         public async Task<IActionResult> DeleteUniversity(int UniversityId)
         {
-            var result = await universityGenRepo.Delete(UniversityId);
-            return Ok(result);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await universityGenRepo.Delete(UniversityId);
+                result.data = data;
+                result.message = "University deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the university";
+                return BadRequest(result.message);
+            }
+
+
         }
 
         #endregion
@@ -161,7 +218,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetDegreebyId(int DegreeId)
         {
             var entity = await DegreeGenRepo.Get(DegreeId);
-            //var entity = db.Degrees.Where(zz => zz.Id == DegreeId).Include(zz => zz.University).FirstOrDefault();
+
 
             return Ok(entity);
         }
@@ -180,6 +237,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetAllDegrees/{UniversityId}")]
         public async Task<IActionResult> GetAllDegrees(int UniversityId)
         {
+
             var degrees = await AdminRepo.GetAllDegrees(UniversityId);
             return Ok(degrees);
 
@@ -189,54 +247,95 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateDegree")]
         public async Task<IActionResult> CreateDegree([FromBody] DegreeDto dto)
         {
-            Degree entity = mapper.Map<Degree>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
+                var check = db.Degrees.Where(zz => zz.DegreeName == dto.DegreeName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Degree already exists";
+                    return BadRequest(result.message);
+                }
+                Degree entity = mapper.Map<Degree>(dto);
+                var data = await DegreeGenRepo.Add(entity);
+                result.data = data;
+                result.message = "Degree created";
+                return Ok(result);
+            }
+            catch
+            {
 
-            dynamic result = await DegreeGenRepo.Add(entity);
-
-
-            return Ok(result);
+                result.message = "something went wrong creating the degree";
+                return BadRequest(result.message);
+            }
 
         }
+
 
         [HttpPut]
         [Route("EditDegree")]
         public async Task<IActionResult> EditDegree([FromBody] DegreeDto dto)
         {
-            Degree entity = mapper.Map<Degree>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.Degrees.Where(zz => zz.DegreeName == dto.DegreeName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Degree already exists";
+                    return BadRequest(result.message);
+                }
+                Degree entity = mapper.Map<Degree>(dto);
+                var data = await DegreeGenRepo.Update(entity);
+                result.data = data;
+                result.message = "Degree updated";
+                return Ok(result);
 
-            dynamic result = await DegreeGenRepo.Update(entity);
+            }
+            catch
+            {
+                result.message = "something went wrong updating the degree";
+                return BadRequest(result.message);
 
+            }
 
-            return Ok(result);
         }
 
-        //[HttpPost]
-        //[Route("DeleteApplication")]
-        //public async Task<IActionResult> DeleteApplication([FromBody] ApplicationDto dto)
-        //{
-        //    if (dto.Id == 0)
-        //    {
-        //        return BadRequest();
-        //    }
 
-        //    dynamic result = await ppmsService.DeleteApplicationAsync(dto);
-        //    if (result.ok)
-        //    {
-        //        return Ok(result);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(result.message);
-        //    }
-        //}
+
 
         [HttpDelete]
         [Route("DeleteDegree/{DegreeId}")]
         public async Task<IActionResult> DeleteDegree(int DegreeId)
         {
-            var result = await DegreeGenRepo.Delete(DegreeId);
-            return Ok(result);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await DegreeGenRepo.Delete(DegreeId);
+                result.data = data;
+                result.message = "Degree deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong deleting the degree";
+                return BadRequest(result.message);
+            }
+
         }
 
         #endregion
@@ -257,7 +356,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetModulebyId(int ModuleId)
         {
             var entity = await ModuleGenRepo.Get(ModuleId);
-            //var entity = db.Degrees.Where(zz => zz.Id == DegreeId).Include(zz => zz.University).FirstOrDefault();
+
 
             return Ok(entity);
         }
@@ -277,13 +376,33 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateModule")]
         public async Task<IActionResult> CreateModule([FromBody] Module dto)
         {
-            Module entity = mapper.Map<Module>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
+                var check = db.Modules.Where(zz => zz.ModuleCode == dto.ModuleCode).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Module already exists";
+                    return BadRequest(result.message);
+                }
+                Module entity = mapper.Map<Module>(dto);
+                var data = await AdminRepo.CreateModule(entity);
+                result.data = data;
+                result.message = "Module created";
+                return Ok(result);
+            }
+            catch
+            {
 
-            dynamic result = await ModuleGenRepo.Add(entity);
+                result.message = "something went wrong creating the module";
+                return BadRequest(result.message);
+            }
 
-
-            return Ok(result);
 
         }
 
@@ -291,40 +410,59 @@ namespace Learn2CodeAPI.Controllers
         [Route("EditModule")]
         public async Task<IActionResult> EditModule([FromBody] Module dto)
         {
-            Module entity = mapper.Map<Module>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.Modules.Where(zz => zz.ModuleCode == dto.ModuleCode).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Module already exists";
+                    return BadRequest(result.message);
+                }
+                Module entity = mapper.Map<Module>(dto);
+                var data = await ModuleGenRepo.Update(entity);
+                result.data = data;
+                result.message = "Module updated";
+                return Ok(result);
 
-            dynamic result = await ModuleGenRepo.Update(entity);
+            }
+            catch
+            {
+                result.message = "something went wrong updating the module";
+                return BadRequest(result.message);
 
-
-            return Ok(result);
+            }
         }
 
-        //[HttpPost]
-        //[Route("DeleteApplication")]
-        //public async Task<IActionResult> DeleteApplication([FromBody] ApplicationDto dto)
-        //{
-        //    if (dto.Id == 0)
-        //    {
-        //        return BadRequest();
-        //    }
 
-        //    dynamic result = await ppmsService.DeleteApplicationAsync(dto);
-        //    if (result.ok)
-        //    {
-        //        return Ok(result);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest(result.message);
-        //    }
-        //}
 
         [HttpDelete]
         [Route("DeleteModule/{ModuleId}")]
         public async Task<IActionResult> DeleteModule(int ModuleId)
         {
-            var result = await ModuleGenRepo.Delete(ModuleId);
-            return Ok(result);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await ModuleGenRepo.Delete(ModuleId);
+                result.data = data;
+                result.message = "Module deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong deleting the module";
+                return BadRequest(result.message);
+            }
+
         }
 
         #endregion
@@ -335,12 +473,32 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateCourseFolder")]
         public async Task<IActionResult> CreateCourseFolder([FromBody] CourseFolderDto dto)
         {
-            CourseFolder entity = mapper.Map<CourseFolder>(dto);
-             
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
-            dynamic result = await CourseFolderGenRepo.Add(entity);
+                var check = db.courseFolders.Where(zz => zz.CourseFolderName == dto.CourseFolderName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Course folder already exists";
+                    return BadRequest(result.message);
+                }
+                CourseFolder entity = mapper.Map<CourseFolder>(dto);
+                var data = await CourseFolderGenRepo.Add(entity);
+                result.data = data;
+                result.message = "Course Folder created";
+                return Ok(result);
+            }
+            catch
+            {
 
-            return Ok(result);
+                result.message = "something went wrong creating the course folder";
+                return BadRequest(result.message);
+            }
 
         }
 
@@ -366,20 +524,59 @@ namespace Learn2CodeAPI.Controllers
         [Route("EditCourseFolder")]
         public async Task<IActionResult> EditCourseFolder([FromBody] CourseFolderDto dto)
         {
-            CourseFolder entity = mapper.Map<CourseFolder>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
-            dynamic result = await CourseFolderGenRepo.Update(entity);
+                var check = db.courseFolders.Where(zz => zz.CourseFolderName == dto.CourseFolderName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Course folder already exists";
+                    return BadRequest(result.message);
+                }
+                CourseFolder entity = mapper.Map<CourseFolder>(dto);
+                var data = await CourseFolderGenRepo.Update(entity);
+                result.data = data;
+                result.message = "Course Folder updated";
+                return Ok(result);
+            }
+            catch
+            {
 
+                result.message = "something went wrong updating the course folder";
+                return BadRequest(result.message);
+            }
 
-            return Ok(result);
         }
 
         [HttpDelete]
         [Route("DeleteCourseFolder/{CourseFolderId}")]
         public async Task<IActionResult> DeleteCourseFolder(int CourseFolderId)
         {
-            var result = await CourseFolderGenRepo.Delete(CourseFolderId);
-            return Ok(result);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await CourseFolderGenRepo.Delete(CourseFolderId);
+                result.data = data;
+                result.message = "Module deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong deleting the module";
+                return BadRequest(result.message);
+            }
+
+
         }
 
 
@@ -387,7 +584,7 @@ namespace Learn2CodeAPI.Controllers
 
         #region Student
         [HttpGet]
-        [Route("GeAllStudents")]
+        [Route("GetAllStudents")]
         public async Task<IActionResult> GeAllStudents()
         {
             var entity = await AdminRepo.GetAllStudents();
@@ -396,15 +593,35 @@ namespace Learn2CodeAPI.Controllers
         }
 
 
-        
+
         //userid is in the aspnet users table
         [HttpDelete]
         [Route("DeleteStudent/{userId}")]
-        public IActionResult search(string userId) {
-            var x = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
-            db.Remove(x);
-            db.SaveChanges();
-            return Ok(x);
+        public IActionResult search(string userId)
+        {
+
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
+                db.Remove(data);
+                db.SaveChanges();
+                result.data = data;
+                result.message = "Student deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the student";
+                return BadRequest(result.message);
+            }
+
+
         }
 
 
@@ -424,59 +641,24 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreateSessionContentCategory")]
         public async Task<IActionResult> CreateSessionContentCategory([FromBody] SessionContentCategoryDto dto)
         {
-            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
-
-
-            dynamic result = await SessionContentCategoryRepo.Add(entity);
-
-
-            return Ok(result);
-
-        }
-
-        [HttpPut]
-        [Route("EditSessionContentCategory")]
-        public async Task<IActionResult> EditSessionContentCategory([FromBody] SessionContentCategoryDto dto)
-        {
-            SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
-
-            dynamic result = await SessionContentCategoryRepo.Update(entity);
-
-
-            return Ok(result);
-        }
-
-        [HttpDelete]
-        [Route("DeleteSessionContentCategory/{SessionContentCategoryId}")]
-        public async Task<IActionResult> DeleteSessionContentCategory(int SessionContentCategoryId)
-        {
-            var result = await SessionContentCategoryRepo.Delete(SessionContentCategoryId);
-            return Ok(result);
-        }
-        #endregion
-
-        #region CourseContentCategory
-        [HttpGet]
-        [Route("GetAllCourseSubCategory")]
-        public async Task<IActionResult> GetAllCourseSubCategory()
-        {
-            var subcategories = await CourseSubCategoryGenRepo.GetAll();
-            return Ok(subcategories);
-
-        }
-
-        //dddd
-        [HttpPost]
-        [Route("CreateCourseSubCategory")]
-        public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
-        {
             dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
-                CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
-                var data = await CourseSubCategoryGenRepo.Add(entity);
+
+                var check = db.SessionContentCategory.Where(zz => zz.SessionContentCategoryName == dto.SessionContentCategoryName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Category already exists";
+                    return BadRequest(result.message);
+                }
+                SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+                var data = await SessionContentCategoryRepo.Add(entity);
                 result.data = data;
-                result.message = "course subcategory created";
+                result.message = "Category created";
                 return Ok(result);
             }
             catch
@@ -486,29 +668,382 @@ namespace Learn2CodeAPI.Controllers
                 return BadRequest(result.message);
             }
 
+
+        }
+
+        [HttpPut]
+        [Route("EditSessionContentCategory")]
+        public async Task<IActionResult> EditSessionContentCategory([FromBody] SessionContentCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var check = db.SessionContentCategory.Where(zz => zz.SessionContentCategoryName == dto.SessionContentCategoryName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Category already exists";
+                    return BadRequest(result.message);
+                }
+                SessionContentCategory entity = mapper.Map<SessionContentCategory>(dto);
+                var data = await SessionContentCategoryRepo.Update(entity);
+                result.data = data;
+                result.message = "Category updated";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong updating the category";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteSessionContentCategory/{SessionContentCategoryId}")]
+        public async Task<IActionResult> DeleteSessionContentCategory(int SessionContentCategoryId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await SessionContentCategoryRepo.Delete(SessionContentCategoryId);
+                result.data = data;
+                result.message = "Category deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong deleting the category";
+                return BadRequest(result.message);
+            }
+
+        }
+        #endregion
+
+        #region CourseContentCategory
+        [HttpGet]
+        [Route("GetAllCourseSubCategory/{CourseFolderId}")]
+        public async Task<IActionResult> GetAllCourseSubCategory(int CourseFolderId)
+        {
+            var subcategories = await db.courseSubCategory.Where(zz => zz.CourseFolderId == CourseFolderId).ToListAsync();
+            return Ok(subcategories);
+
+        }
+
+
+        [HttpPost]
+        [Route("CreateCourseSubCategory")]
+        public async Task<IActionResult> CreateCourseSubCategory([FromBody] CoursSubCategoryDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.courseSubCategory.Where(zz => zz.CourseSubCategoryName == dto.CourseSubCategoryName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Subcategory already exists";
+                    return BadRequest(result.message);
+                }
+
+                CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+                var data = await CourseSubCategoryGenRepo.Add(entity);
+                result.data = data;
+                result.message = "course subcategory created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong creating the subcategory";
+                return BadRequest(result.message);
+            }
+
         }
 
         [HttpPut]
         [Route("EditCourseSubCategory")]
         public async Task<IActionResult> EditCourseSubCategory([FromBody] CoursSubCategoryDto dto)
         {
-            CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
 
-            dynamic result = await CourseSubCategoryGenRepo.Update(entity);
+                CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
+                var data = await CourseSubCategoryGenRepo.Update(entity);
+                result.data = data;
+                result.message = "course subcategory updated";
+                return Ok(result);
+            }
+            catch
+            {
 
+                result.message = "something went wrong updating the subcategory";
+                return BadRequest(result.message);
+            }
 
-            return Ok(result);
         }
 
         [HttpDelete]
         [Route("DeleteCourseSubCategory/{CourseSubCategoryId}")]
         public async Task<IActionResult> DeleteCourseSubCategory(int CourseSubCategoryId)
         {
-            var result = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
-            return Ok(result);
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
+                result.data = data;
+                result.message = "Subcategory deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong deleting the subcategory";
+                return BadRequest(result.message);
+            }
+
         }
 
         #endregion
 
+        #region Tutor
+        [HttpGet]
+        [Route("GetAllAplications")]
+        public async Task<IActionResult> GetAllAplications()
+        {
+            var applications = await AdminRepo.GetAllApplications();
+            return Ok(applications);
+
+        }
+
+        [HttpGet]
+        [Route("GetTutorbyId/{TutorId}")]
+        public async Task<IActionResult> GetTutorbyId(int TutorId)
+        {
+            var entity = await TutorGenRepo.Get(TutorId);
+
+            return Ok(entity);
+        }
+
+        //email will be done at later stage
+        [HttpPut]
+        [Route("RejectTutor")]
+        public async Task<IActionResult> RejectTutor([FromBody] TutorDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                Tutor entity = mapper.Map<Tutor>(dto);
+                var data = await AdminRepo.Reject(entity);
+                result.data = data;
+                result.message = "Tutor rejected";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong while rejectin the tutor";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("CreateTutor")]
+        public async Task<IActionResult> CreateTutor([FromBody] CreateTutorDto dto)
+        {
+
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.Users.Where(zz => zz.UserName == dto.UserName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Username is taken";
+                    return BadRequest(result.message);
+                }
+
+                var userIdentity = mapper.Map<AppUser>(dto);
+                userIdentity.Email = dto.TutorEmail;
+                var data = await AdminRepo.CreateTutor(userIdentity, dto);
+                result.data = data;
+                result.message = "Tutor created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong while creating the tutor";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+
+        [HttpGet]
+        [Route("GetAllTutors")]
+        public async Task<IActionResult> GetAllTutors()
+        {
+            var Tutors = await AdminRepo.GetAllTutors();
+            return Ok(Tutors);
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteTutor/{userId}")]
+        public IActionResult DeleteTutor(string userId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var user = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
+                var tutor = db.Tutor.Where(zz => zz.UserId == userId).FirstOrDefault();
+                var x = db.File.Where(zz => zz.Id == tutor.FileId).FirstOrDefault();
+                db.Remove(user);
+                db.Remove(x);
+                db.SaveChanges();
+                result.data = tutor;
+                result.message = "Tutor deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "something went wrong while deleting the tutor";
+                return BadRequest(result.message);
+            }
+
+        }
+
+
+        #endregion
+
+        #region coursecontent
+        [HttpPost]
+        [Route("CreatContent")]
+        public IActionResult Index([FromForm(Name = "file")] IFormFile files)
+        {
+            //Getting FileName
+            var fileName = Path.GetFileName(files.FileName);
+            //Getting file Extension
+            var fileExtension = Path.GetExtension(fileName);
+            // concatenating  FileName + FileExtension
+            var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
+            if (files != null)
+            {
+                if (files.Length > 0)
+                {
+
+
+                    var objfiles = new CourseContent()
+                    {
+                        Id = 0,
+                        ContentTypeId = 1,
+                        CourseSubCategoryId = 6,
+                        Filepath = "",
+                        //FileType = fileExtension,
+                        //CreatedOn = DateTime.Now
+                    };
+
+                    using (var target = new MemoryStream())
+                    {
+                        files.CopyTo(target);
+                        objfiles.DataFiles = target.ToArray();
+                    }
+
+                    db.CourseContent.Add(objfiles);
+                    db.SaveChanges();
+
+                }
+            }
+            return Ok();
+        }
+        #endregion
+
+        #region Subscription
+
+        [HttpGet]
+        [Route("GetAllSubscriptions")]
+        public async Task<IActionResult> GetAllSubscriptions()
+        {
+            var Subscriptions = await SubscriptionGenRepo.GetAll();
+            return Ok(Subscriptions);
+
+        }
+
+        [HttpPost]
+        [Route("CreateSubscription")]
+        public async Task<IActionResult> CreateSubscription([FromBody] SubscriptionDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var check = db.Subscription.Where(zz => zz.SubscriptionName == dto.SubscriptionName).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Subscription already exists";
+                    return BadRequest(result.message);
+                }
+               
+                var data = await AdminRepo.CreateSubscription(dto);
+                result.data = data;
+                result.message = "Subscription created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong creating the Subscription";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        #endregion
     }
+
+   
+
+
 }
+

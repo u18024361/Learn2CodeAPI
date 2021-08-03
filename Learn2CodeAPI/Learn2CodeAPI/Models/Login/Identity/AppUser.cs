@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Models.Generic;
+using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -9,5 +10,6 @@ namespace Learn2CodeAPI.Models.Login.Identity
 {
     public class AppUser : IdentityUser 
     {
+        
     }
 }

@@ -8,11 +8,13 @@ using Learn2CodeAPI.IRepository.Generic;
 using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryLogin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
+using Learn2CodeAPI.IRepository.IRepositoryTutor;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Repository.Generic;
 using Learn2CodeAPI.Repository.RepositoryAdmin;
 using Learn2CodeAPI.Repository.RepositoryLogin;
 using Learn2CodeAPI.Repository.RepositoryStudent;
+using Learn2CodeAPI.Repository.RepositoryTutor;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -45,6 +47,7 @@ namespace Learn2CodeAPI
 
             services.AddControllers();
             services.AddScoped<IStudent, StudentRepository>();
+            services.AddScoped<ITutor, TutorRepo>();
             services.AddScoped<IAdmin, AdminRepo>();
             services.AddScoped<ILogin, LoginRepo>();
 
@@ -71,7 +74,7 @@ namespace Learn2CodeAPI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, AppDbContext context, UserManager<AppUser> userManeger)
         {
             if (env.IsDevelopment())
             {
@@ -83,6 +86,8 @@ namespace Learn2CodeAPI
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
+            SeedHelpers.SeedDb(context, userManeger);
             app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
