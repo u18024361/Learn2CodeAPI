@@ -16,5 +16,9 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
         Task<IEnumerable<Message>> GetRecievedMessages(string UserId);
         Task<ResourceCategory> GetByName(string name);
 
+        Task<IEnumerable<TutorModule>> GetTutorModule(int TutorId);
+        Task<IEnumerable<SessionTime>> GetSessionTime();
+        Task<BookingInstance> CreateBooking(BookingInstanceDto model);
+
     }
 }

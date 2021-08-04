@@ -17,6 +17,7 @@ namespace Learn2CodeAPI.Models.Admin
         public ICollection<StudentModule> StudentModule { get; set; }
 
         public ICollection<TutorSessionModule> TutorSessionModule { get; set; }
+        public ICollection<TutorSessionModuleTutor> TutorSessionModuleTutor { get; set; }
 
         public int DegreeId { get; set; }
 
@@ -24,5 +25,6 @@ namespace Learn2CodeAPI.Models.Admin
         public Degree Degree { get; set; }
 
         public ICollection<TutorModule> TutorModule { get; set; }
+        public ICollection<BookingInstance> BookingInstance { get; set; }
     }
 }

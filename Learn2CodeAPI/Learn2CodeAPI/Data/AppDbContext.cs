@@ -29,11 +29,24 @@ namespace Learn2CodeAPI.Data
                 .WithMany(b => b.StudentModule)
                 .HasForeignKey(bc => bc.StudentId);
             modelBuilder.Entity<StudentModule>()
-                .HasOne(bc => bc.Module)
+                .HasOne(bc => bc.Tutor)
                 .WithMany(c => c.StudentModule)
                 .HasForeignKey(bc => bc.ModuleId);
 
             base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
+            modelBuilder.Entity<Message>()
+                .HasOne(bc => bc.student)
+                .WithMany(b => b.message)
+                .HasForeignKey(bc => bc.StudentId);
+            modelBuilder.Entity<Message>()
+                .HasOne(bc => bc.tutor)
+                .WithMany(c => c.message)
+                .HasForeignKey(bc => bc.TutorId);
+
+
 
             base.OnModelCreating(modelBuilder);
 
@@ -74,6 +87,11 @@ namespace Learn2CodeAPI.Data
                 .WithMany(c => c.SubscriptionTutorSession)
                 .HasForeignKey(bc => bc.SubscriptionId);
 
+            base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
+           
 
 
             //create user
@@ -131,6 +149,11 @@ namespace Learn2CodeAPI.Data
         public DbSet<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
         public DbSet<TutorModule> TutorModule { get; set; }
         public DbSet<ResourceCategory> ResourceCategory { get; set; }
+        public DbSet<TutorSessionModuleTutor> TutorSessionModuleTutor { get; set; }
+        public DbSet<SessionTime> SessionTime { get; set; }
+        public DbSet<BookingStatus> BookingStatus { get; set; }
+        public DbSet<BookingInstance> BookingInstance { get; set; }
+        public DbSet<Payment> Payment{ get; set; }
 
 
     }

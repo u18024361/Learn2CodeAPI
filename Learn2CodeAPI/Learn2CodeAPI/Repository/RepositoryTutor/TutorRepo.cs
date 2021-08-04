@@ -28,13 +28,13 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
 
         }
 
+        #region recourcecategory
         public async Task<ResourceCategory> GetByName(string Name)
         {
             var resourcecategory = await db.ResourceCategory.Where(zz => zz.ResourceCategoryName == Name).FirstOrDefaultAsync(); ;
             return resourcecategory;
         }
-
-
+        #endregion
 
         #region Message
         public async Task<Message> CreateMessage(MessageDto model)
@@ -73,6 +73,44 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
 
             return message;
         }
+
+
+
+        #endregion
+
+        #region bookinginstance
+        public async Task<IEnumerable<TutorModule>> GetTutorModule(int TutorId)
+        {
+            var module = await db.TutorModule.Include(zz => zz.Module).Where(zz => zz.TutorId == TutorId).ToListAsync();
+            return module;
+        }
+
+        public async Task<IEnumerable<SessionTime>> GetSessionTime()
+        {
+            var module = await db.SessionTime.ToListAsync();
+            return module;
+        }
+
+        public async Task<BookingInstance> CreateBooking(BookingInstanceDto model)
+        {
+            string timestring = model.Date.ToString("MM / dd / yyyy");
+            int idtutgroup = await db.TutorSession.Where(zz => zz.SessionType.SessionTypeName == "Group").Select(zz => zz.Id).FirstOrDefaultAsync();
+            int idgroup = await db.BookingStatus.Where(zz => zz.bookingStatus == "Ongoing").Select(zz => zz.Id).FirstOrDefaultAsync();
+            int idindividual = await db.BookingStatus.Where(zz => zz.bookingStatus == "Open").Select(zz => zz.Id).FirstOrDefaultAsync();
+            BookingInstance entity = mapper.Map<BookingInstance>(model);
+            entity.AttendanceTaken = false;
+            entity.ContentUploaded = false;
+            entity.Date = timestring;
+            if(model.TutorSessionId == idtutgroup)
+            {
+                entity.BookingStatusId = idgroup;
+            }
+            else { entity.BookingStatusId = idindividual; }
+            await db.BookingInstance.AddAsync(entity);
+            await db.SaveChangesAsync();
+            return entity;
+        }
+
 
         #endregion
     }
