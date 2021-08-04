@@ -21,7 +21,7 @@ namespace Learn2CodeAPI.Dtos.AdminDto
 
         public int FileId { get; set; }
 
-
+        public int ModuleId { get; set; }
         public string UserId { get; set; }
 
         public int TutorStatusId { get; set; }

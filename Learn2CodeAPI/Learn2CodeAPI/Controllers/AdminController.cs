@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -958,6 +960,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("CreatContent")]
         public IActionResult Index([FromForm(Name = "file")] IFormFile files)
         {
+           
             //Getting FileName
             var fileName = Path.GetFileName(files.FileName);
             //Getting file Extension
@@ -1104,9 +1107,38 @@ namespace Learn2CodeAPI.Controllers
         }
 
         #endregion
+
+        #region CSV
+        [HttpPost]
+        [Route("CSV")]
+        public async Task<List<Payment>> Import([FromForm(Name = "file")]IFormFile file)
+        {
+            var list = new List<Payment>();
+            using(var stream = new MemoryStream())
+            {
+                await file.CopyToAsync(stream);
+                using(var package = new ExcelPackage(stream))
+                {
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+                    var rowcount = worksheet.Dimension.Rows;
+                    for(int row = 2; row <= rowcount; row++)
+                    {
+                        list.Add(new Payment { Amount = worksheet.Cells[row, 1].Value.ToString().Trim() });
+                    }
+                }
+            }
+            foreach (var item in list)
+            {
+                await db.Payment.AddAsync(item);
+                    
+            }
+            await db.SaveChangesAsync();
+            return list;
+        }
+        #endregion
     }
 
-   
+
 
 
 }

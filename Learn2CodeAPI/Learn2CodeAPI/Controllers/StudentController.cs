@@ -30,11 +30,12 @@ namespace Learn2CodeAPI.Controllers
         private readonly AppDbContext db;
         private IStudent studentRepo;
         private IGenRepository<Tutor> TutorGenRepo;
+        private IGenRepository<Message> Mess;
         private IGenRepository<Message> MessageGenRepo;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
-            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message> _Message)
+            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message>_Mess,IGenRepository<Message>_Mes)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -42,7 +43,8 @@ namespace Learn2CodeAPI.Controllers
             _appDbContext = appDbContext;
             db = _db;
             TutorGenRepo = _TutorGenRepo;
-            _Message = MessageGenRepo;
+            MessageGenRepo = _Mess;
+            Mess = _Mes;
 
         }
 
@@ -168,7 +170,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpDelete]
         [Route("DeleteMessage/{MessageId}")]
-        public async Task<IActionResult> DeleteUniversity(int MessageId)
+        public async Task<IActionResult> DeleteMessage(int MessageId)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)

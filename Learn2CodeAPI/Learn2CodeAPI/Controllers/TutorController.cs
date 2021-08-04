@@ -29,8 +29,8 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Module> ModuleRepo;
         private IGenRepository<Message> MessageGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
+        private IGenRepository<BookingInstance> BookingInstanceGenRepo;
         private readonly IWebHostEnvironment webHostEnvironment;
-
         private readonly AppDbContext db;
 
         public TutorController(
@@ -41,7 +41,9 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Module> _ModuleRepo,
             IGenRepository<Message> _Message,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
-            AppDbContext _db)
+            AppDbContext _db,
+            IGenRepository<BookingInstance> _BookingInstanceGenRepo
+             )
 
         {
             db = _db;
@@ -52,6 +54,7 @@ namespace Learn2CodeAPI.Controllers
             ResourceCategoryGenRepo = _ResourceCategoryGenRepo;
             webHostEnvironment = hostEnvironment;
             ModuleRepo = _ModuleRepo;
+            BookingInstanceGenRepo = _BookingInstanceGenRepo;
         }
 
         #region ResourceCategory
@@ -252,7 +255,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpDelete]
         [Route("DeleteMessage/{MessageId}")]
-        public async Task<IActionResult> DeleteUniversity(int MessageId)
+        public async Task<IActionResult> DeleteMessage(int MessageId)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
@@ -270,7 +273,7 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
                 var data = await MessageGenRepo.Delete(MessageId);
-                
+
                 result.data = data;
                 result.message = "University deleted";
                 return Ok(result);
@@ -282,7 +285,7 @@ namespace Learn2CodeAPI.Controllers
                 return BadRequest(result.message);
             }
 
-           
+
         }
         #endregion
 
@@ -357,7 +360,7 @@ namespace Learn2CodeAPI.Controllers
 
 
 
-       
+
 
         private string UploadedFile(TutorDtoo model)
         {
@@ -377,11 +380,174 @@ namespace Learn2CodeAPI.Controllers
         }
         #endregion
 
+        #region Bookinginstance
 
-        
+        //get modules for dropdown
+        [HttpGet]
+        [Route("GetTutorModule/{TutorId}")]
+        public async Task<IActionResult> GetTutorModule(int TutorId)
+        {
+            var entity = await TutorRepo.GetTutorModule(TutorId);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetSessionTime")]
+        public async Task<IActionResult> GetSessionTime()
+        {
+            var entity = await TutorRepo.GetSessionTime();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetGroupSessions/{TutorId}")]
+        public async Task<IActionResult> GetGroupSessions(int TutorId)
+        {
+            var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
+                .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Group").FirstAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetIndividualSessions/{TutorId}")]
+        public async Task<IActionResult> GetIndividualSessions(int TutorId)
+        {
+            var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
+                 .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Individual").FirstAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllSessions/{TutorId}")]
+        public async Task<IActionResult> GetAllSessions(int TutorId)
+        {
+            var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
+                 .Where(zz => zz.TutorId == TutorId).FirstAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpPost]
+        [Route("CreateBooking")]
+        public async Task<IActionResult> CreateBooking([FromBody] BookingInstanceDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                
+                string timestring = dto.Date.ToString("MM/dd/yyyy");
+                var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
+                zz.Date == timestring && zz.TutorId == dto.TutorId).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Session already exists at that time on that day";
+                    return BadRequest(result.message);
+                }
+
+                var data = await TutorRepo.CreateBooking(dto);
+                result.data = data;
+                result.message = "Session created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong creating the session";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("EditSession")]
+        public async Task<IActionResult> EditSession([FromBody] BookingInstanceDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
+                DateTime oDate = Convert.ToDateTime(session.Date);
+                var start = DateTime.Now;
+                if ((oDate - start).TotalDays <= 1)
+                {
+                    result.message = "Can't update as there is less than 24 hours";
+                    return BadRequest(result.message);
+                }
+
+                //var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
+                //zz.Date == dto.Date && zz.TutorId == dto.TutorId).FirstOrDefault();
+                //if (check != null)
+                //{
+                //    result.message = "USession Already exists";
+                //    return BadRequest(result.message);
+                //}
+                string timestring = dto.Date.ToString("MM/dd/yyyy");
+                BookingInstance entity = mapper.Map<BookingInstance>(dto);
+                entity.Date = timestring;
+                var data = await BookingInstanceGenRepo.Update(entity);
+                result.data = data;
+                result.message = "Session updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the Session";
+                return BadRequest(result.message);
+
+            }
+        }
+
+
+        [HttpDelete]
+        [Route("DeleteSession/{SessionId}")]
+        public async Task<IActionResult> DeleteSession(int SessionId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var session = db.BookingInstance.Where(zz => zz.Id == SessionId).FirstOrDefault();
+                DateTime oDate = Convert.ToDateTime(session.Date);
+                var start = DateTime.Now;
+                if ((oDate - start).TotalDays <= 1)
+                {
+                    result.message = "Can't delete as there is less than 24 hours";
+                    return BadRequest(result.message);
+                }
+                var data = await BookingInstanceGenRepo.Delete(SessionId);
+
+                result.data = data;
+                result.message = "Session deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the Session";
+                return BadRequest(result.message);
+            }
+
+
+        }
+        #endregion
 
     }
-
 }
 
 

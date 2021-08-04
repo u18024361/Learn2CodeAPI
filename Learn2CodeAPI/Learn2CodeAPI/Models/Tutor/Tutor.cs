@@ -33,5 +33,8 @@ namespace Learn2CodeAPI.Models.Tutor
         public ICollection<Message> message { get; set; }
 
         public ICollection<TutorModule> TutorModule { get; set; }
+        public ICollection<TutorSessionModuleTutor> TutorSessionModuleTutor { get; set; }
+
+        public ICollection<BookingInstance> BookingInstance { get; set; }
     }
 }
