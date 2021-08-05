@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Dtos.TutorDto;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
 using System;
@@ -20,5 +21,8 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
         Task<IEnumerable<SessionTime>> GetSessionTime();
         Task<BookingInstance> CreateBooking(BookingInstanceDto model);
 
+        Task<IEnumerable<Module>> GetModules();
+        Task<IEnumerable<Resource>> GetModuleResources(int ModuleId);
+        
     }
 }

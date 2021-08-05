@@ -2,6 +2,7 @@
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.IRepositoryTutor;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
@@ -33,6 +34,21 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
         {
             var resourcecategory = await db.ResourceCategory.Where(zz => zz.ResourceCategoryName == Name).FirstOrDefaultAsync(); ;
             return resourcecategory;
+        }
+        #endregion
+
+        #region Resource
+        public async Task<IEnumerable<Module>> GetModules()
+        {
+            var modules = await db.Modules.Include(zz => zz.Degree).Include(zz => zz.Degree.University).ToListAsync();
+            return modules;
+        }
+
+        public async Task<IEnumerable<Resource>> GetModuleResources(int ModuleId)
+        {
+            var resources = await db.Resource.Include(zz => zz.ResourceCategory).Include(zz => zz.Module)
+                .Where(zz => zz.ModuleId == ModuleId).ToListAsync();
+            return resources;
         }
         #endregion
 
@@ -111,7 +127,13 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return entity;
         }
 
+       
+
+
+
 
         #endregion
+
+
     }
 }

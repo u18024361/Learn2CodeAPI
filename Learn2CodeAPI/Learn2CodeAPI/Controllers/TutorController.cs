@@ -28,6 +28,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<Module> ModuleRepo;
         private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<Resource> ResourceGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
         private IGenRepository<BookingInstance> BookingInstanceGenRepo;
         private readonly IWebHostEnvironment webHostEnvironment;
@@ -42,7 +43,8 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Message> _Message,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
             AppDbContext _db,
-            IGenRepository<BookingInstance> _BookingInstanceGenRepo
+            IGenRepository<BookingInstance> _BookingInstanceGenRepo,
+            IGenRepository<Resource> _Resource
              )
 
         {
@@ -55,6 +57,7 @@ namespace Learn2CodeAPI.Controllers
             webHostEnvironment = hostEnvironment;
             ModuleRepo = _ModuleRepo;
             BookingInstanceGenRepo = _BookingInstanceGenRepo;
+            ResourceGenRepo = _Resource;
         }
 
         #region ResourceCategory
@@ -183,7 +186,156 @@ namespace Learn2CodeAPI.Controllers
         }
         #endregion
 
+        #region Resource
+        [HttpGet]
+        [Route("GetAllModules")]
+        public async Task<IActionResult> GetAllResourceModules()
+        {
+            var entity = await TutorRepo.GetModules();
 
+            return Ok(entity);
+        }
+
+        //testing purposes
+        [HttpGet]
+        [Route("GetResourcesall")]
+        public async Task<IActionResult> GetResources()
+        {
+            var entity = await db.Resource.Include(zz => zz.Module).Include(zz => zz.ResourceCategory).ToListAsync();
+
+            return Ok(entity);
+        }
+
+        
+
+        [HttpGet]
+        [Route("GetModuleResources/{ModuleId}")]
+        public async Task<IActionResult> GetModuleResources(int ModuleId)
+        {
+            var entity = await TutorRepo.GetModuleResources(ModuleId);
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("DownloadResource/{resourceid}")]
+        public async Task<FileStreamResult> DownloadResource(int id)
+        {
+            var entity = await db.Resource.Where(zz => zz.Id == id).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "application/pdf");
+        }
+
+        [HttpPost]
+        [Route("CreateResource")]
+        public async Task<IActionResult> CreateResource([FromForm] ResourceDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+               
+                Resource resource = new Resource();
+               
+                resource.ModuleId = dto.ModuleId;
+                resource.ResourceCategoryId = dto.ResourceCategoryId;
+                resource.ResourceDescription = dto.ResourceDescription;
+                using (var target = new MemoryStream())
+                {
+                    dto.ResoucesName.CopyTo(target);
+                    resource.ResoucesName = target.ToArray();
+                }
+                await db.Resource.AddAsync(resource);
+                await db.SaveChangesAsync();
+                result.data = resource;
+                result.message = "Resource Category created";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went while adding the resource";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpPut]
+        [Route("EditResource")]
+        public async Task<IActionResult> EditResource([FromForm] ResourceDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                //var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
+                //zz.Date == dto.Date && zz.TutorId == dto.TutorId).FirstOrDefault();
+                //if (check != null)
+                //{
+                //    result.message = "USession Already exists";
+                //    return BadRequest(result.message);
+                //}
+
+                var resource = await db.Resource.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+                resource.ModuleId = dto.ModuleId;
+                resource.ResourceCategoryId = dto.ResourceCategoryId;
+                resource.ResourceDescription = dto.ResourceDescription;
+                using (var target = new MemoryStream())
+                {
+                    dto.ResoucesName.CopyTo(target);
+                    resource.ResoucesName = target.ToArray();
+                }
+                await db.SaveChangesAsync();
+                result.data = resource;
+                result.message = "Resource updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the resource";
+                return BadRequest(result.message);
+
+            }
+        }
+
+        [HttpDelete]
+        [Route("DeleteResource/{ResourceId}")]
+        public async Task<IActionResult> DeleteResource(int ResourceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                
+                var data = await ResourceGenRepo.Delete(ResourceId);
+
+                result.data = data;
+                result.message = "Resource deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the resource";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+
+        #endregion
 
         #region Messages
         //for creating a message
@@ -546,6 +698,8 @@ namespace Learn2CodeAPI.Controllers
 
         }
         #endregion
+
+        
 
     }
 }
