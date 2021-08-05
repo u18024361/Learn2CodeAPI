@@ -11,5 +11,7 @@ namespace Learn2CodeAPI.Models.Tutor
         public ResourceCategory() { }
 
         public string ResourceCategoryName { get; set; }
+
+        public ICollection<Resource> Resource { get; set; }
     }
 }

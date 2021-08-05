@@ -26,5 +26,7 @@ namespace Learn2CodeAPI.Models.Admin
 
         public ICollection<TutorModule> TutorModule { get; set; }
         public ICollection<BookingInstance> BookingInstance { get; set; }
+
+        public ICollection<Resource> Resource { get; set; }
     }
 }

@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210805125147_resource")]
+    partial class resource
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,15 +401,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "48fd51dc-a930-4390-900d-47e6879bc62e",
+                            ConcurrencyStamp = "907ecce5-7f1c-40c8-bab3-528ffb360f09",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEGjdMjMHTB+mvA7XQeO5qBl36F8ciP6BY4rYtNQRoLXJWo5EcoHt3JfVUePgjHZyjQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEBTg2XFKf4wcZRN7OlaT0ej/rGKuM9NiENjQYfrVK0I0VaWkBY6RMWjWpGwvdwlJ/A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "85a78c9e-3339-47d4-ac2d-42b4bf282bed",
+                            SecurityStamp = "b7e85c9b-78b5-4d3d-a69f-e7262aae8a9d",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -596,8 +598,8 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("ResourceCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ResourceDescription")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ResourceDescription")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

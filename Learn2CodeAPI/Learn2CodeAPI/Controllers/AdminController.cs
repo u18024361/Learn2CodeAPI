@@ -17,10 +17,15 @@ using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc; 
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
+using CsvHelper;
+using System.Globalization;
+using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
+
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -1109,8 +1114,9 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
         #region CSV
+        // dont call this one
         [HttpPost]
-        [Route("CSV")]
+        [Route("Excell")]
         public async Task<List<Payment>> Import([FromForm(Name = "file")]IFormFile file)
         {
             var list = new List<Payment>();
@@ -1123,7 +1129,7 @@ namespace Learn2CodeAPI.Controllers
                     var rowcount = worksheet.Dimension.Rows;
                     for(int row = 2; row <= rowcount; row++)
                     {
-                        list.Add(new Payment { Amount = worksheet.Cells[row, 1].Value.ToString().Trim() });
+                        list.Add(new Payment { Amount = worksheet.Cells[row, 3].Value.ToString().Trim() });
                     }
                 }
             }
@@ -1135,7 +1141,58 @@ namespace Learn2CodeAPI.Controllers
             await db.SaveChangesAsync();
             return list;
         }
+
+        [HttpPost]
+        [Route("CSVUpload")]
+        public IActionResult Importt([FromForm(Name = "file")]IFormFile file)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var list = new List<Payment>();
+                using (var stream = new MemoryStream())
+                {
+                    file.CopyTo(stream);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    using (var reader = new StreamReader(stream))
+                    {
+
+                        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+                        {
+
+                            var records = csv.GetRecords<Payment>().ToList();
+                            records.RemoveAt(records.Count - 1);
+                            foreach (var item in records)
+                            {
+                                db.Payment.Add(item);
+                                db.SaveChanges();
+                            }
+
+
+                        };
+                    }
+
+                }
+                result.message = "File uploaded";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong uploading the file";
+                return BadRequest(result.message);
+            }
+        }
+
         #endregion
+
+
     }
 
 
