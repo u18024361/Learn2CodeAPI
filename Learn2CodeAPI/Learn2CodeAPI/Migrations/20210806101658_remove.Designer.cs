@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210806101658_remove")]
+    partial class remove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -399,15 +401,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "40c27b91-9383-4193-85a2-5019d89d3df0",
+                            ConcurrencyStamp = "7710d9d9-65fa-49c7-9fe8-e35ee73843c9",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAENzlHxQB8Z5NZFKR/2myqJu/9cABy0fFHyglSsOOEjyAvBEqbo5uT8UkeNiPWKgIHQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPvBGSCPDhVFYL5+TwmN2/ATUn1+OBGv1qTWR4iqORyAjNsDzAuMpaAKFyDrj6V0MA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "b359254d-df29-4cb1-a4e8-7037eb6703ac",
+                            SecurityStamp = "37b1fd62-145c-4de4-8073-08b283865713",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -538,9 +540,6 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<byte[]>("FileName")
-                        .HasColumnType("varbinary(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("File");
@@ -662,9 +661,6 @@ namespace Learn2CodeAPI.Migrations
 
                     b.Property<string>("TutorName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("TutorPhoto")
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<int>("TutorStatusId")
                         .HasColumnType("int");

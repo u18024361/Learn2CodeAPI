@@ -15,7 +15,7 @@ namespace Learn2CodeAPI.Models.Tutor
         public string TutorCell { get; set; }
         public string TutorAbout { get; set; }
 
-        public string TutorPhoto { get; set; }
+        public byte[] TutorPhoto { get; set; }
         public string TutorEmail { get; set; }
 
         public int FileId { get; set; }

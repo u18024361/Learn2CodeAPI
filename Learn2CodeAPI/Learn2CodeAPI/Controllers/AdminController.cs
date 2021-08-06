@@ -854,6 +854,15 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+        [HttpGet]
+        [Route("DownTutorApplication/{Fileid}")]
+        public async Task<FileStreamResult> DownloadResource(int Fileid)
+        {
+            var entity = await db.File.Where(zz => zz.Id == Fileid).Select(zz => zz.FileName).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "Application/pdf");
+        }
+
         //email will be done at later stage
         [HttpPut]
         [Route("RejectTutor")]
