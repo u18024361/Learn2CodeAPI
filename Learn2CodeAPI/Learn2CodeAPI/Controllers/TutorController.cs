@@ -454,7 +454,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPost]
         [Route("TutorApplication")]
-        public async Task<IActionResult> TutorApplication(TutorDtoo model)
+        public async Task<IActionResult> TutorApplication([FromForm] TutorDtoo model)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
@@ -471,23 +471,31 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                string uniqueFileName = UploadedFile(model);
+               
                 Models.Tutor.File file = new Models.Tutor.File();
-                file.FileName = "test";
+                using (var Filetarget = new MemoryStream())
+                {
+                    model.File.CopyTo(Filetarget);
+                    file.FileName = Filetarget.ToArray();
+                }
                 await db.File.AddAsync(file);
                 await db.SaveChangesAsync();
                 int idpending = await db.TutorStatus.Where(zz => zz.TutorStatusDesc == "Applied").Select(zz => zz.Id).FirstOrDefaultAsync();
-                Tutor tutor = new Tutor
+                Tutor tutor = new Tutor();
+
+                tutor.TutorName = model.TutorName;
+                tutor.TutorSurname = model.TutorSurname;
+                tutor.TutorAbout = model.TutorAbout;
+                tutor.TutorCell = model.TutorCell;
+                tutor.TutorEmail = model.TutorEmail;
+                tutor.FileId = file.Id;
+                tutor.TutorStatusId = idpending;
+                using (var Imagetarget = new MemoryStream())
                 {
-                    TutorName = model.TutorName,
-                    TutorSurname = model.TutorSurname,
-                    TutorAbout = model.TutorAbout,
-                    TutorCell = model.TutorCell,
-                    TutorEmail = model.TutorEmail,
-                    FileId = file.Id,
-                    TutorStatusId = idpending,
-                    TutorPhoto = uniqueFileName,
-                };
+                    model.TutorPhoto.CopyTo(Imagetarget);
+                    tutor.TutorPhoto = Imagetarget.ToArray();
+                }
+
                 await db.Tutor.AddAsync(tutor);
                 await db.SaveChangesAsync();
 

@@ -9,8 +9,7 @@ namespace Learn2CodeAPI.Models.Tutor
 {
     public class File : BaseEntity
     {
-        //public byte[] FileName { get; set; }
-        public string FileName { get; set; }
-
+        public byte[] FileName { get; set; }
+       
     }
 }

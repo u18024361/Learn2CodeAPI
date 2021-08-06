@@ -15,6 +15,8 @@ namespace Learn2CodeAPI.Dtos.TutorDto
         public string TutorAbout { get; set; }
 
         public IFormFile TutorPhoto { get; set; }
+
+        public IFormFile File { get; set; }
         public string TutorEmail { get; set; }
 
         public int FileId { get; set; }
