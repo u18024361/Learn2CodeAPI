@@ -44,6 +44,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<SessionContentCategory> SessionContentCategoryRepo;
         private IGenRepository<Subscription> SubscriptionGenRepo;
         private IGenRepository<Tutor> TutorGenRepo;
+        private IGenRepository<CourseContent> CourseContentRepo;
         private readonly AppDbContext db;
         private IAdmin AdminRepo;
         public AdminController(
@@ -57,6 +58,7 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Student> _StudentGenRepo,
              IGenRepository<Tutor> _TutorGenRepo,
             IGenRepository<SessionContentCategory> _SessionContentCategoryRepo,
+             IGenRepository<CourseContent> _CourseContentRepo,
             IGenRepository<Subscription> _SubscriptionGenRepo,
             IAdmin _AdminRepo,
             AppDbContext _db
@@ -79,6 +81,7 @@ namespace Learn2CodeAPI.Controllers
             TutorGenRepo = _TutorGenRepo;
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
             SubscriptionGenRepo = _SubscriptionGenRepo;
+            CourseContentRepo = _CourseContentRepo;
         }
 
         [HttpGet]
@@ -970,46 +973,160 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
         #region coursecontent
+
+        [HttpGet]
+        [Route("GetContent/{CourseCategoryId}")]
+        public async Task<IActionResult> GetContent(int CourseCategoryId)
+        {
+            var content = await db.CourseContent.Include(zz => zz.ContentType).Include(zz => zz.CourseSubCategory).Where(zz => zz.CourseSubCategoryId == CourseCategoryId).ToListAsync();
+            return Ok(content);
+
+        }
+
         [HttpPost]
         [Route("CreatContent")]
-        public IActionResult Index([FromForm(Name = "file")] IFormFile files)
+        public async Task<IActionResult> CreatContent([FromForm] CourseContentDto dto)
         {
-           
-            //Getting FileName
-            var fileName = Path.GetFileName(files.FileName);
-            //Getting file Extension
-            var fileExtension = Path.GetExtension(fileName);
-            // concatenating  FileName + FileExtension
-            var newFileName = String.Concat(Convert.ToString(Guid.NewGuid()), fileExtension);
-            if (files != null)
+            //   [FromForm(Name = "file")]
+            //IFormFile files
+
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
             {
-                if (files.Length > 0)
-                {
-
-
-                    var objfiles = new CourseContent()
-                    {
-                        Id = 0,
-                        ContentTypeId = 1,
-                        CourseSubCategoryId = 6,
-                        Filepath = "",
-                        //FileType = fileExtension,
-                        //CreatedOn = DateTime.Now
-                    };
-
-                    using (var target = new MemoryStream())
-                    {
-                        files.CopyTo(target);
-                        objfiles.DataFiles = target.ToArray();
-                    }
-
-                    db.CourseContent.Add(objfiles);
-                    db.SaveChanges();
-
-                }
+                return BadRequest(ModelState);
             }
-            return Ok();
+            try
+            {
+
+                var check = await db.CourseContent.Where(zz => zz.FileName == dto.Content.FileName).FirstOrDefaultAsync();
+                if (check != null)
+                {
+                    result.message = "Content already exists";
+                    return BadRequest(result.message);
+                }
+
+
+                var objfiles = new CourseContent()
+                {
+                    Id = 0,
+                    ContentTypeId = dto.ContentTypeId,
+                    CourseSubCategoryId = dto.CourseSubCategoryId,
+                    FileName = dto.Content.FileName,
+
+                };
+                using (var target = new MemoryStream())
+                {
+                    dto.Content.CopyTo(target);
+                    objfiles.Content = target.ToArray();
+                }
+
+                await db.CourseContent.AddAsync(objfiles);
+               await  db.SaveChangesAsync();
+
+                result.data = objfiles;
+                result.message = "Content Added";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong while adding the content";
+                return BadRequest(result.message);
+            }
+
         }
+
+        [HttpPut]
+        [Route("EditContent")]
+        public async Task<IActionResult> EditContent([FromBody] CourseContentDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = db.CourseContent.Where(zz => zz.FileName == dto.Content.FileName && zz.Id !=  dto.Id).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Content already exists";
+                    return BadRequest(result.message);
+                }
+                var content = await db.CourseContent.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+                content.FileName = dto.Content.FileName;
+                content.CourseSubCategoryId = dto.CourseSubCategoryId;
+                content.ContentTypeId = dto.ContentTypeId;
+                using (var target = new MemoryStream())
+                {
+                    dto.Content.CopyTo(target);
+                    content.Content = target.ToArray();
+                }
+                await db.SaveChangesAsync();
+                result.data = content;
+                result.message = "Content updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the content";
+                return BadRequest(result.message);
+
+            }
+
+
+
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteContent/{ContentId}")]
+        public async Task<IActionResult> DeleteResource(int ContentId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var data = await CourseContentRepo.Delete(ContentId);
+
+                result.data = data;
+                result.message = "Resource deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the Content";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("Video/{id}")]
+        public async Task<FileStreamResult> Video(int id)
+        {
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Content);
+            return new FileStreamResult(ms, "video/mp4");
+        }
+
+        [HttpGet]
+        [Route("DownloadRContentPdf/{id}")]
+        public async Task<FileStreamResult> DownloadRContentPdf(int id)
+        {
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).Select(zz => zz.Content).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "Application/pdf");
+        }
+
+
         #endregion
 
         #region Subscription
