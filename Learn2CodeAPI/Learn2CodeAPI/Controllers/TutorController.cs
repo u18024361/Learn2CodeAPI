@@ -218,13 +218,15 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("DownloadResource/{resourceid}")]
+        [Route("DownloadResource/{id}")]
         public async Task<FileStreamResult> DownloadResource(int id)
         {
             var entity = await db.Resource.Where(zz => zz.Id == id).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
-            MemoryStream ms = new MemoryStream(entity);
-            return new FileStreamResult(ms, "application/pdf");
+           MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "Application/pdf");
         }
+
+        
 
         [HttpPost]
         [Route("CreateResource")]
