@@ -23,6 +23,11 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
 
         Task<IEnumerable<Module>> GetModules();
         Task<IEnumerable<Resource>> GetModuleResources(int ModuleId);
-        
+
+        Task<IEnumerable<BookingInstance>> GetTutorSessions(int TutorId);
+        Task<IEnumerable<SessionContentCategory>> GetSessionContentCategory();
+        Task<IEnumerable<GroupSessionContent>> GroupSessionContent(int BookingInstanceId);
+
+
     }
 }

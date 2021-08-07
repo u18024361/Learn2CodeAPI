@@ -31,6 +31,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Resource> ResourceGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
         private IGenRepository<BookingInstance> BookingInstanceGenRepo;
+        private IGenRepository<GroupSessionContent> GroupSessionContentGenRepo;
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly AppDbContext db;
 
@@ -41,6 +42,7 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Student> _StudentGenRepo,
             IGenRepository<Module> _ModuleRepo,
             IGenRepository<Message> _Message,
+            IGenRepository<GroupSessionContent> _GroupSessionContentGenRepo,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
             AppDbContext _db,
             IGenRepository<BookingInstance> _BookingInstanceGenRepo,
@@ -58,6 +60,7 @@ namespace Learn2CodeAPI.Controllers
             ModuleRepo = _ModuleRepo;
             BookingInstanceGenRepo = _BookingInstanceGenRepo;
             ResourceGenRepo = _Resource;
+            GroupSessionContentGenRepo = _GroupSessionContentGenRepo;
         }
 
         #region ResourceCategory
@@ -218,10 +221,10 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("DownloadResource/{id}")]
-        public async Task<FileStreamResult> DownloadResource(int id)
+        [Route("DownloadResource/{Resourceid}")]
+        public async Task<FileStreamResult> DownloadResource(int Resourceid)
         {
-            var entity = await db.Resource.Where(zz => zz.Id == id).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
+            var entity = await db.Resource.Where(zz => zz.Id == Resourceid).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
            MemoryStream ms = new MemoryStream(entity);
             return new FileStreamResult(ms, "Application/pdf");
         }
@@ -277,14 +280,6 @@ namespace Learn2CodeAPI.Controllers
             try
             {
 
-                //var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
-                //zz.Date == dto.Date && zz.TutorId == dto.TutorId).FirstOrDefault();
-                //if (check != null)
-                //{
-                //    result.message = "USession Already exists";
-                //    return BadRequest(result.message);
-                //}
-
                 var resource = await db.Resource.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
                 resource.ModuleId = dto.ModuleId;
                 resource.ResourceCategoryId = dto.ResourceCategoryId;
@@ -293,6 +288,12 @@ namespace Learn2CodeAPI.Controllers
                 {
                     dto.ResoucesName.CopyTo(target);
                     resource.ResoucesName = target.ToArray();
+                }
+                var check = db.Resource.Where(zz => zz.ResoucesName == resource.ResoucesName && zz.Id != dto.Id).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Resource already exists";
+                    return BadRequest(result.message);
                 }
                 await db.SaveChangesAsync();
                 result.data = resource;
@@ -640,6 +641,7 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
+                string datestring = dto.Date.ToString("MM/dd/yyyy");
                 DateTime oDate = Convert.ToDateTime(session.Date);
                 var start = DateTime.Now;
                 if ((oDate - start).TotalDays <= 1)
@@ -648,13 +650,15 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                //var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
-                //zz.Date == dto.Date && zz.TutorId == dto.TutorId).FirstOrDefault();
-                //if (check != null)
-                //{
-                //    result.message = "USession Already exists";
-                //    return BadRequest(result.message);
-                //}
+                var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
+                zz.Date == datestring && zz.Id != dto.Id).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Session already exists on the provided date and time";
+                    return BadRequest(result.message);
+                }
+
+                
                 string timestring = dto.Date.ToString("MM/dd/yyyy");
                 BookingInstance entity = mapper.Map<BookingInstance>(dto);
                 entity.Date = timestring;
@@ -709,7 +713,173 @@ namespace Learn2CodeAPI.Controllers
         }
         #endregion
 
-        
+        #region groupsessioncontent
+        [HttpGet]
+        [Route("GetTutorSessions/{TutorId}")]
+        public async Task<IActionResult> GetTutorSessions(int TutorId)
+        {
+            var entity = await TutorRepo.GetTutorSessions(TutorId);
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetSessionContentCategory")]
+        public async Task<IActionResult> GetSessionContentCategory()
+        {
+            var entity = await TutorRepo.GetSessionContentCategory();
+            return Ok(entity);
+        }
+
+        [HttpPost]
+        [Route("CreateSessionContent")]
+        public async Task<IActionResult> CreateSessionContent([FromForm] GroupSessionContentDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = await db.GroupSessionContent.Where(zz => zz.BookingInstanceId == dto.BookingInstanceId).FirstOrDefaultAsync();
+                if (check != null)
+                {
+                    result.message = "Content already exists";
+                    return BadRequest(result.message);
+                }
+                GroupSessionContent content = new GroupSessionContent();
+                content.BookingInstanceId = dto.BookingInstanceId;
+                content.NotesName = dto.Notes.FileName;
+                content.RecordingName = dto.Recording.FileName;
+                content.SessionContentCategoryId = dto.SessionContentCategoryId;
+                using (var target = new MemoryStream())
+                {
+                    dto.Notes.CopyTo(target);
+                    content.Notes = target.ToArray();
+                }
+                using (var video = new MemoryStream())
+                {
+                    dto.Recording.CopyTo(video);
+                    content.Recording = video.ToArray();
+                }
+                await db.GroupSessionContent.AddAsync(content);
+                await db.SaveChangesAsync();
+                var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                instance.ContentUploaded = true;
+                await db.SaveChangesAsync();
+                result.data = content;
+                result.message = "Content added successfully";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went while adding the content";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("GetSessionContent/{BookingInstanceId}")]
+        public async Task<IActionResult> GetSessionContent(int BookingInstanceId)
+        {
+            var entity = await TutorRepo.GroupSessionContent(BookingInstanceId);
+            return Ok(entity);
+        }
+
+        [HttpPut]
+        [Route("EditSessionContent")]
+        public async Task<IActionResult> EditSessionContent([FromForm] GroupSessionContentDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+               
+                var content = await db.GroupSessionContent.Where(zz =>zz.Id == dto.Id).FirstOrDefaultAsync();
+                content.SessionContentCategoryId = dto.SessionContentCategoryId;
+                content.NotesName = dto.Notes.FileName;
+                content.RecordingName = dto.Recording.FileName;
+                using (var target = new MemoryStream())
+                {
+                    dto.Notes.CopyTo(target);
+                    content.Notes = target.ToArray();
+                }
+                using (var video = new MemoryStream())
+                {
+                    dto.Recording.CopyTo(video);
+                    content.Recording = video.ToArray();
+                }
+                await db.GroupSessionContent.AddAsync(content);
+                await db.SaveChangesAsync();
+                var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                instance.ContentUploaded = true;
+                await db.SaveChangesAsync();
+                result.data = content;
+                result.message = "Content updated successfully";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went while updating the content";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteSessionContent/{GroupSessionContentId}")]
+        public async Task<IActionResult> DeleteSessionContent(int GroupSessionContentId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var data = await GroupSessionContentGenRepo.Delete(GroupSessionContentId);
+
+                result.data = data;
+                result.message = "Content deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the Content";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        [HttpGet]
+        [Route("DownloadNotes/{GroupSessionContentId}")]
+        public async Task<FileStreamResult> DownloadNotes(int GroupSessionContentId)
+        {
+            var entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).Select(zz => zz.Notes).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "Application/pdf");
+        }
+
+        [HttpGet]
+        [Route("WatchVideo/{GroupSessionContentId}")]
+        public async Task<FileStreamResult> Video(int GroupSessionContentId)
+        {
+            var entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Recording);
+            return new FileStreamResult(ms, "video/mp4");
+        }
+        #endregion
+
+
 
     }
 }

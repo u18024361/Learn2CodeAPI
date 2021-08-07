@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210807083933_CSvv")]
+    partial class CSvv
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -182,11 +184,11 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<string>("FullName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PaymentAmount")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("PaymentAmount")
+                        .HasColumnType("float");
 
-                    b.Property<string>("PaymentDate")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "21c4d925-bed3-4fbe-8e11-e8fc74c5b08c",
+                            ConcurrencyStamp = "bfc65fc5-7f87-42a2-89a1-fc78756cc358",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEOIj8E3TYBenbFfDuN4KykWkLNJFHjq6srtPWdaj1UDnS7MDTReSrxb6WTsrXtpGZg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEMQYyM3HvfbSmEZQXKw37rz0tvvGt1Eu1nKpmJUUXBkS7bmP2EwU6VSB2PEd0SIsnw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "4b7bd439-6495-4e21-b4da-f2be3bfb9f8f",
+                            SecurityStamp = "e0fb287b-5859-4a2b-921d-970d193270ec",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -550,34 +552,6 @@ namespace Learn2CodeAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("File");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.GroupSessionContent", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("BookingInstanceId")
-                        .HasColumnType("int");
-
-                    b.Property<byte[]>("Notes")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("Recording")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<int>("SessionContentCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingInstanceId");
-
-                    b.HasIndex("SessionContentCategoryId");
-
-                    b.ToTable("GroupSessionContent");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Message", b =>
@@ -1129,25 +1103,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("TutorSession");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.GroupSessionContent", b =>
-                {
-                    b.HasOne("Learn2CodeAPI.Models.Tutor.BookingInstance", "BookingInstance")
-                        .WithMany()
-                        .HasForeignKey("BookingInstanceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learn2CodeAPI.Models.Admin.SessionContentCategory", "SessionContentCategory")
-                        .WithMany("GroupSessionContent")
-                        .HasForeignKey("SessionContentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("BookingInstance");
-
-                    b.Navigation("SessionContentCategory");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Message", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Student.Student", "student")
@@ -1341,11 +1296,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("TutorSessionModule");
 
                     b.Navigation("TutorSessionModuleTutor");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionContentCategory", b =>
-                {
-                    b.Navigation("GroupSessionContent");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.SessionType", b =>
