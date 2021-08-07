@@ -14,7 +14,11 @@ namespace Learn2CodeAPI.Models.Admin
         [Key]
         [Ignore]
         public int  Id { get; set; }
-        [Name("Original Amount")]
-        public string Amount { get; set; }
+        [Name("Amount Paid")]
+        public string PaymentAmount { get; set; }
+        [Name("Customer (fullname)")]
+        public string FullName { get; set; }
+        [Name("Transaction Date")]
+        public string PaymentDate { get; set; }
     }
 }

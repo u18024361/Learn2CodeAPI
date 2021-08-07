@@ -795,6 +795,12 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var check = db.courseSubCategory.Where(zz => zz.CourseSubCategoryName == dto.CourseSubCategoryName && zz.Id != dto.Id).FirstOrDefault();
+                if (check != null)
+                {
+                    result.message = "Category already exists";
+                    return BadRequest(result.message);
+                }
 
                 CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
                 var data = await CourseSubCategoryGenRepo.Update(entity);
@@ -1241,32 +1247,32 @@ namespace Learn2CodeAPI.Controllers
 
         #region CSV
         // dont call this one
-        [HttpPost]
-        [Route("Excell")]
-        public async Task<List<Payment>> Import([FromForm(Name = "file")]IFormFile file)
-        {
-            var list = new List<Payment>();
-            using(var stream = new MemoryStream())
-            {
-                await file.CopyToAsync(stream);
-                using(var package = new ExcelPackage(stream))
-                {
-                    ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
-                    var rowcount = worksheet.Dimension.Rows;
-                    for(int row = 2; row <= rowcount; row++)
-                    {
-                        list.Add(new Payment { Amount = worksheet.Cells[row, 3].Value.ToString().Trim() });
-                    }
-                }
-            }
-            foreach (var item in list)
-            {
-                await db.Payment.AddAsync(item);
+        //[HttpPost]
+        //[Route("Excell")]
+        //public async Task<List<Payment>> Import([FromForm(Name = "file")]IFormFile file)
+        //{
+        //    var list = new List<Payment>();
+        //    using(var stream = new MemoryStream())
+        //    {
+        //        await file.CopyToAsync(stream);
+        //        using(var package = new ExcelPackage(stream))
+        //        {
+        //            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+        //            var rowcount = worksheet.Dimension.Rows;
+        //            for(int row = 2; row <= rowcount; row++)
+        //            {
+        //                list.Add(new Payment { PaymentAmount = worksheet.Cells[row, 3].Value.ToString().Trim() });
+        //            }
+        //        }
+        //    }
+        //    foreach (var item in list)
+        //    {
+        //        await db.Payment.AddAsync(item);
                     
-            }
-            await db.SaveChangesAsync();
-            return list;
-        }
+        //    }
+        //    await db.SaveChangesAsync();
+        //    return list;
+        //}
 
         [HttpPost]
         [Route("CSVUpload")]

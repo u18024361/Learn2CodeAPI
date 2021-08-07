@@ -168,7 +168,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<BookingStatus> BookingStatus { get; set; }
         public DbSet<BookingInstance> BookingInstance { get; set; }
         public DbSet<Payment> Payment{ get; set; }
-
+        public DbSet<GroupSessionContent> GroupSessionContent { get; set; }
         public DbSet<Resource> Resource { get; set; }
 
 

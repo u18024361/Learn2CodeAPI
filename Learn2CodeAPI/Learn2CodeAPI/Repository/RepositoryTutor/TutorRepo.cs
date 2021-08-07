@@ -127,13 +127,31 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return entity;
         }
 
-       
-
-
-
 
         #endregion
 
+        #region sessioncontent
+        public async Task<IEnumerable<BookingInstance>> GetTutorSessions(int TutorId)
+        {
+            var sessions = await db.BookingInstance.Include(zz =>zz.Module).Where(zz => zz.TutorId == TutorId &&
+            zz.TutorSession.SessionType.SessionTypeName == "Group").ToListAsync();
+            return sessions;
+        }
+
+        public async Task<IEnumerable<SessionContentCategory>> GetSessionContentCategory()
+        {
+            var categories = await db.SessionContentCategory.ToListAsync();
+            return categories;
+        }
+
+        public async Task<IEnumerable<GroupSessionContent>> GroupSessionContent(int BookingInstanceId)
+        {
+            var content = await db.GroupSessionContent.Where(zz => zz.BookingInstanceId == BookingInstanceId).ToListAsync();
+            return content;
+        }
+
+
+        #endregion
 
     }
 }
