@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -151,6 +152,42 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
         }
 
 
+        #endregion
+
+        #region MaintainTutor
+        public async Task<Tutor> UpdateTutor(UpdateTutorDto dto)
+        {
+            //tutor table
+            var tutor = await db.Tutor.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+            tutor.TutorName = dto.TutorName;
+            tutor.TutorSurname= dto.TutorSurname;
+            tutor.TutorEmail = dto.TutorEmail;
+            tutor.TutorAbout = dto.TutorAbout;
+            tutor.TutorCell = dto.TutorCell;
+            using (var target = new MemoryStream())
+            {
+                dto.TutorPhoto.CopyTo(target);
+                tutor.TutorPhoto = target.ToArray();
+            }
+
+
+            //File
+            var File = await db.File.Where(zz => zz.Id == dto.FileId).FirstOrDefaultAsync();
+            using (var file = new MemoryStream())
+            {
+                dto.File.CopyTo(file);
+                File.FileName = file.ToArray();
+            }
+
+            //user table
+            var user = await db.Users.Where(zz => zz.Id == dto.UserId).FirstOrDefaultAsync();
+            user.Email = dto.TutorEmail;
+            user.NormalizedEmail = dto.TutorEmail.ToUpper();
+            user.NormalizedUserName = dto.UserName.ToUpper();
+            user.UserName = dto.UserName;
+            await db.SaveChangesAsync();
+            return tutor;
+        }
         #endregion
 
     }

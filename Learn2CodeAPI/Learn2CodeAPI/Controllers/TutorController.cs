@@ -33,6 +33,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<BookingInstance> BookingInstanceGenRepo;
         private IGenRepository<GroupSessionContent> GroupSessionContentGenRepo;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
 
         public TutorController(
@@ -40,6 +41,7 @@ namespace Learn2CodeAPI.Controllers
             ITutor _TutorRepo,
             IWebHostEnvironment hostEnvironment,
             IGenRepository<Student> _StudentGenRepo,
+            IGenRepository<Tutor> _Tutor,
             IGenRepository<Module> _ModuleRepo,
             IGenRepository<Message> _Message,
             IGenRepository<GroupSessionContent> _GroupSessionContentGenRepo,
@@ -61,6 +63,7 @@ namespace Learn2CodeAPI.Controllers
             BookingInstanceGenRepo = _BookingInstanceGenRepo;
             ResourceGenRepo = _Resource;
             GroupSessionContentGenRepo = _GroupSessionContentGenRepo;
+            TutorGenRepo = _Tutor;
         }
 
         #region ResourceCategory
@@ -876,6 +879,81 @@ namespace Learn2CodeAPI.Controllers
             var entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).FirstOrDefaultAsync();
             MemoryStream ms = new MemoryStream(entity.Recording);
             return new FileStreamResult(ms, "video/mp4");
+        }
+        #endregion
+
+        #region MaintainTutor
+
+        [HttpPut]
+        [Route("updateTutor")]
+        public async Task<IActionResult> UpdateStudentAsync([FromForm] UpdateTutorDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var check = await db.Users.Where(zz => zz.Email == dto.TutorEmail
+                && zz.Id != dto.UserId).FirstOrDefaultAsync();
+                if (check != null)
+                {
+                    result.message = "Sorry Email is taken";
+                    return BadRequest(result.message);
+                }
+                var checkusername = await db.Users.Where(zz => zz.UserName == dto.UserName
+               && zz.Id != dto.UserId).FirstOrDefaultAsync();
+                if (checkusername != null)
+                {
+                    result.message = "Sorry username is taken";
+                    return BadRequest(result.message);
+                }
+                
+                var data = await TutorRepo.UpdateTutor(dto);
+                result.data = data;
+                result.message = "Tutor updated";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong updating the Tutor";
+                return BadRequest(result.message);
+
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteTutor/{TutorId}")]
+        public async Task<IActionResult> DeleteTutor(int TutorId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var tutor = await db.Tutor.Where(zz => zz.Id == TutorId).FirstOrDefaultAsync();
+                var file = await db.File.Where(zz => zz.Id == tutor.FileId).FirstOrDefaultAsync();
+
+                var data = await TutorGenRepo.Delete(TutorId);
+                db.File.Remove(file);
+                await db.SaveChangesAsync();
+                result.data = data;
+                result.message = "Account deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting Your Account";
+                return BadRequest(result.message);
+            }
+
+
         }
         #endregion
 
