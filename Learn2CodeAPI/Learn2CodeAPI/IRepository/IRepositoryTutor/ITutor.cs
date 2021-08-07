@@ -28,6 +28,8 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
         Task<IEnumerable<SessionContentCategory>> GetSessionContentCategory();
         Task<IEnumerable<GroupSessionContent>> GroupSessionContent(int BookingInstanceId);
 
+        Task<Tutor> UpdateTutor(UpdateTutorDto dto);
+
 
     }
 }
