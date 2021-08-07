@@ -572,7 +572,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetGroupSessions(int TutorId)
         {
             var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
-                .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Group").FirstAsync();
+                .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Group").ToListAsync();
 
             return Ok(entity);
         }
@@ -582,7 +582,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetIndividualSessions(int TutorId)
         {
             var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
-                 .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Individual").FirstAsync();
+                 .Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Individual").ToListAsync();
 
             return Ok(entity);
         }
@@ -592,7 +592,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetAllSessions(int TutorId)
         {
             var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
-                 .Where(zz => zz.TutorId == TutorId).FirstAsync();
+                 .Where(zz => zz.TutorId == TutorId).ToListAsync();
 
             return Ok(entity);
         }
