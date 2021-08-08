@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210808165854_RegisteredStudent")]
+    partial class RegisteredStudent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "89ee56cd-3f6f-4e6e-8526-828162cfdeb6",
+                            ConcurrencyStamp = "9397d547-44b5-4efe-9934-038513f404f9",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEGNuYz718vVLsH2kRMNVISuLNc0tmxlnNY8FSWQqe0bI1gnBk0O7VxYBUlyEiouTQQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEEaTKNajW8bgvvPeD8rvRR5Ch48ou94gGzT627XcT7HlXQVKX/oLTCU6QqR673Ce0w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "945a7d5b-9608-4c91-a09e-7d2727956f05",
+                            SecurityStamp = "f9f51c57-4e73-42e2-abc0-ffc73c3c1900",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -626,9 +628,6 @@ namespace Learn2CodeAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("Attended")
-                        .HasColumnType("bit");
 
                     b.Property<int>("BookingInstanceId")
                         .HasColumnType("int");

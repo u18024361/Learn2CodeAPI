@@ -957,6 +957,121 @@ namespace Learn2CodeAPI.Controllers
         }
         #endregion
 
+        #region Finalize session
+        [HttpGet]
+        [Route("FinalizeSession/{BookingInstanceId}")]
+        public async Task<IActionResult> FinalizeSession(int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                int status = await db.BookingStatus.Where(zz => zz.bookingStatus == "Finalized").Select(zz => zz.Id).FirstAsync();
+                var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
+                instance.BookingStatusId = status;
+                result.data = instance;
+                result.message = "Session finalized";
+                return Ok(result);
+
+            }
+            catch
+            {
+                result.message = "Something went wrong finalizing the Session";
+                return BadRequest(result.message);
+
+            }
+        }
+        #endregion
+
+        #region Attendance
+        [HttpGet]
+        [Route("GetSessions/{TutorId}")]
+        public async Task<IActionResult> GetSessions(int TutorId)
+        {
+            var entity = await db.BookingInstance.Where(zz => zz.TutorId == TutorId && zz.TutorSession.SessionType.SessionTypeName == "Group")
+                .Include(zz =>zz.Module).ToListAsync();
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetSessionAttendance/{BookingInstanceId}")]
+        public async Task<IActionResult> GetSessionAttendance(int BookingInstanceId)
+        {
+            var entity = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == BookingInstanceId)
+                .Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpPost]
+        [Route("SubmitAttendance")]
+        public async Task<IActionResult> SubmitAttendance([FromBody] List<RegisteredStudent> register)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            { 
+                foreach(RegisteredStudent student in register)
+                {
+                    RegisteredStudent existreg = db.RegisteredStudent.Find(student.Id);
+                    existreg.Attended = student.Attended;
+                    var instance = await db.BookingInstance.Where(zz => zz.Id == student.BookingInstanceId).FirstOrDefaultAsync();
+                    instance.AttendanceTaken = true;
+                }
+                await db.SaveChangesAsync();
+               
+                result.data = register;
+                result.message = "Attendance Taken";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong taking attendance";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteAttendance/{BookingInstanceId}")]
+        public async Task<IActionResult> DeleteAttendance(int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                List<RegisteredStudent> list = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == BookingInstanceId).ToListAsync();
+                foreach(RegisteredStudent student in list)
+                {
+                  db.RegisteredStudent.Remove(student);
+                }
+                await db.SaveChangesAsync();
+                result.data = list;
+                result.message = "Attendance deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the attendance";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        #endregion
+
 
 
     }
