@@ -105,6 +105,19 @@ namespace Learn2CodeAPI.Data
                 .WithMany(c => c.Resource)
                 .HasForeignKey(bc => bc.ResourceCategoryId);
 
+            base.OnModelCreating(modelBuilder);
+
+            //modelBuilder.Entity<StudentModule>()
+            //.HasKey(bc => new { bc.StudentId, bc.ModuleId });
+            modelBuilder.Entity<RegisteredStudent>()
+                .HasOne(bc => bc.Student)
+                .WithMany(b => b.RegisteredStudent)
+                .HasForeignKey(bc => bc.StudentId);
+            modelBuilder.Entity<RegisteredStudent>()
+                .HasOne(bc => bc.BookingInstance)
+                .WithMany(c => c.RegisteredStudent)
+                .HasForeignKey(bc => bc.BookingInstanceId);
+
 
 
 
@@ -170,6 +183,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<Payment> Payment{ get; set; }
         public DbSet<GroupSessionContent> GroupSessionContent { get; set; }
         public DbSet<Resource> Resource { get; set; }
+        public DbSet<RegisteredStudent> RegisteredStudent { get; set; }
 
 
     }
