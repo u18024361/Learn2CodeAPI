@@ -66,6 +66,15 @@ namespace Learn2CodeAPI.Controllers
             TutorGenRepo = _Tutor;
         }
 
+        [HttpGet]
+        [Route("GetTutor/{UserId}")]
+        public async Task<IActionResult> GetResourceCategorybyId(string UserId)
+        {
+            var entity = await db.Tutor.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+
+            return Ok(entity);
+        }
+
         #region ResourceCategory
         [HttpGet]
         [Route("GetResourceCategorybyId/{ResourceCategoryId}")]
@@ -227,9 +236,28 @@ namespace Learn2CodeAPI.Controllers
         [Route("DownloadResource/{Resourceid}")]
         public async Task<FileStreamResult> DownloadResource(int Resourceid)
         {
-            var entity = await db.Resource.Where(zz => zz.Id == Resourceid).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
-           MemoryStream ms = new MemoryStream(entity);
-            return new FileStreamResult(ms, "Application/pdf");
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                result.message = "Sorry error on our side";
+                return Ok(result);
+            }
+            try
+            {
+                var entity = await db.Resource.Where(zz => zz.Id == Resourceid).Select(zz => zz.ResoucesName).FirstOrDefaultAsync();
+                MemoryStream ms = new MemoryStream(entity);
+                return new FileStreamResult(ms, "Application/pdf");
+
+
+            }
+            catch
+            {
+
+                result.message = "Something went wrong downloading the resource";
+                return BadRequest(result.message);
+            }
+
+           
         }
 
         

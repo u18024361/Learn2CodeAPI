@@ -118,6 +118,25 @@ namespace Learn2CodeAPI.Data
                 .WithMany(c => c.RegisteredStudent)
                 .HasForeignKey(bc => bc.BookingInstanceId);
 
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<CourseBasketLine>()
+                .HasOne(bc => bc.Basket)
+                .WithMany(b => b.CourseBasketLine)
+                .HasForeignKey(bc => bc.BasketId);
+            modelBuilder.Entity<CourseBasketLine>()
+                .HasOne(bc => bc.CourseSubCategory)
+                .WithMany(c => c.CourseBasketLine)
+                .HasForeignKey(bc => bc.CourseSubCategoryId);
+
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<CourseEnrolLine>()
+                .HasOne(bc => bc.CourseEnrol)
+                .WithMany(b => b.CourseEnrolLine)
+                .HasForeignKey(bc => bc.CourseEnrolId);
+            modelBuilder.Entity<CourseEnrolLine>()
+                .HasOne(bc => bc.CourseSubCategory)
+                .WithMany(c => c.CourseEnrolLine)
+                .HasForeignKey(bc => bc.CourseSubCategoryId);
 
 
 
@@ -183,6 +202,10 @@ namespace Learn2CodeAPI.Data
         public DbSet<Payment> Payment{ get; set; }
         public DbSet<GroupSessionContent> GroupSessionContent { get; set; }
         public DbSet<Resource> Resource { get; set; }
+        public DbSet<Basket> Basket { get; set; }
+        public DbSet<CourseBasketLine> CourseBasketLine { get; set; }
+        public DbSet<CourseEnrol> CourseEnrol { get; set; }
+        public DbSet<CourseEnrolLine> CourseEnrolLine { get; set; }
         public DbSet<RegisteredStudent> RegisteredStudent { get; set; }
 
 

@@ -3,6 +3,7 @@ using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.StudentDto;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Learn2CodeAPI.Models.Tutor;
@@ -26,6 +27,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             _userManager = userManager;
             
         }
+
+        #region Student
         public async Task<Student> Register(AppUser userIdentity, RegistrationDto model)
         {
             var result = await _userManager.CreateAsync(userIdentity, model.Password);
@@ -52,13 +55,18 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
                     StudentId = student.Id,
                     ModuleId = model.ModuleId
                 });
+                await db.Basket.AddAsync(new Basket
+                {
+                    StudentId = student.Id,
+
+                });
                 //await _userManager.AddToRoleAsync(userIdentity, "Student");
                 await db.SaveChangesAsync();
 
 
                 return student;
             }
-            catch (Exception )
+            catch (Exception)
             {
                 return null;
             }
@@ -75,8 +83,12 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
             //StudentModule
             var studentModule = db.StudentModule.Where(zz => zz.StudentId == dto.StudentId).FirstOrDefault();
-            studentModule.ModuleId = dto.ModuleId;
-            studentModule.StudentId = dto.StudentId;
+            if (dto.ModuleId != 0)
+            {
+                studentModule.ModuleId = dto.ModuleId;
+                studentModule.StudentId = dto.StudentId;
+            }
+
 
             //user table
             var user = db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefault();
@@ -87,6 +99,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             await db.SaveChangesAsync();
             return student;
         }
+
+        #endregion
 
         #region messages
         public async Task<Message> CreateMessage(MessageDto model)
@@ -120,8 +134,40 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return message;
         }
 
+        public async Task<IEnumerable<Tutor>> GetTutors()
+        {
+            var tutors = await db.Tutor.Include(zz => zz.Identity).Where(zz => zz.TutorStatus.TutorStatusDesc == "Accepted").ToListAsync();
+            return tutors;
+        }
 
 
+
+
+
+        #endregion
+
+        #region viewresources
+        public async Task<IEnumerable<Resource>> GetResource(int ModuleId)
+        {
+            var resource = await db.Resource.Include(zz => zz.ResourceCategory).Where(zz => zz.ModuleId == ModuleId).ToListAsync();
+            return resource;
+        }
+
+
+        #endregion
+
+        #region ViewShop
+        public async Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId)
+        {
+            var coursesubcategory = await db.courseSubCategory.Where(zz => zz.CourseFolderId == CourseFolderId).ToListAsync();
+            return coursesubcategory;
+        }
+
+        public async Task<Basket> GetBasket(int StudentId)
+        {
+            var basket = await db.Basket.Where(zz => zz.StudentId == StudentId).FirstOrDefaultAsync();
+            return basket;
+        }
         #endregion
     }
 }
