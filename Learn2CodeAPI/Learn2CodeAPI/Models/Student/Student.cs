@@ -24,5 +24,6 @@ namespace Learn2CodeAPI.Models.Student
         public ICollection<StudentModule> StudentModule { get; set; }
         public ICollection<Message> message { get; set; }
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
+        public ICollection<CourseEnrol> CourseEnrol { get; set; }
     }
 }
