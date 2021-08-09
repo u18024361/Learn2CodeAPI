@@ -166,7 +166,60 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
         public async Task<Basket> GetBasket(int StudentId)
         {
             var basket = await db.Basket.Where(zz => zz.StudentId == StudentId).FirstOrDefaultAsync();
+            int Quantity = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).CountAsync();
+            double TotalPrice = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).Include(zz => zz.CourseSubCategory).Select(zz => zz.CourseSubCategory.price).SumAsync();
+            basket.Quantity = Quantity;
+            basket.TotalPrice = TotalPrice;
+            await db.SaveChangesAsync();
             return basket;
+        }
+
+       
+        #endregion
+
+        #region AddtoBasket
+
+        //for courses
+        public async Task<CourseBasketLine> BuyCourse(CourseBuyDto dto)
+        {
+            CourseBasketLine courseBasket = new CourseBasketLine();
+
+            courseBasket.BasketId = dto.BasketId;
+            courseBasket.CourseSubCategoryId = dto.CourseSubCategoryId;
+
+            await db.CourseBasketLine.AddAsync(courseBasket);
+            await db.SaveChangesAsync();
+            return courseBasket;
+        }
+
+
+        #endregion
+
+        #region Checkout
+        public async Task<Basket> Checkout(CheckoutDto dto)
+        {
+            var coursebasketline = await db.CourseBasketLine.Where(zz => zz.BasketId == dto.BasketId).ToListAsync();
+            string timestring = DateTime.Now.ToString("MM/dd/yyyy");
+            CourseEnrol x = new CourseEnrol();
+            x.StudentId = dto.StudentId;
+            x.Date = timestring;
+            await db.CourseEnrol.AddAsync(x);
+            await db.SaveChangesAsync();
+            foreach (CourseBasketLine course in coursebasketline)
+            {
+                
+                CourseEnrolLine y = new CourseEnrolLine();
+                y.CourseSubCategoryId = course.CourseSubCategoryId;
+                y.CourseEnrolId = x.Id;
+                await db.CourseEnrolLine.AddAsync(y);
+                db.CourseBasketLine.Remove(course);
+            }
+            var basket = await db.Basket.Where(zz => zz.Id == dto.BasketId).FirstOrDefaultAsync();
+            basket.Quantity = 0;
+            basket.TotalPrice = 0;
+            await db.SaveChangesAsync();
+            return basket;
+
         }
         #endregion
     }
