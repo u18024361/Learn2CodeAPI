@@ -36,11 +36,12 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Module> ModuleGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
             AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message>_Mess,IGenRepository<Message>_Mes, 
-            IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo)
+            IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo, IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -52,6 +53,7 @@ namespace Learn2CodeAPI.Controllers
             Mess = _Mes;
             ModuleGenRepo = _ModuleGenRepo;
             CourseFolderGenRepo = _CourseFolderGenRepo;
+            CourseBasketLineGenRepo = _CourseBasketLineGenRepo;
 
         }
 
@@ -154,6 +156,7 @@ namespace Learn2CodeAPI.Controllers
             return Ok(students);
 
         }
+
 
        
 
@@ -303,11 +306,11 @@ namespace Learn2CodeAPI.Controllers
 
         #region ViewShop
         [HttpGet]
-        [Route("GetBasket{StudentId}")]
+        [Route("GetBasket/{StudentId}")]
         public async Task<IActionResult> GetBasket(int StudentId)
         {
 
-            var coursefolder = await CourseFolderGenRepo.GetAll();
+            var coursefolder = await studentRepo.GetBasket(StudentId);
             return Ok(coursefolder);
 
         }
@@ -334,33 +337,138 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
         #region Addtobasket
-        //[HttpPost]
-        //[Route("AddtoBasket")]
-        //public async Task<IActionResult> AddtoBasket([FromBody] CourseSubCategory dto)
-        //{
-        //    dynamic result = new ExpandoObject();
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-        //    try
-        //    {
-        //        var data = await studentRepo.CreateMessage(dto);
-        //        result.data = data;
-        //        result.message = "Message sent";
-        //        return Ok(result);
-        //    }
-        //    catch
-        //    {
+        //for courses
+        [HttpPost]
+        [Route("AddCoursetoBasket")]
+        public async Task<IActionResult> AddtoBasket([FromBody] CourseBuyDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await studentRepo.BuyCourse(dto);
+                result.data = data;
+                result.message = "Course added";
+                return Ok(result);
+            }
+            catch
+            {
 
-        //        result.message = "Something went wrong sending the message";
-        //        return BadRequest(result.message);
-        //    }
+                result.message = "Something went wrong adding the course";
+                return BadRequest(result.message);
+            }
 
-        //}
+        }
         #endregion
 
+        #region ViewBasket
+        [HttpGet]
+        [Route("GetBasketCourses/{BasketId}")]
+        public async Task<IActionResult> GetBasketCourses(int BasketId)
+        {
 
+            var courses = await db.CourseBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.CourseSubCategory).ToListAsync();
+            return Ok(courses);
+
+        }
+        #endregion
+
+        #region Checkout
+        [HttpPost]
+        [Route("Checkout")]
+        public async Task<IActionResult> Checkout([FromBody] CheckoutDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                if(dto.Message != "Approved")
+                {
+                    result.message = "Error when Checking out";
+                    return Ok(result);
+                }
+
+
+
+                var data = await studentRepo.Checkout(dto);
+                result.data = data;
+                result.message = "Message sent";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong While checking out";
+                return BadRequest(result.message);
+            }
+
+        }
+        #endregion
+
+        #region viewCourses
+        [HttpGet]
+        [Route("GetStudentCourses/{StudentId}")]
+        public async Task<IActionResult> GetStudentCourses(int StudentId)
+        {
+
+            var Courses = await db.CourseEnrol.Include(zz => zz.CourseEnrolLine)
+                .ThenInclude(StudentModule => StudentModule.CourseSubCategory.courseFolder).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return Ok(Courses);
+
+        }
+        [HttpGet]
+        [Route("Video/{id}")]
+        public async Task<FileStreamResult> Video(int id)
+        {
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Content);
+            return new FileStreamResult(ms, "video/mp4");
+        }
+
+        [HttpGet]
+        [Route("DownloadRContentPdf/{id}")]
+        public async Task<FileStreamResult> DownloadRContentPdf(int id)
+        {
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).Select(zz => zz.Content).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity);
+            return new FileStreamResult(ms, "Application/pdf");
+        }
+
+        #endregion
+
+        #region removeItem
+        [HttpDelete]
+        [Route("RemoveCourse/{CourseBasketLineId}")]
+        public async Task<IActionResult> DeleteResourceCategory(int CourseBasketLineId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await CourseBasketLineGenRepo.Delete(CourseBasketLineId);
+                result.data = data;
+                result.message = "Course Removed";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong removing the course";
+                return BadRequest(result.message);
+            }
+
+
+        }
+        #endregion
 
     }
 }

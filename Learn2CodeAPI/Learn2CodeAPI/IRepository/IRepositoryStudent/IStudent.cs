@@ -24,6 +24,9 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<IEnumerable<Resource>> GetResource(int ModuleId);
         Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId);
         Task<Basket> GetBasket(int StudentId);
+        Task<CourseBasketLine> BuyCourse(CourseBuyDto dto);
+
+        Task<Basket>Checkout(CheckoutDto dto);
 
     }
 }

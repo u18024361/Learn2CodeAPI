@@ -433,13 +433,10 @@ C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcore
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.dll
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.pdb
 C:\Users\Bea\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.genruntimeconfig.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.csprojAssemblyReference.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.Manifest.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.xml
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfoInputs.cache
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfo.cs
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\it\Microsoft.CodeAnalysis.CSharp.resources.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\appsettings.Development.json
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\appsettings.json
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Properties\launchSettings.json
@@ -466,6 +463,7 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.Razor.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.CodeAnalysis.Workspaces.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.Data.SqlClient.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Abstractions.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Design.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\Microsoft.EntityFrameworkCore.Relational.dll
@@ -539,8 +537,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\de\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\es\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\fr\Microsoft.CodeAnalysis.CSharp.resources.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\it\Microsoft.CodeAnalysis.CSharp.resources.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\ja\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\ko\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\pl\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\pt-BR\Microsoft.CodeAnalysis.CSharp.resources.dll
@@ -574,7 +570,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\tr\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.1\Microsoft.Data.SqlClient.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win-arm\native\Microsoft.Data.SqlClient.SNI.pdb
@@ -590,8 +585,13 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Runtime.Caching.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.Manifest.cache
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.xml
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfoInputs.cache
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfo.cs
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.RazorTargetAssemblyInfo.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.csproj.CopyComplete
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.pdb
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.csprojAssemblyReference.cache
