@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210810115129_subshop")]
+    partial class subshop
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "88243897-75be-4739-8ff9-63797a0d79cb",
+                            ConcurrencyStamp = "6a02460e-7cee-483f-8ef5-4e4ee9b2fb1a",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEFNC8vhbN0XOYKOOFE7l8HqYdDXY7Xp9qYbanb7iIN79LWA56YkjTfdStR0hETKAUQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPRe6APU6dZCLvqWXBzj3NG/ZGnMFB4pVlA9+XlFUeN52QYx9uUpK5JMdPfBdH54JQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5707317a-e1cb-46e4-8841-40201ae048dd",
+                            SecurityStamp = "cd018618-7c81-475d-bcac-fc2365673407",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -570,56 +572,6 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("SubscriptionId");
 
                     b.ToTable("SubScriptionBasketLine");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Student.Ticket", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("EnrollmentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ExpDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SubscriptionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TicketStatusId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TutorSessionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EnrollmentId");
-
-                    b.HasIndex("SubscriptionId");
-
-                    b.HasIndex("TicketStatusId");
-
-                    b.HasIndex("TutorSessionId");
-
-                    b.ToTable("Ticket");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Student.TicketStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("ticketStatus")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TicketStatus");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Basket", b =>
@@ -1421,41 +1373,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Subscription");
                 });
 
-            modelBuilder.Entity("Learn2CodeAPI.Models.Student.Ticket", b =>
-                {
-                    b.HasOne("Learn2CodeAPI.Models.Student.Enrollment", "Enrollment")
-                        .WithMany("Ticket")
-                        .HasForeignKey("EnrollmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learn2CodeAPI.Models.Admin.Subscription", "Subscription")
-                        .WithMany("Ticket")
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learn2CodeAPI.Models.Student.TicketStatus", "TicketStatus")
-                        .WithMany("Ticket")
-                        .HasForeignKey("TicketStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Learn2CodeAPI.Models.Admin.TutorSession", "TutorSession")
-                        .WithMany("Ticket")
-                        .HasForeignKey("TutorSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Enrollment");
-
-                    b.Navigation("Subscription");
-
-                    b.Navigation("TicketStatus");
-
-                    b.Navigation("TutorSession");
-                });
-
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Basket", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Student.Student", "Student")
@@ -1798,8 +1715,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("SubScriptionBasketLine");
 
                     b.Navigation("SubscriptionTutorSession");
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Admin.TutorSession", b =>
@@ -1807,8 +1722,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("BookingInstance");
 
                     b.Navigation("SubscriptionTutorSession");
-
-                    b.Navigation("Ticket");
 
                     b.Navigation("TutorSessionModule");
 
@@ -1823,8 +1736,6 @@ namespace Learn2CodeAPI.Migrations
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Enrollment", b =>
                 {
                     b.Navigation("EnrolLine");
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
@@ -1836,11 +1747,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("RegisteredStudent");
 
                     b.Navigation("StudentModule");
-                });
-
-            modelBuilder.Entity("Learn2CodeAPI.Models.Student.TicketStatus", b =>
-                {
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.Basket", b =>

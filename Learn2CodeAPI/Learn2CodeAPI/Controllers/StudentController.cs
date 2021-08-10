@@ -37,11 +37,13 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<Message> MessageGenRepo;
         private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
+        private IGenRepository<SubScriptionBasketLine> SubScriptionBasketLineGenRepo;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
             AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message>_Mess,IGenRepository<Message>_Mes, 
-            IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo, IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo)
+            IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
+            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -54,6 +56,7 @@ namespace Learn2CodeAPI.Controllers
             ModuleGenRepo = _ModuleGenRepo;
             CourseFolderGenRepo = _CourseFolderGenRepo;
             CourseBasketLineGenRepo = _CourseBasketLineGenRepo;
+            SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
 
         }
 
@@ -316,6 +319,26 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetModule")]
+        public async Task<IActionResult> GetModule()
+        {
+
+            var coursefolder = await ModuleGenRepo.GetAll();
+            return Ok(coursefolder);
+
+        }
+
+        [HttpGet]
+        [Route("GetSubscription")]
+        public async Task<IActionResult> GetSubscription()
+        {
+
+            var coursefolder = await studentRepo.GetSubscriptions();
+            return Ok(coursefolder);
+
+        }
+
+        [HttpGet]
         [Route("GetCourseFolder")]
         public async Task<IActionResult> GetCourseFolder()
         {
@@ -362,9 +385,35 @@ namespace Learn2CodeAPI.Controllers
             }
 
         }
+        //for subscriptions
+        [HttpPost]
+        [Route("AddSubscriptiontoBasket")]
+        public async Task<IActionResult> AddSubscriptiontoBasket([FromBody] SubscriptionBuyDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await studentRepo.BuySubscription(dto);
+                result.data = data;
+                result.message = "Subscription added";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong adding the Subscription";
+                return BadRequest(result.message);
+            }
+
+        }
         #endregion
 
         #region ViewBasket
+        //forcourses
         [HttpGet]
         [Route("GetBasketCourses/{BasketId}")]
         public async Task<IActionResult> GetBasketCourses(int BasketId)
@@ -372,6 +421,16 @@ namespace Learn2CodeAPI.Controllers
 
             var courses = await db.CourseBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.CourseSubCategory).ToListAsync();
             return Ok(courses);
+
+        }
+        //forsubscriptions
+        [HttpGet]
+        [Route("GetBasketSubscriptions/{BasketId}")]
+        public async Task<IActionResult> GetBasketSubscriptions(int BasketId)
+        {
+
+            var Subscriptions = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.Module).Include(zz => zz.Subscription).ToListAsync();
+            return Ok(Subscriptions);
 
         }
         #endregion
@@ -398,7 +457,7 @@ namespace Learn2CodeAPI.Controllers
 
                 var data = await studentRepo.Checkout(dto);
                 result.data = data;
-                result.message = "Message sent";
+                result.message = "Checkout Successfull";
                 return Ok(result);
             }
             catch
@@ -443,6 +502,7 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
         #region removeItem
+        //for courses
         [HttpDelete]
         [Route("RemoveCourse/{CourseBasketLineId}")]
         public async Task<IActionResult> DeleteResourceCategory(int CourseBasketLineId)
@@ -463,6 +523,33 @@ namespace Learn2CodeAPI.Controllers
             {
 
                 result.message = "Something went wrong removing the course";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        // for subscriptions
+        [HttpDelete]
+        [Route("RemoveSubscription/{SubScriptionBasketLineId}")]
+        public async Task<IActionResult> RemoveSubscription(int SubScriptionBasketLineId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var data = await SubScriptionBasketLineGenRepo.Delete(SubScriptionBasketLineId);
+                result.data = data;
+                result.message = "Subscription Removed";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong removing the subscription";
                 return BadRequest(result.message);
             }
 
