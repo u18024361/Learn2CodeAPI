@@ -105,7 +105,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
         public async Task<IEnumerable<Student>> GetAllStudents()
         {
 
-            var Students = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Tutor.Degree.University).ToListAsync(); 
+            var Students = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Module.Degree.University).ToListAsync(); 
             return Students;
         }
 

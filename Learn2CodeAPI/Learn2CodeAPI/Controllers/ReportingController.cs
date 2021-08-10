@@ -86,11 +86,11 @@ namespace Learn2CodeAPI.Controllers
 
         #region studentdetails
         [HttpGet]
-        [Route("TutorDetails")]
+        [Route("StudentDetails")]
         public async Task<IActionResult> GetAllStudents()
         {
 
-            var Students = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Tutor.Degree.University).ToListAsync();
+            var Students = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule).ThenInclude(StudentModule => StudentModule.Module.Degree.University).ToListAsync();
             return Ok(Students);
         }
 

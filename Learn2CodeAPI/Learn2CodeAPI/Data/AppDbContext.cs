@@ -29,7 +29,7 @@ namespace Learn2CodeAPI.Data
                 .WithMany(b => b.StudentModule)
                 .HasForeignKey(bc => bc.StudentId);
             modelBuilder.Entity<StudentModule>()
-                .HasOne(bc => bc.Tutor)
+                .HasOne(bc => bc.Module)
                 .WithMany(c => c.StudentModule)
                 .HasForeignKey(bc => bc.ModuleId);
 
