@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Models.Generic;
+using Learn2CodeAPI.Models.Student;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,5 +22,8 @@ namespace Learn2CodeAPI.Models.Admin
         public double price { get; set; }
 
         public ICollection<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
+        public ICollection<SubScriptionBasketLine> SubScriptionBasketLine { get; set; }
+        public ICollection<EnrolLine> EnrolLine { get; set; }
+        public ICollection<Ticket> Ticket { get; set; }
     }
 }

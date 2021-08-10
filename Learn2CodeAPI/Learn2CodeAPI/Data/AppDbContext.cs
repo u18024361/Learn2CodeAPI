@@ -138,6 +138,33 @@ namespace Learn2CodeAPI.Data
                 .WithMany(c => c.CourseEnrolLine)
                 .HasForeignKey(bc => bc.CourseSubCategoryId);
 
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<SubScriptionBasketLine>()
+                .HasOne(bc => bc.Basket)
+                .WithMany(b => b.SubScriptionBasketLine)
+                .HasForeignKey(bc => bc.BasketId);
+            modelBuilder.Entity<SubScriptionBasketLine>()
+                .HasOne(bc => bc.Subscription)
+                .WithMany(c => c.SubScriptionBasketLine)
+                .HasForeignKey(bc => bc.SubscriptionId);
+            modelBuilder.Entity<SubScriptionBasketLine>()
+                .HasOne(bc => bc.Module)
+                .WithMany(c => c.SubScriptionBasketLine)
+                .HasForeignKey(bc => bc.ModuleId);
+
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<EnrolLine>()
+                .HasOne(bc => bc.Enrollment)
+                .WithMany(b => b.EnrolLine)
+                .HasForeignKey(bc => bc.EnrollmentId);
+            modelBuilder.Entity<EnrolLine>()
+                .HasOne(bc => bc.Subscription)
+                .WithMany(c => c.EnrolLine)
+                .HasForeignKey(bc => bc.SubscriptionId);
+            modelBuilder.Entity<EnrolLine>()
+                .HasOne(bc => bc.Module)
+                .WithMany(c => c.EnrolLine)
+                .HasForeignKey(bc => bc.ModuleId);
 
 
             //create user
@@ -207,6 +234,11 @@ namespace Learn2CodeAPI.Data
         public DbSet<CourseEnrol> CourseEnrol { get; set; }
         public DbSet<CourseEnrolLine> CourseEnrolLine { get; set; }
         public DbSet<RegisteredStudent> RegisteredStudent { get; set; }
+        public DbSet<SubScriptionBasketLine> SubScriptionBasketLine { get; set; }
+        public DbSet<EnrolLine> EnrolLine { get; set; }
+        public DbSet<Enrollment> Enrollment { get; set; }
+        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<TicketStatus> TicketStatus { get; set; }
 
 
     }

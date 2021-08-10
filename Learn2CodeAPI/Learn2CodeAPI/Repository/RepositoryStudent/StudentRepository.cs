@@ -163,13 +163,20 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return coursesubcategory;
         }
 
+        public async Task<IEnumerable<Subscription>> GetSubscriptions()
+        {
+           var subscriptions = await db.Subscription.Include(zz => zz.SubscriptionTutorSession).ThenInclude(SubscriptionTutorSession => SubscriptionTutorSession.TutorSession.SessionType).ToListAsync();
+            return subscriptions;
+        }
         public async Task<Basket> GetBasket(int StudentId)
         {
             var basket = await db.Basket.Where(zz => zz.StudentId == StudentId).FirstOrDefaultAsync();
-            int Quantity = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).CountAsync();
-            double TotalPrice = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).Include(zz => zz.CourseSubCategory).Select(zz => zz.CourseSubCategory.price).SumAsync();
-            basket.Quantity = Quantity;
-            basket.TotalPrice = TotalPrice;
+            int CourseQuantity = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).CountAsync();
+            double CourseTotalPrice = await db.CourseBasketLine.Where(zz => zz.BasketId == basket.Id).Include(zz => zz.CourseSubCategory).Select(zz => zz.CourseSubCategory.price).SumAsync();
+            int SubscriptionQuantity = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == basket.Id).CountAsync();
+            double SubscriptionTotalPrice = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == basket.Id).Include(zz =>zz.Subscription).Select(zz => zz.Subscription.price).SumAsync();
+            basket.Quantity = CourseQuantity + SubscriptionQuantity;
+            basket.TotalPrice = CourseTotalPrice + SubscriptionTotalPrice;
             await db.SaveChangesAsync();
             return basket;
         }
@@ -192,6 +199,20 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return courseBasket;
         }
 
+        public async Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto)
+        {
+            SubScriptionBasketLine SubscriptionBasket = new SubScriptionBasketLine();
+
+            SubscriptionBasket.BasketId = dto.BasketId;
+            SubscriptionBasket.SubscriptionId = dto.SubscriptionId;
+            SubscriptionBasket.ModuleId = dto.ModuleId;
+
+
+            await db.SubScriptionBasketLine.AddAsync(SubscriptionBasket);
+            await db.SaveChangesAsync();
+            return SubscriptionBasket;
+        }
+
 
         #endregion
 
@@ -199,21 +220,67 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
         public async Task<Basket> Checkout(CheckoutDto dto)
         {
             var coursebasketline = await db.CourseBasketLine.Where(zz => zz.BasketId == dto.BasketId).ToListAsync();
-            string timestring = DateTime.Now.ToString("MM/dd/yyyy");
-            CourseEnrol x = new CourseEnrol();
-            x.StudentId = dto.StudentId;
-            x.Date = timestring;
-            await db.CourseEnrol.AddAsync(x);
-            await db.SaveChangesAsync();
-            foreach (CourseBasketLine course in coursebasketline)
+            var subscriptionbasketline = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == dto.BasketId).ToListAsync();
+            if (coursebasketline.Count != 0)
             {
-                
-                CourseEnrolLine y = new CourseEnrolLine();
-                y.CourseSubCategoryId = course.CourseSubCategoryId;
-                y.CourseEnrolId = x.Id;
-                await db.CourseEnrolLine.AddAsync(y);
-                db.CourseBasketLine.Remove(course);
+                string timestring = DateTime.Now.ToString("MM/dd/yyyy");
+                CourseEnrol x = new CourseEnrol();
+                x.StudentId = dto.StudentId;
+                x.Date = timestring;
+                await db.CourseEnrol.AddAsync(x);
+                await db.SaveChangesAsync();
+                foreach (CourseBasketLine course in coursebasketline)
+                {
+
+                    CourseEnrolLine y = new CourseEnrolLine();
+                    y.CourseSubCategoryId = course.CourseSubCategoryId;
+                    y.CourseEnrolId = x.Id;
+                    await db.CourseEnrolLine.AddAsync(y);
+                    db.CourseBasketLine.Remove(course);
+                }
             }
+
+            if (subscriptionbasketline.Count != 0)
+            {
+                string timestring = DateTime.Now.ToString("MM/dd/yyyy");
+                Enrollment z = new Enrollment();
+                z.StudentId = dto.StudentId;
+                z.Date = timestring;
+                await db.Enrollment.AddAsync(z);
+                await db.SaveChangesAsync();
+                var status = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
+                foreach (SubScriptionBasketLine sub in subscriptionbasketline)
+                {
+                    var ticketquantity = await db.SubscriptionTutorSession.Where(zz => zz.SubscriptionId == sub.SubscriptionId).FirstOrDefaultAsync();
+                    var duration = await db.Subscription.Where(zz => zz.Id == sub.SubscriptionId).FirstOrDefaultAsync();
+                    
+                    
+                    EnrolLine y = new EnrolLine();
+                    y.SubscriptionId = sub.SubscriptionId;
+                    y.EnrollmentId = z.Id;
+                    y.ModuleId = sub.ModuleId;
+                    y.TicketQuantity = ticketquantity.Quantity;
+                    y.StartDate = DateTime.Now;
+                    y.EndDate = DateTime.Now.AddMonths(duration.Duration);
+                    await db.EnrolLine.AddAsync(y);
+                    db.SubScriptionBasketLine.Remove(sub);
+
+                    for (int i = 0; i < ticketquantity.Quantity; i++)
+                    {
+                        Ticket ticket = new Ticket();
+                        ticket.EnrollmentId = z.Id;
+                        ticket.TicketStatusId = status.Id;
+                        ticket.SubscriptionId = sub.SubscriptionId;
+                        ticket.TutorSessionId = ticketquantity.TutorSessionId;
+                        ticket.ModuleId = sub.ModuleId;
+                        ticket.ExpDate = y.EndDate;
+                        await db.Ticket.AddAsync(ticket);
+
+                    }
+                }
+            }
+
+
             var basket = await db.Basket.Where(zz => zz.Id == dto.BasketId).FirstOrDefaultAsync();
             basket.Quantity = 0;
             basket.TotalPrice = 0;
@@ -221,6 +288,9 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return basket;
 
         }
+
+        
+
         #endregion
     }
 }
