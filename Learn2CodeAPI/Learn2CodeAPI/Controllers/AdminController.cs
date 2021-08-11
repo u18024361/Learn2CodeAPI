@@ -1322,6 +1322,16 @@ namespace Learn2CodeAPI.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("GetPayments")]
+        public async Task<IActionResult> GetUniversitybyId()
+        {
+            var entity = await AdminRepo.GetPayments();
+
+            return Ok(entity);
+        }
+
+
         #endregion
 
 
