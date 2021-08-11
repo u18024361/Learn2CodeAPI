@@ -1,6 +1,9 @@
 ﻿using Learn2CodeAPI.Dtos.StudentDto;
+using Learn2CodeAPI.Dtos.TutorDto;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
+using Learn2CodeAPI.Models.Tutor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,5 +16,18 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Student> Register(AppUser userIdentity, RegistrationDto model);
 
         Task<Student> UpdateProfile(UpdateStudent dto);
+        Task<IEnumerable<Message>> GetSentMessages(string UserId);
+        Task<IEnumerable<Message>> GetRecievedMessages(string UserId);
+        Task<Message> CreateMessage(MessageDto model);
+
+        Task<IEnumerable<Tutor>> GetTutors();
+        Task<IEnumerable<Resource>> GetResource(int ModuleId);
+        Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId);
+        Task<IEnumerable<Subscription>> GetSubscriptions();
+        Task<Basket> GetBasket(int StudentId);
+        Task<CourseBasketLine> BuyCourse(CourseBuyDto dto);
+        Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto);
+        Task<Basket>Checkout(CheckoutDto dto);
+
     }
 }

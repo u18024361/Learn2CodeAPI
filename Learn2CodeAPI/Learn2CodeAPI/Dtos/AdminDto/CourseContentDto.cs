@@ -1,4 +1,5 @@
 ﻿using Learn2CodeAPI.Dtos.GenericDto;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,8 @@ namespace Learn2CodeAPI.Dtos.AdminDto
 {
     public class CourseContentDto : BaseDto
     {
-        public byte[] File { get; set; }
+        public IFormFile Content { get; set; }
+        
         public int CourseSubCategoryId { get; set; }
 
         public int ContentTypeId { get; set; }

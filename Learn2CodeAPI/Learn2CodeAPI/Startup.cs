@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
@@ -9,22 +10,26 @@ using Learn2CodeAPI.IRepository.IRepositoryAdmin;
 using Learn2CodeAPI.IRepository.IRepositoryLogin;
 using Learn2CodeAPI.IRepository.IRepositoryStudent;
 using Learn2CodeAPI.IRepository.IRepositoryTutor;
+using Learn2CodeAPI.JwtFeatures;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Repository.Generic;
 using Learn2CodeAPI.Repository.RepositoryAdmin;
 using Learn2CodeAPI.Repository.RepositoryLogin;
 using Learn2CodeAPI.Repository.RepositoryStudent;
 using Learn2CodeAPI.Repository.RepositoryTutor;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Learn2CodeAPI
 {
@@ -54,7 +59,25 @@ namespace Learn2CodeAPI
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
             services.AddIdentity<AppUser, IdentityRole>()
                      .AddEntityFrameworkStores<AppDbContext>();
-
+            var jwtSettings = Configuration.GetSection("JwtSettings");
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = jwtSettings.GetSection("validIssuer").Value,
+                    ValidAudience = jwtSettings.GetSection("validAudience").Value,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.GetSection("securityKey").Value))
+                };
+            });
+            services.AddScoped<JwtHandler>();
 
 
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -85,9 +108,10 @@ namespace Learn2CodeAPI
 
             app.UseRouting();
 
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
             SeedHelpers.SeedDb(context, userManeger);
+            app.UseStaticFiles();
             app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>

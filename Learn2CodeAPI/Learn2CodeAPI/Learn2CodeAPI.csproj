@@ -5,16 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\LoginDto\IdentityDto\" />
-    <Folder Include="Dtos\ReportDto\" />
     <Folder Include="IRepository\IRepositoryReport\" />
     <Folder Include="Models\Report\" />
+    <Folder Include="Images\" />
     <Folder Include="Repository\RepositoryReport\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
+    <PackageReference Include="CsvHelper" Version="27.1.1" />
+    <PackageReference Include="EPPlus" Version="5.7.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.15" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.0.0" />

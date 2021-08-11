@@ -74,7 +74,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             await db.SaveChangesAsync();
 
             int idTrue = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == true).Select(zz => zz.Id).FirstOrDefaultAsync();
-            int idFalse = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == false).Select(zz => zz.Id).FirstOrDefaultAsync(); ;
+            int idFalse = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == false).Select(zz => zz.Id).FirstOrDefaultAsync(); 
 
             TutorSessionModule TSM = new TutorSessionModule();
             TSM.ModuleId = module.Id;
@@ -117,14 +117,15 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
         public async Task<IEnumerable<Tutor>> GetAllApplications()
         {
 
-            var Applicants = await db.Tutor.Include(zz => zz.TutorStatus).Include(zz =>zz.File).Where(zz => zz.TutorStatus.TutorStatusDesc == "Applied").ToListAsync();
+            var Applicants = await db.Tutor.Include(zz => zz.TutorStatus).Include(zz =>zz.File).Include(zz =>zz.TutorModule).ThenInclude(zz =>zz.Module)
+                .Where(zz => zz.TutorStatus.TutorStatusDesc == "Applied").ToListAsync();
             return Applicants;
         }
 
         public async Task<IEnumerable<Tutor>> GetAllTutors()
         {
 
-            var Tutors = await db.Tutor.Where(zz => zz.TutorStatus.TutorStatusDesc == "Accepted").ToListAsync();
+            var Tutors = await db.Tutor.Include(zz => zz.TutorStatus).Include(zz => zz.File).Include(zz => zz.TutorModule).ThenInclude(zz => zz.Module).Where(zz => zz.TutorStatus.TutorStatusDesc == "Accepted").ToListAsync();
             return Tutors;
         }
 
@@ -142,6 +143,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
         {
             
             var result = await  _userManager.CreateAsync(userIdentity, tutor.Password);
+            await _userManager.AddToRoleAsync(userIdentity, "Tutor");
 
             if (!result.Succeeded)
             {
@@ -153,6 +155,23 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             AcceptedTutor.UserId = userIdentity.Id;
             AcceptedTutor.TutorStatusId = idAccepted;
            await db.SaveChangesAsync();
+
+
+            int idTrue = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == true).Select(zz => zz.Id).FirstOrDefaultAsync();
+            int idFalse = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == false).Select(zz => zz.Id).FirstOrDefaultAsync();
+
+            TutorSessionModuleTutor td = new TutorSessionModuleTutor();
+            td.TutorId = AcceptedTutor.Id;
+            td.ModuleId = tutor.ModuleId;
+            td.TutorSessionId = idTrue;
+            await db.TutorSessionModuleTutor.AddAsync(td);
+            await db.SaveChangesAsync();
+            TutorSessionModuleTutor tdg = new TutorSessionModuleTutor();
+            tdg.TutorId = AcceptedTutor.Id;
+            tdg.ModuleId = tutor.ModuleId;
+            tdg.TutorSessionId = idFalse;
+            await db.TutorSessionModuleTutor.AddAsync(tdg);
+            await db.SaveChangesAsync();
             return AcceptedTutor;
         }
 
@@ -192,9 +211,17 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             await db.SaveChangesAsync();
             return entity;
         }
+
+
         #endregion
 
-
+        #region csv
+        public async Task<IEnumerable<Payment>> GetPayments()
+        {
+            var payments = await db.Payment.ToListAsync();
+                return payments;
+        }
+        #endregion
 
 
     }

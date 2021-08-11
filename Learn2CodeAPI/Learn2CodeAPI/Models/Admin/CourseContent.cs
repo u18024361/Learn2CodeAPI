@@ -9,9 +9,9 @@ namespace Learn2CodeAPI.Models.Admin
 {
     public class CourseContent : BaseEntity
     {
-        public string Filepath { get; set; }
+        public string FileName { get; set; }
 
-        public byte[] DataFiles { get; set; }
+        public byte[] Content { get; set; }
         public int CourseSubCategoryId { get; set; }
 
         [ForeignKey("CourseSubCategoryId")]

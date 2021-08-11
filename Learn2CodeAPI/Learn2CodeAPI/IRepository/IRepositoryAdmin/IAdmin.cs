@@ -34,6 +34,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
 
         Task<Subscription> CreateSubscription( SubscriptionDto subscription);
         Task<Subscription> UpdateSubscription(SubscriptionDto subscription);
+        Task<IEnumerable<Payment>> GetPayments();
 
     }
 }

@@ -15,7 +15,7 @@ namespace Learn2CodeAPI.Models.Tutor
         public string TutorCell { get; set; }
         public string TutorAbout { get; set; }
 
-        public string TutorPhoto { get; set; }
+        public byte[] TutorPhoto { get; set; }
         public string TutorEmail { get; set; }
 
         public int FileId { get; set; }
@@ -31,5 +31,10 @@ namespace Learn2CodeAPI.Models.Tutor
         public TutorStatus TutorStatus { get; set; }
 
         public ICollection<Message> message { get; set; }
+
+        public ICollection<TutorModule> TutorModule { get; set; }
+        public ICollection<TutorSessionModuleTutor> TutorSessionModuleTutor { get; set; }
+
+        public ICollection<BookingInstance> BookingInstance { get; set; }
     }
 }
