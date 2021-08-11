@@ -210,9 +210,17 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             await db.SaveChangesAsync();
             return entity;
         }
+
+
         #endregion
 
-
+        #region csv
+        public async Task<IEnumerable<Payment>> GetPayments()
+        {
+            var payments = await db.Payment.ToListAsync();
+                return payments;
+        }
+        #endregion
 
 
     }

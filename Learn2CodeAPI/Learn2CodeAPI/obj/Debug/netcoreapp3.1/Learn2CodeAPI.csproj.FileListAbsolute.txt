@@ -587,7 +587,6 @@ C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\net
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\bin\Debug\netcoreapp3.1\runtimes\win\lib\netstandard2.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.Manifest.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\staticwebassets\Learn2CodeAPI.StaticWebAssets.xml
-C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfoInputs.cache
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.AssemblyInfo.cs
 C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Learn2CodeAPI\obj\Debug\netcoreapp3.1\Learn2CodeAPI.RazorTargetAssemblyInfo.cache
