@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Emailservice;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Data.Mapper;
 using Learn2CodeAPI.IRepository.Generic;
@@ -50,11 +51,19 @@ namespace Learn2CodeAPI
                 x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
 
+          
+                         
+
             services.AddControllers();
             services.AddScoped<IStudent, StudentRepository>();
             services.AddScoped<ITutor, TutorRepo>();
             services.AddScoped<IAdmin, AdminRepo>();
             services.AddScoped<ILogin, LoginRepo>();
+            services.AddScoped<IEmailSender, EmailSender>();
+            var emailConfig = Configuration
+           .GetSection("EmailConfiguration")
+           .Get<Emailconfiguration>();
+            services.AddSingleton(emailConfig);
 
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
             services.AddIdentity<AppUser, IdentityRole>()

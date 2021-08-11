@@ -1,0 +1,8 @@
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\bin\Debug\netcoreapp3.1\Emailservice.deps.json
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\bin\Debug\netcoreapp3.1\Emailservice.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\obj\Debug\netcoreapp3.1\Emailservice.csprojAssemblyReference.cache
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\obj\Debug\netcoreapp3.1\Emailservice.AssemblyInfoInputs.cache
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\obj\Debug\netcoreapp3.1\Emailservice.AssemblyInfo.cs
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\bin\Debug\netcoreapp3.1\Emailservice.pdb
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\obj\Debug\netcoreapp3.1\Emailservice.dll
+C:\Users\Roberto\Desktop\Learn2CodeAPI\Learn2CodeAPI\Emailservice\obj\Debug\netcoreapp3.1\Emailservice.pdb
