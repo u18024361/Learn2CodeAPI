@@ -3,6 +3,7 @@ using Learn2CodeAPI.Dtos.LoginDto;
 using Learn2CodeAPI.IRepository.IRepositoryLogin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,14 +22,23 @@ namespace Learn2CodeAPI.Repository.RepositoryLogin
             _userManager = userManager;
 
         }
+        #region changepassword
         public async Task<AppUser> ChangePassword(ChangePasswordDto dto)
         {
-            var user = db.Users.Where(zz => zz.Id == dto.Id).FirstOrDefault();
+            var user = await db.Users.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
             user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, dto.Password);
 
             await db.SaveChangesAsync();
 
             return user;
         }
+
+        public async Task<AppUser> getpassword(string userid)
+        {
+            var user = await db.Users.Where(zz => zz.Id == userid).FirstOrDefaultAsync();
+            return user;
+        }
+        #endregion
+
     }
 }

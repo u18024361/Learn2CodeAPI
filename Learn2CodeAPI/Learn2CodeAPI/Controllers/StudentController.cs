@@ -59,6 +59,17 @@ namespace Learn2CodeAPI.Controllers
             SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
 
         }
+        [HttpGet]
+        [Route("Getstudent/{userid}")]
+        public async Task<IActionResult> GetAllTutorsMessaging( string userid)
+        {
+
+            var student = await db.Students.Include(zz => zz.Identity).Include(zz => zz.StudentModule)
+                .ThenInclude(zz => zz.Module.Degree.University).Where(zz => zz.UserId == userid)
+                .FirstOrDefaultAsync();
+            return Ok(student);
+
+        }
 
         #region Student
         //registration action
@@ -555,6 +566,37 @@ namespace Learn2CodeAPI.Controllers
 
 
         }
+        #endregion
+
+        #region make individual
+
+        [HttpGet]
+        [Route("Getbookingmodules/{StudentId}")]
+        public async Task<IActionResult> Getbookingmodules(int StudentId)
+        {
+            dynamic result = new ExpandoObject();
+            var today = DateTime.Now;
+            var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
+            && zz.EndDate >= today).ToListAsync();
+            var sessionmodulelist = new List<dynamic>();
+            foreach(var item in enrol)
+            {
+                dynamic modulesesion = new ExpandoObject();
+                modulesesion.moduelId = item.ModuleId;
+                modulesesion.Module = item.Module;
+                 var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
+                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId).FirstOrDefaultAsync();
+                modulesesion.TutorSessionId = session.TutorSessionId;
+                modulesesion.TutorSession = session.TutorSession;
+                sessionmodulelist.Add(modulesesion);
+
+            }
+            
+
+            return Ok(sessionmodulelist);
+
+        }
+
         #endregion
 
     }

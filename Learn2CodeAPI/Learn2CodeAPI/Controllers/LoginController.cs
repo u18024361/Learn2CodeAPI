@@ -44,23 +44,48 @@ namespace Learn2CodeAPI.Controllers
             _jwtHandler = jwtHandler; 
         }
 
+
+        #region changepassword
+        //to check if password is correct not sure will work cause of hashing
+        [HttpGet]
+        [Route("GetPassword/{Userid}")]
+        public async Task<IActionResult> GetPassword(string userid)
+        {
+            var password = await loginrepo.getpassword(userid);
+            return Ok(password.PasswordHash);
+
+        }
+
+        //must send userid
         [HttpPut]
         [Route("ChangePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
         {
-
-            var result = await loginrepo.ChangePassword(dto);
-            if (result == null)
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Unable to update password");
+                return BadRequest(ModelState);
             }
-            else
+            try
             {
-                return Ok("Password updated Succesffully");
-            }
+                var data = await loginrepo.ChangePassword(dto);
+                result.data = data;
+                result.message = "Password changed";
+                return Ok(result);
 
+            }
+            catch
+            {
+                result.message = "Something went wrong while changing the password";
+                return BadRequest(result.message);
+
+            }
 
         }
+
+        #endregion
+
+
 
         #region Login
         [HttpPost]

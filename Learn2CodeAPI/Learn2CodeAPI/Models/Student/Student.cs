@@ -22,6 +22,7 @@ namespace Learn2CodeAPI.Models.Student
         public AppUser Identity { get; set; }
 
         public ICollection<StudentModule> StudentModule { get; set; }
+        public ICollection<Booking> Booking { get; set; }
         public ICollection<Message> message { get; set; }
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
         public ICollection<CourseEnrol> CourseEnrol { get; set; }

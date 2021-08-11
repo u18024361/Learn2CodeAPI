@@ -10,6 +10,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryLogin
    public interface ILogin
     {
         Task<AppUser> ChangePassword(ChangePasswordDto dto);
+        Task<AppUser> getpassword(string userid);
     }
 }
 
