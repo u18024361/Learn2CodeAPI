@@ -988,6 +988,14 @@ namespace Learn2CodeAPI.Controllers
             return Ok(content);
 
         }
+        [HttpGet]
+        [Route("GetContenttype")]
+        public async Task<IActionResult> GetContenttype()
+        {
+            var contenttype = await db.ContentType.ToListAsync();
+            return Ok(contenttype);
+
+        }
 
         [HttpPost]
         [Route("CreatContent")]

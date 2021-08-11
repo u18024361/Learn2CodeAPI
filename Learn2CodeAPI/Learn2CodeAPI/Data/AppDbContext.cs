@@ -217,7 +217,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<TutorSessionModule> TutorSessionModule { get; set; }
         public DbSet<TutorSession> TutorSession { get; set; }
         public DbSet<SessionType> SessionType { get; set; }
-
+        public DbSet<ContentType> ContentType { get; set; }
         public DbSet<Subscription> Subscription { get; set; }
         public DbSet<SubscriptionTutorSession> SubscriptionTutorSession { get; set; }
         public DbSet<TutorModule> TutorModule { get; set; }
