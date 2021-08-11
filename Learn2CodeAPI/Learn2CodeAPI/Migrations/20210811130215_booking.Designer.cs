@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210811130215_booking")]
+    partial class booking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7f7e14a8-496d-477d-b504-d4c7eec1cfe2",
+                            ConcurrencyStamp = "85f46c78-9071-411c-a8d6-6f39a151ffc8",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEMGGKgSQI7aZl4YmMzb7aQU2rCxTvlIQqTJHePssXL7SHmquZDcohU/1twphmBoi0A==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEIXEy5/iIvQfDV+ApUDgGItZMsji2SrwRGsyQdsq/BXCb1LLo48UxpH/pyBzPsKaWw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "86c0259b-464e-4430-9d18-8b22df2130fa",
+                            SecurityStamp = "8f70599c-ef3e-47c5-981c-410a51eaf173",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -677,7 +679,7 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<bool>("AttendanceTaken")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("BookingId")
+                    b.Property<int>("BookingId")
                         .HasColumnType("int");
 
                     b.Property<int>("BookingStatusId")
@@ -1517,7 +1519,9 @@ namespace Learn2CodeAPI.Migrations
                 {
                     b.HasOne("Learn2CodeAPI.Models.Student.Booking", "Booking")
                         .WithMany("bookinginstances")
-                        .HasForeignKey("BookingId");
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Learn2CodeAPI.Models.Tutor.BookingStatus", "BookingStatus")
                         .WithMany("BookingInstance")
