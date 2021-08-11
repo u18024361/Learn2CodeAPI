@@ -32,6 +32,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
         public async Task<Student> Register(AppUser userIdentity, RegistrationDto model)
         {
             var result = await _userManager.CreateAsync(userIdentity, model.Password);
+            await _userManager.AddToRoleAsync(userIdentity, "Student");
 
             if (!result.Succeeded)
             {

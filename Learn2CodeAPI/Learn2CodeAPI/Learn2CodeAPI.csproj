@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Dtos\LoginDto\IdentityDto\" />
     <Folder Include="IRepository\IRepositoryReport\" />
     <Folder Include="Models\Report\" />
     <Folder Include="Images\" />

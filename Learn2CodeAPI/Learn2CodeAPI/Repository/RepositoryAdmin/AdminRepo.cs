@@ -143,6 +143,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
         {
             
             var result = await  _userManager.CreateAsync(userIdentity, tutor.Password);
+            await _userManager.AddToRoleAsync(userIdentity, "Tutor");
 
             if (!result.Succeeded)
             {
