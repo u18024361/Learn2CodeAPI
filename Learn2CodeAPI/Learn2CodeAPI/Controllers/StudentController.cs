@@ -570,28 +570,108 @@ namespace Learn2CodeAPI.Controllers
 
         #region make individual
 
+        //to get individual
         [HttpGet]
-        [Route("Getbookingmodules/{StudentId}")]
-        public async Task<IActionResult> Getbookingmodules(int StudentId)
+        [Route("GetbookingIndividual/{StudentId}")]
+        public async Task<IActionResult> GetbookingIndividual(int StudentId)
         {
             dynamic result = new ExpandoObject();
             var today = DateTime.Now;
             var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
             && zz.EndDate >= today).ToListAsync();
             var sessionmodulelist = new List<dynamic>();
+            var individualsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == false).FirstOrDefaultAsync();
             foreach(var item in enrol)
+            {
+                dynamic modulesesion = new ExpandoObject();
+                modulesesion.moduleId = item.ModuleId;
+                item.Module.EnrolLine = null;
+                modulesesion.module = item.Module;
+                 var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
+                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId && zz.TutorSessionId == individualsession.Id).FirstOrDefaultAsync();
+                modulesesion.tutorSessionId = session.TutorSessionId;
+                session.TutorSession.SubscriptionTutorSession = null;
+                modulesesion.tutorSession = session.TutorSession;
+                sessionmodulelist.Add(modulesesion);
+
+            }
+            
+
+            return Ok(sessionmodulelist);
+
+        }
+
+        [HttpGet]
+        [Route("GetIndividualAvailable/{ModuleId}/{TutorSessionId}")]
+        public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
+        {
+            var available = await db.BookingInstance.Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
+            return Ok(available);
+        }
+
+        [HttpGet]
+        [Route("CreateIndividualBooking/{StudentId}/{BookingInstanceId}/{ModuleId}")]
+        public async Task<IActionResult> CreateIndividualBooking(int StudentId, int BookingInstanceId, int ModuleId)
+        {
+            var today = DateTime.Now;
+            var enrolineId = await db.EnrolLine
+           .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate >= today && zz.ModuleId == ModuleId)
+           .Select(zz => zz.Id).FirstOrDefaultAsync();
+
+            // enrolmentid becomes enrollineid
+            var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
+                .Where(zz => zz.EnrollmentId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
+            
+            if ( ticketlist.Count > 0)
+            {
+                var newBooking = new Booking();
+                newBooking.StudentId = StudentId;
+                await db.Booking.AddAsync(newBooking);
+                await db.SaveChangesAsync();
+
+                int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
+                var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
+                instance.BookingStatusId = bookedstatus;
+
+                ticketlist[0].TicketStatus ==
+                await db.SaveChangesAsync();
+                return Ok(instance);
+            }
+            else
+            {
+                return BadRequest("no tickets");
+            }
+
+
+           
+        }
+
+
+
+        //to get group
+        [HttpGet]
+        [Route("GetbookingGroup/{StudentId}")]
+        public async Task<IActionResult> GetbookingGroup(int StudentId)
+        {
+            dynamic result = new ExpandoObject();
+            var today = DateTime.Now;
+            var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
+            && zz.EndDate >= today).ToListAsync();
+            var sessionmodulelist = new List<dynamic>();
+            var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+            foreach (var item in enrol)
             {
                 dynamic modulesesion = new ExpandoObject();
                 modulesesion.moduelId = item.ModuleId;
                 modulesesion.Module = item.Module;
-                 var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
-                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId).FirstOrDefaultAsync();
+                var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
+                   .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId && zz.TutorSessionId == groupsession.Id).FirstOrDefaultAsync();
                 modulesesion.TutorSessionId = session.TutorSessionId;
                 modulesesion.TutorSession = session.TutorSession;
                 sessionmodulelist.Add(modulesesion);
 
             }
-            
+
 
             return Ok(sessionmodulelist);
 
