@@ -1,5 +1,6 @@
 ﻿using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Generic;
+using Learn2CodeAPI.Models.Student;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -48,5 +49,10 @@ namespace Learn2CodeAPI.Models.Tutor
         public bool ContentUploaded { get; set; }
 
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
+
+        public int? BookingId { get; set; }
+
+        [ForeignKey("BookingId")]
+        public Booking Booking { get; set; }
     }
 }

@@ -29,5 +29,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Emailservice\Emailservice.csproj" />
+  </ItemGroup>
+
 
 </Project>

@@ -238,6 +238,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<EnrolLine> EnrolLine { get; set; }
         public DbSet<Enrollment> Enrollment { get; set; }
         public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<Booking> Booking { get; set; }
         public DbSet<TicketStatus> TicketStatus { get; set; }
 
 
