@@ -67,7 +67,10 @@ namespace Learn2CodeAPI
 
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
             services.AddIdentity<AppUser, IdentityRole>()
-                     .AddEntityFrameworkStores<AppDbContext>();
+                     .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                     opt.TokenLifespan = TimeSpan.FromHours(2));
+
             var jwtSettings = Configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
             {
