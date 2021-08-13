@@ -54,5 +54,10 @@ namespace Learn2CodeAPI.Models.Tutor
 
         [ForeignKey("BookingId")]
         public Booking Booking { get; set; }
+
+        public int? TicketId { get; set; }
+
+        [ForeignKey("TicketId")]
+        public Ticket Ticket { get; set; }
     }
 }

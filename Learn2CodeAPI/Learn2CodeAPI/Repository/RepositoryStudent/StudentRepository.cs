@@ -275,6 +275,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
                         ticket.TutorSessionId = ticketquantity.TutorSessionId;
                         ticket.ModuleId = sub.ModuleId;
                         ticket.ExpDate = y.EndDate;
+                        ticket.EnrolLineId = y.Id;
                         await db.Ticket.AddAsync(ticket);
 
                     }
@@ -290,7 +291,36 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
         }
 
-        
+
+
+        #endregion
+
+        #region individualbookings
+
+        public async Task<IEnumerable<Booking>> GetMyBookings(int StudentId)
+        {
+            var bookings = await db.Booking.Include(zz => zz.bookinginstances).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return bookings;
+        }
+
+        public async Task<BookingInstance> CancelBooking(int BookingInstanceId)
+        {
+            int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Open").Select(zz => zz.Id).FirstOrDefaultAsync();
+            int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == true).Select(zz => zz.Id).FirstOrDefaultAsync();
+            var myBookings = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
+            var ticket = await db.Ticket.Where(zz => zz.Id == myBookings.TicketId).FirstOrDefaultAsync();
+            var enroline = await db.EnrolLine.Where(zz => zz.Id == ticket.EnrolLineId).FirstOrDefaultAsync();
+            int x = enroline.TicketQuantity + 1;
+            enroline.TicketQuantity = x;
+            ticket.TicketStatusId = ticketstatus;
+            myBookings.BookingId = null;
+            myBookings.TicketId = null;
+            myBookings.BookingStatusId = bookedstatus;
+            await db.SaveChangesAsync();
+            return myBookings;
+        }
+
+
 
         #endregion
     }

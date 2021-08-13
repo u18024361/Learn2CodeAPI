@@ -21,6 +21,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Message> CreateMessage(MessageDto model);
 
         Task<IEnumerable<Tutor>> GetTutors();
+        Task<IEnumerable<Booking>> GetMyBookings(int StudentId);
         Task<IEnumerable<Resource>> GetResource(int ModuleId);
         Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId);
         Task<IEnumerable<Subscription>> GetSubscriptions();
@@ -28,6 +29,6 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<CourseBasketLine> BuyCourse(CourseBuyDto dto);
         Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto);
         Task<Basket>Checkout(CheckoutDto dto);
-
+        Task<BookingInstance> CancelBooking(int BookingInstanceId);
     }
 }

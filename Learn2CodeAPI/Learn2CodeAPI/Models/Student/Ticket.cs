@@ -31,6 +31,10 @@ namespace Learn2CodeAPI.Models.Student
         [ForeignKey("TicketStatusId")]
         public TicketStatus TicketStatus { get; set; }
 
+        public int EnrolLineId { get; set; }
+        [ForeignKey("EnrolLineId")]
+        public EnrolLine EnrolLine { get; set; }
+
         public DateTime ExpDate { get; set; }
     }
 }

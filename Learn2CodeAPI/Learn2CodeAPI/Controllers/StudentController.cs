@@ -242,13 +242,13 @@ namespace Learn2CodeAPI.Controllers
                 var data = await MessageGenRepo.Delete(MessageId);
 
                 result.data = data;
-                result.message = "University deleted";
+                result.message = "Message deleted";
                 return Ok(result);
             }
             catch
             {
 
-                result.message = "Something went wrong deleting the university";
+                result.message = "Something went wrong deleting the message";
                 return BadRequest(result.message);
             }
 
@@ -570,7 +570,7 @@ namespace Learn2CodeAPI.Controllers
 
         #region make individual
 
-        //to get individual
+        //for dropdown
         [HttpGet]
         [Route("GetbookingIndividual/{StudentId}")]
         public async Task<IActionResult> GetbookingIndividual(int StudentId)
@@ -601,6 +601,8 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+
+        //displays list of  sessions to book
         [HttpGet]
         [Route("GetIndividualAvailable/{ModuleId}/{TutorSessionId}")]
         public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
@@ -609,42 +611,99 @@ namespace Learn2CodeAPI.Controllers
             return Ok(available);
         }
 
-        //[HttpGet]
-        //[Route("CreateIndividualBooking/{StudentId}/{BookingInstanceId}/{ModuleId}")]
-        //public async Task<IActionResult> CreateIndividualBooking(int StudentId, int BookingInstanceId, int ModuleId)
-        //{
-        //    var today = DateTime.Now;
-        //    var enrolineId = await db.EnrolLine
-        //   .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate >= today && zz.ModuleId == ModuleId)
-        //   .Select(zz => zz.Id).FirstOrDefaultAsync();
 
-        //    // enrolmentid becomes enrollineid
-        //    var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
-        //        .Where(zz => zz.EnrollmentId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
+        //to make a booking
+        [HttpGet]
+        [Route("CreateIndividualBooking/{StudentId}/{BookingInstanceId}/{ModuleId}")]
+        public async Task<IActionResult> CreateIndividualBooking(int StudentId, int BookingInstanceId, int ModuleId)
+        {
+            var today = DateTime.Now;
+           //check enroline quantity
+            var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
+           .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate >= today && zz.ModuleId == ModuleId && zz.Subscription.SubscriptionTutorSession
+           .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual") )
+           .Select(zz => zz.Id).FirstOrDefaultAsync();
+
+            //enrolmentid becomes enrollineid
+           var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
+               .Where(zz => zz.EnrolLineId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
+
+            if (ticketlist.Count > 0)
+            {
+                var newBooking = new Booking();
+                newBooking.StudentId = StudentId;
+                await db.Booking.AddAsync(newBooking);
+                await db.SaveChangesAsync();
+
+                int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus== false).Select(zz => zz.Id).FirstOrDefaultAsync();
+                int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
+                var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
+                instance.BookingStatusId = bookedstatus;
+                instance.BookingId = newBooking.Id;
+                instance.TicketId = ticketlist[0].Id;
+
+                ticketlist[0].TicketStatusId = ticketstatus;
+                var enrolinequantity = await db.EnrolLine.Where(zz => zz.Id == enrolineId).FirstOrDefaultAsync();
+                int x = enrolinequantity.TicketQuantity - 1;
+                enrolinequantity.TicketQuantity = x;
+                await db.SaveChangesAsync();
+                return Ok(instance);
+            }
+            else
+            {
+                return BadRequest("no tickets");
+            }
+
+        }
+
+        //to display bookings made
+        [HttpGet]
+        [Route("GetMyBookings/{StudentId}")]
+        public async Task<IActionResult> GetMyBookings(int StudentId)
+        {
+
+            var myBookings = await studentRepo.GetMyBookings(StudentId);
+            return Ok(myBookings);
+
+        }
+
+        [HttpGet]
+        [Route("CancelMyBooking/{BookingInstanceId}")]
+        public async Task<IActionResult> CancelMyBooking(int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var session = db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefault();
+                DateTime oDate = Convert.ToDateTime(session.Date);
+                var start = DateTime.Now;
+                if ((oDate - start).TotalDays <= 1)
+                {
+                    result.message = "Can't cancel booking as there is less than 24 hours";
+                    return BadRequest(result.message);
+                }
+                var data = await studentRepo.CancelBooking(BookingInstanceId);
+                result.data = data;
+                result.message = "Cancellation successfull";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong while canceling the booking";
+                return BadRequest(result.message);
+            }
+
+
+
             
-        //    if ( ticketlist.Count > 0)
-        //    {
-        //        var newBooking = new Booking();
-        //        newBooking.StudentId = StudentId;
-        //        await db.Booking.AddAsync(newBooking);
-        //        await db.SaveChangesAsync();
 
-        //        int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
-        //        var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
-        //        instance.BookingStatusId = bookedstatus;
+        }
 
-        //        ticketlist[0].TicketStatus ==
-        //        await db.SaveChangesAsync();
-        //        return Ok(instance);
-        //    }
-        //    else
-        //    {
-        //        return BadRequest("no tickets");
-        //    }
-
-
-           
-        //}
 
 
 

@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210813104641_fixenroline")]
+    partial class fixenroline
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f1b5b585-4b63-4063-b90c-ccbd82a5cb94",
+                            ConcurrencyStamp = "f6b5d527-96d8-4095-9f23-2c8d6b444782",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEEJgGi2JvTPOZ1hCLnDGRX1Tr8+V7cxYKGJK7sBsBVa/rMiegI0ZHpwMhsA4+XdPUA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPHtrTZOiFfXAnLo42NThSdQFmsnLzlBrTkdw42BByRfdO3KkbSGpHPCvWdvQ3ENzg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5fb9685e-0185-4121-b308-f3a3f7c348ac",
+                            SecurityStamp = "8a349046-051b-48ec-b6d3-573df23fcac8",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -706,9 +708,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("SessionTimeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TicketId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -727,8 +726,6 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("ModuleId");
 
                     b.HasIndex("SessionTimeId");
-
-                    b.HasIndex("TicketId");
 
                     b.HasIndex("TutorId");
 
@@ -1555,10 +1552,6 @@ namespace Learn2CodeAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learn2CodeAPI.Models.Student.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId");
-
                     b.HasOne("Learn2CodeAPI.Models.Tutor.Tutor", "Tutor")
                         .WithMany("BookingInstance")
                         .HasForeignKey("TutorId")
@@ -1578,8 +1571,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Module");
 
                     b.Navigation("SessionTime");
-
-                    b.Navigation("Ticket");
 
                     b.Navigation("Tutor");
 
