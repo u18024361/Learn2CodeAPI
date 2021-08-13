@@ -166,7 +166,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
         public async Task<IEnumerable<Subscription>> GetSubscriptions()
         {
-           var subscriptions = await db.Subscription.Include(zz => zz.SubscriptionTutorSession).ThenInclude(SubscriptionTutorSession => SubscriptionTutorSession.TutorSession.SessionType).ToListAsync();
+           var subscriptions = await db.Subscription.Include(zz => zz.SubscriptionTutorSession)
+                .ThenInclude(SubscriptionTutorSession => SubscriptionTutorSession.TutorSession.SessionType).ToListAsync();
             return subscriptions;
         }
         public async Task<Basket> GetBasket(int StudentId)
