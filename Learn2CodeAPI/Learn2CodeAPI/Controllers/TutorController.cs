@@ -461,13 +461,13 @@ namespace Learn2CodeAPI.Controllers
                 var data = await MessageGenRepo.Delete(MessageId);
 
                 result.data = data;
-                result.message = "University deleted";
+                result.message = "Message deleted";
                 return Ok(result);
             }
             catch
             {
 
-                result.message = "Something went wrong deleting the university";
+                result.message = "Something went wrong deleting the message";
                 return BadRequest(result.message);
             }
 

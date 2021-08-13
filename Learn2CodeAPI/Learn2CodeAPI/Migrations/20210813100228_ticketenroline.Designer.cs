@@ -4,14 +4,16 @@ using Learn2CodeAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Learn2CodeAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210813100228_ticketenroline")]
+    partial class ticketenroline
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,15 +407,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "f1b5b585-4b63-4063-b90c-ccbd82a5cb94",
+                            ConcurrencyStamp = "858448dc-1524-4d33-b0f0-1e243473179f",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEEJgGi2JvTPOZ1hCLnDGRX1Tr8+V7cxYKGJK7sBsBVa/rMiegI0ZHpwMhsA4+XdPUA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFq1x4gPnwdheYS9HqbEq+8RHcllxEdesN6YEfTFIitYAlzEr+Kv8ckBy9WW37LqYw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5fb9685e-0185-4121-b308-f3a3f7c348ac",
+                            SecurityStamp = "967f5fc2-73c3-4522-9da3-6e95b500c972",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -468,6 +470,9 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("EnrolLineId")
+                        .HasColumnType("int");
+
                     b.Property<int>("EnrollmentId")
                         .HasColumnType("int");
 
@@ -484,6 +489,8 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EnrolLineId");
 
                     b.HasIndex("EnrollmentId");
 
@@ -706,9 +713,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("SessionTimeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TicketId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -727,8 +731,6 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("ModuleId");
 
                     b.HasIndex("SessionTimeId");
-
-                    b.HasIndex("TicketId");
 
                     b.HasIndex("TutorId");
 
@@ -1378,6 +1380,10 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.EnrolLine", b =>
                 {
+                    b.HasOne("Learn2CodeAPI.Models.Student.EnrolLine", null)
+                        .WithMany("enrolLine")
+                        .HasForeignKey("EnrolLineId");
+
                     b.HasOne("Learn2CodeAPI.Models.Student.Enrollment", "Enrollment")
                         .WithMany("EnrolLine")
                         .HasForeignKey("EnrollmentId")
@@ -1472,7 +1478,7 @@ namespace Learn2CodeAPI.Migrations
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Ticket", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Student.EnrolLine", "EnrolLine")
-                        .WithMany("Ticket")
+                        .WithMany()
                         .HasForeignKey("EnrolLineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1555,10 +1561,6 @@ namespace Learn2CodeAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Learn2CodeAPI.Models.Student.Ticket", "Ticket")
-                        .WithMany()
-                        .HasForeignKey("TicketId");
-
                     b.HasOne("Learn2CodeAPI.Models.Tutor.Tutor", "Tutor")
                         .WithMany("BookingInstance")
                         .HasForeignKey("TutorId")
@@ -1578,8 +1580,6 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Module");
 
                     b.Navigation("SessionTime");
-
-                    b.Navigation("Ticket");
 
                     b.Navigation("Tutor");
 
@@ -1905,7 +1905,7 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.EnrolLine", b =>
                 {
-                    b.Navigation("Ticket");
+                    b.Navigation("enrolLine");
                 });
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Enrollment", b =>
