@@ -30,5 +30,9 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto);
         Task<Basket>Checkout(CheckoutDto dto);
         Task<BookingInstance> CancelBooking(int BookingInstanceId);
+
+        Task<Feedback> CreateFeedback(Feedback feedback);
+        Task<Feedback> DeleteFeedback(int StudentId, int BookingInstanceId);
+        Task<IEnumerable<Feedback>> MyFeedback(int StudentId);
     }
 }

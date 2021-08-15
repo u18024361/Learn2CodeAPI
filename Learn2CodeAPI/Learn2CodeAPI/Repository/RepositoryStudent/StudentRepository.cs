@@ -316,6 +316,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             ticket.TicketStatusId = ticketstatus;
             myBookings.BookingId = null;
             myBookings.TicketId = null;
+            myBookings.Description = null;
             myBookings.BookingStatusId = bookedstatus;
             await db.SaveChangesAsync();
             return myBookings;
@@ -323,6 +324,39 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
 
 
+
+
+        #endregion
+
+        #region feedback
+        public async Task<Feedback> CreateFeedback(Feedback feedback)
+        {
+            Feedback newfeedback = new Feedback();
+            newfeedback.StudentId = feedback.StudentId;
+            newfeedback.BookingInstanceId = feedback.Id;
+            newfeedback.Friendliness = feedback.Friendliness;
+            newfeedback.Timliness = feedback.Timliness;
+            newfeedback.Ability = feedback.Ability;
+            newfeedback.Description = feedback.Description;
+            await db.Feedback.AddAsync(feedback);
+            await db.SaveChangesAsync();
+            return feedback;
+        }
+
+        public async Task<Feedback> DeleteFeedback(int StudentId, int BookingInstanceId)
+        {
+            var feedback = await db.Feedback.Where(zz => zz.BookingInstanceId == BookingInstanceId
+            && zz.StudentId == StudentId).FirstOrDefaultAsync();
+            db.Feedback.Remove(feedback);
+            return feedback;
+        }
+
+
+       async Task <IEnumerable<Feedback>> IStudent.MyFeedback(int StudentId)
+        {
+            var myFeedback = await db.Feedback.Include(zz =>zz.BookingInstance).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return myFeedback;
+        }
         #endregion
     }
 }

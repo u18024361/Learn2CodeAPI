@@ -613,46 +613,63 @@ namespace Learn2CodeAPI.Controllers
 
 
         //to make a booking
-        [HttpGet]
-        [Route("CreateIndividualBooking/{StudentId}/{BookingInstanceId}/{ModuleId}")]
-        public async Task<IActionResult> CreateIndividualBooking(int StudentId, int BookingInstanceId, int ModuleId)
+        [HttpPost]
+        [Route("CreateIndividualBooking")]
+        public async Task<IActionResult> CreateIndividualBooking([FromBody] BookIndividualDto dto)
         {
-            var today = DateTime.Now;
-           //check enroline quantity
-            var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
-           .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate >= today && zz.ModuleId == ModuleId && zz.Subscription.SubscriptionTutorSession
-           .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual") )
-           .Select(zz => zz.Id).FirstOrDefaultAsync();
-
-            //enrolmentid becomes enrollineid
-           var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
-               .Where(zz => zz.EnrolLineId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
-
-            if (ticketlist.Count > 0)
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
             {
-                var newBooking = new Booking();
-                newBooking.StudentId = StudentId;
-                await db.Booking.AddAsync(newBooking);
-                await db.SaveChangesAsync();
-
-                int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus== false).Select(zz => zz.Id).FirstOrDefaultAsync();
-                int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
-                var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
-                instance.BookingStatusId = bookedstatus;
-                instance.BookingId = newBooking.Id;
-                instance.TicketId = ticketlist[0].Id;
-
-                ticketlist[0].TicketStatusId = ticketstatus;
-                var enrolinequantity = await db.EnrolLine.Where(zz => zz.Id == enrolineId).FirstOrDefaultAsync();
-                int x = enrolinequantity.TicketQuantity - 1;
-                enrolinequantity.TicketQuantity = x;
-                await db.SaveChangesAsync();
-                return Ok(instance);
+                return BadRequest(ModelState);
             }
-            else
+            try
             {
-                return BadRequest("no tickets");
+                var today = DateTime.Now;
+                //check enroline quantity
+                var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
+               .Where(zz => zz.Enrollment.StudentId == dto.StudentId && zz.EndDate >= today && zz.ModuleId == dto.ModuleId && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual"))
+               .Select(zz => zz.Id).FirstOrDefaultAsync();
+
+                //enrolmentid becomes enrollineid
+                var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
+                    .Where(zz => zz.EnrolLineId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
+
+                if (ticketlist.Count > 0)
+                {
+                    var newBooking = new Booking();
+                    newBooking.StudentId = dto.StudentId;
+                    await db.Booking.AddAsync(newBooking);
+                    await db.SaveChangesAsync();
+
+                    int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).Select(zz => zz.Id).FirstOrDefaultAsync();
+                    int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
+                    var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                    instance.BookingStatusId = bookedstatus;
+                    instance.BookingId = newBooking.Id;
+                    instance.TicketId = ticketlist[0].Id;
+                    instance.Description = dto.Description;
+
+                    ticketlist[0].TicketStatusId = ticketstatus;
+                    var enrolinequantity = await db.EnrolLine.Where(zz => zz.Id == enrolineId).FirstOrDefaultAsync();
+                    int x = enrolinequantity.TicketQuantity - 1;
+                    enrolinequantity.TicketQuantity = x;
+                    await db.SaveChangesAsync();
+                    result.data = instance;
+                    result.message = "Booking successfull";
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("no tickets");
+                }
             }
+            catch
+            {
+                result.message = "Something went wrong while making the booking";
+                return BadRequest(result.message);
+            }
+         
 
         }
 
@@ -738,5 +755,73 @@ namespace Learn2CodeAPI.Controllers
 
         #endregion
 
+        #region feedback
+        [HttpPost]
+        [Route("CreateFeedback")]
+        public async Task<IActionResult> CreateFeedback([FromBody] Feedback feedback)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var user = db.Feedback.Where(zz => zz.StudentId == feedback.StudentId && zz.BookingInstanceId == feedback.BookingInstanceId).FirstOrDefault();
+                if (user != null)
+                {
+                    return BadRequest("Feedback already exists");
+                }
+                var data = await studentRepo.CreateFeedback(feedback);
+                result.data = data;
+                result.message = "Feedback submitted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong while submitting the feedback.";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("GetMyFeedback/{StudentId}")]
+        public async Task<IActionResult> GetMyFeedback(int StudentId)
+        {
+
+            var feedback = await studentRepo.MyFeedback(StudentId);
+            return Ok(feedback);
+
+        }
+
+        [HttpDelete]
+        [Route("GetMyFeedback/{StudentId}/{BookingInstanceId}")]
+        public async Task<IActionResult> DeleteMyFeedback(int StudentId, int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var feedback = await studentRepo.DeleteFeedback(StudentId, BookingInstanceId);
+                result.data = feedback;
+                result.message = "Feedback deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the feedback";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        #endregion
     }
 }
