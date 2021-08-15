@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.ReportDto;
 using Learn2CodeAPI.Models.Login.Identity;
+using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -139,5 +142,64 @@ namespace Learn2CodeAPI.Controllers
 
         #endregion
 
+        #region Feedback
+        [HttpGet]
+        [Route("GetSessions")]
+        public async Task<IActionResult> GetSessions()
+        {
+            var sessions = await db.BookingInstance.ToListAsync();
+            return Ok(sessions);
+        }
+
+        //for description table
+        [HttpGet]
+        [Route("GetSessionsFeedback/{BookingInstanceId}")]
+        public async Task<IActionResult> GetSessionsFeedback(int BookingInstanceId)
+        {
+            var sessions = await db.Feedback.Include(zz => zz.Student).Where(zz => zz.BookingInstanceId == BookingInstanceId).ToListAsync();
+            return Ok(sessions);
+        }
+
+        [HttpGet]
+        [Route("GetSessionsFeedbackScore/{BookingInstanceId}")]
+        public async Task<IActionResult> GetSessionsFeedbackScore(int BookingInstanceId)
+        {
+            dynamic feedbackobject = new ExpandoObject();
+            List<Feedback> sessions = await db.Feedback.Include(zz => zz.Student).Where(zz => zz.BookingInstanceId == BookingInstanceId).ToListAsync();
+            feedbackobject.Timliness = sessions.Average(zz => zz.Timliness);
+            feedbackobject.Ability = sessions.Average(zz => zz.Ability);
+            feedbackobject.Friendliness = sessions.Average(zz => zz.Friendliness);
+            return Ok(feedbackobject);
+        }
+
+        #endregion
+
+        #region totlatutorsession
+        [HttpGet]
+        [Route("GetTotalTutorsessions")]
+        public async Task<IActionResult> GetTotalTutorsessions([FromBody] TotalTutorSessionDto dto)
+        {
+            var Tutorsessions = new List<TutorSessionDto>();
+            string StartDate = dto.StartDate.ToString("MM/dd/yyyy");
+            string EndDate = dto.EndDate.ToString("MM/dd/yyyy");
+            var sessions = await db.BookingInstance.Include(zz => zz.Module).Include(zz =>zz.Tutor).Where(zz => zz.TutorId == dto.TutorId).ToListAsync();
+
+            foreach(var item in sessions)
+            {
+                TutorSessionDto x = new TutorSessionDto();
+                string[] formats = { "MM/dd/yyyy" };
+                x.Date= DateTime.ParseExact(item.Date, formats, new CultureInfo("en-US"), DateTimeStyles.None);
+                x.TutorName = item.Tutor.TutorName;
+                x.TutorSurname = item.Tutor.TutorSurname;
+                x.TutorEmail = item.Tutor.TutorEmail;
+                x.ModuleCode = item.Module.ModuleCode;
+                x.Title = item.Title;
+                Tutorsessions.Add(x);
+            }
+
+            var list = Tutorsessions.Where(zz => zz.Date >= dto.StartDate && zz.Date <= dto.EndDate).ToList();
+            return Ok(list);
+        }
+        #endregion
     }
 }

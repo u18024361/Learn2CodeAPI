@@ -49,6 +49,8 @@ namespace Learn2CodeAPI.Models.Tutor
         public bool ContentUploaded { get; set; }
 
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
+        public ICollection<Feedback> Feedback { get; set; }
+
 
         public int? BookingId { get; set; }
 
