@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Emailservice;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -32,18 +33,19 @@ namespace Learn2CodeAPI.Controllers
         private readonly AppDbContext db;
         private IStudent studentRepo;
         private IGenRepository<Tutor> TutorGenRepo;
-        private IGenRepository<Message> Mess;
+        private IGenRepository<Models.Tutor.Message> Mess;
         private IGenRepository<Module> ModuleGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
-        private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<Models.Tutor.Message> MessageGenRepo;
         private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
         private IGenRepository<SubScriptionBasketLine> SubScriptionBasketLineGenRepo;
+        private readonly IEmailSender _emailsender;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
-            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message>_Mess,IGenRepository<Message>_Mes, 
+            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Models.Tutor.Message> _Mess,IGenRepository<Models.Tutor.Message> _Mes, 
             IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
-            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo)
+            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -57,6 +59,7 @@ namespace Learn2CodeAPI.Controllers
             CourseFolderGenRepo = _CourseFolderGenRepo;
             CourseBasketLineGenRepo = _CourseBasketLineGenRepo;
             SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
+            _emailsender = emailsender;
 
         }
         [HttpGet]
@@ -716,10 +719,44 @@ namespace Learn2CodeAPI.Controllers
             }
 
 
+        }
 
+        [HttpPost]
+        [Route("BookingChangeRequest")]
+        public async Task<IActionResult> BookingChangeRequest([FromBody] BookingChangeDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                string datestring = dto.date.ToString("MM/dd/yyyy");
+                SessionTime time = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
+                BookingInstance email = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+                string subject = "Change request: " + email.SessionTime.StartTime + "-" + email.SessionTime.EndTime + " " + email.Date;
+                string content = dto.Message + " " +"Time: " + time.StartTime + "-" + time.EndTime + " " +"Date: " + datestring;
+
+                var message = new Emailservice.Message(new string[] { email.Tutor.TutorEmail }, subject, content);
+                await _emailsender.SendEmailAsync(message);
+
+                   
+                    result.message = "Booking successfull";
+                    return Ok(result);
             
+            }
+            catch
+            {
+                result.message = "Something went wrong while making the booking";
+                return BadRequest(result.message);
+            }
+
 
         }
+
+
+
 
 
 

@@ -30,8 +30,8 @@ namespace Learn2CodeAPI.Controllers
         public async Task< IEnumerable<WeatherForecast>> Get()
         {
             var rng = new Random();
-            // var message = new Message(new string[] { "" }, "hmmmm", "This is the content from our email.");
-            //await _emailsender.SendEmailAsync(message);
+            var message = new Message(new string[] { "" }, "hmmmm", "This is the content from our email.");
+            await _emailsender.SendEmailAsync(message);
             
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

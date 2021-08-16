@@ -241,6 +241,7 @@ namespace Learn2CodeAPI.Data
         public DbSet<Booking> Booking { get; set; }
         public DbSet<TicketStatus> TicketStatus { get; set; }
         public DbSet<Feedback> Feedback { get; set; }
+       
 
 
     }

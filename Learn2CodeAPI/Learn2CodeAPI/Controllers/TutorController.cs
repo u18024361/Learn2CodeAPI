@@ -682,7 +682,7 @@ namespace Learn2CodeAPI.Controllers
                 }
 
                 var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
-                zz.Date == datestring && zz.Id != dto.Id).FirstOrDefault();
+                zz.Date == datestring && zz.Id != dto.Id && zz.TutorId == dto.TutorId).FirstOrDefault();
                 if (check != null)
                 {
                     result.message = "Session already exists on the provided date and time";
@@ -876,7 +876,10 @@ namespace Learn2CodeAPI.Controllers
             {
 
                 var data = await GroupSessionContentGenRepo.Delete(GroupSessionContentId);
-
+                int sessionid = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).Select(zz => zz.BookingInstanceId).FirstOrDefaultAsync();
+                var session = await db.BookingInstance.Where(zz => zz.Id == sessionid).FirstOrDefaultAsync();
+                session.ContentUploaded = false;
+                await db.SaveChangesAsync();
                 result.data = data;
                 result.message = "Content deleted";
                 return Ok(result);
