@@ -461,7 +461,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                if(dto.Message != "Approved")
+                if (dto.Message != "Approved")
                 {
                     result.message = "Error when Checking out";
                     return Ok(result);
@@ -672,7 +672,7 @@ namespace Learn2CodeAPI.Controllers
                 result.message = "Something went wrong while making the booking";
                 return BadRequest(result.message);
             }
-         
+
 
         }
 
@@ -834,7 +834,7 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpDelete]
-        [Route("GetMyFeedback/{StudentId}/{BookingInstanceId}")]
+        [Route("DeleteMyFeedback/{StudentId}/{BookingInstanceId}")]
         public async Task<IActionResult> DeleteMyFeedback(int StudentId, int BookingInstanceId)
         {
             dynamic result = new ExpandoObject();

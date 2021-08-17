@@ -255,8 +255,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
                 {
                     var ticketquantity = await db.SubscriptionTutorSession.Where(zz => zz.SubscriptionId == sub.SubscriptionId).FirstOrDefaultAsync();
                     var duration = await db.Subscription.Where(zz => zz.Id == sub.SubscriptionId).FirstOrDefaultAsync();
-                    
-                    
+
+
                     EnrolLine y = new EnrolLine();
                     y.SubscriptionId = sub.SubscriptionId;
                     y.EnrollmentId = z.Id;
@@ -348,13 +348,14 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             var feedback = await db.Feedback.Where(zz => zz.BookingInstanceId == BookingInstanceId
             && zz.StudentId == StudentId).FirstOrDefaultAsync();
             db.Feedback.Remove(feedback);
+            await db.SaveChangesAsync();
             return feedback;
         }
 
 
        async Task <IEnumerable<Feedback>> IStudent.MyFeedback(int StudentId)
         {
-            var myFeedback = await db.Feedback.Include(zz =>zz.BookingInstance).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            var myFeedback = await db.Feedback.Include(zz =>zz.BookingInstance).ThenInclude(zz => zz.Tutor).Where(zz => zz.StudentId == StudentId).ToListAsync();
             return myFeedback;
         }
         #endregion

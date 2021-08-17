@@ -155,7 +155,7 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             AcceptedTutor.UserId = userIdentity.Id;
             AcceptedTutor.TutorStatusId = idAccepted;
            await db.SaveChangesAsync();
-
+          
 
             int idTrue = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == true).Select(zz => zz.Id).FirstOrDefaultAsync();
             int idFalse = await db.TutorSession.Where(zz => zz.SessionType.IsGroup == false).Select(zz => zz.Id).FirstOrDefaultAsync();
