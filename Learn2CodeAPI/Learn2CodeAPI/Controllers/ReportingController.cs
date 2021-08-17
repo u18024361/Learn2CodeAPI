@@ -156,6 +156,14 @@ namespace Learn2CodeAPI.Controllers
             return Ok(sessions);
         }
 
+        [HttpGet]
+        [Route("GetSessionDetails/{id}")]
+        public async Task<IActionResult> GetSessionDetails(int id)
+        {
+            var sessions = await db.BookingInstance.Include(zz => zz.Tutor).Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            return Ok(sessions);
+        }
+
         //for description table
         [HttpGet]
         [Route("GetSessionsFeedback/{BookingInstanceId}")]
