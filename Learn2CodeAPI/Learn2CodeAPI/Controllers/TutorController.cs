@@ -898,8 +898,8 @@ namespace Learn2CodeAPI.Controllers
         [Route("DownloadNotes/{GroupSessionContentId}")]
         public async Task<FileStreamResult> DownloadNotes(int GroupSessionContentId)
         {
-            var entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).Select(zz => zz.Notes).FirstOrDefaultAsync();
-            MemoryStream ms = new MemoryStream(entity);
+            GroupSessionContent entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Notes);
             return new FileStreamResult(ms, "Application/pdf");
         }
 
@@ -1104,7 +1104,25 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
 
+        //test
+        [HttpPost]
+        [Route("File")]
+        public async Task<IActionResult> File([FromForm(Name = "file")] IFormFile file)
+        {
+            Models.Tutor.File x = new Models.Tutor.File();
+            using (var Filetarget = new MemoryStream())
+            {
+                file.CopyTo(Filetarget);
+                x.FileName = Filetarget.ToArray();
+                
+                
+            }
+            await db.File.AddAsync(x);
+            await db.SaveChangesAsync();
+            return Ok();
+          
 
+        }
     }
 }
 

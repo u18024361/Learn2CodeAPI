@@ -28,7 +28,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Basket> GetBasket(int StudentId);
         Task<CourseBasketLine> BuyCourse(CourseBuyDto dto);
         Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto);
-        Task<Basket>Checkout(CheckoutDto dto);
+       Task<Basket>Checkout(CheckoutDto dto);
         Task<BookingInstance> CancelBooking(int BookingInstanceId);
 
         Task<Feedback> CreateFeedback(Feedback feedback);

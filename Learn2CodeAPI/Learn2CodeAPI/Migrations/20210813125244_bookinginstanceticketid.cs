@@ -30,7 +30,7 @@ namespace Learn2CodeAPI.Migrations
                 column: "TicketId",
                 principalTable: "Ticket",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.NoAction);
+                onDelete: ReferentialAction.SetNull);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

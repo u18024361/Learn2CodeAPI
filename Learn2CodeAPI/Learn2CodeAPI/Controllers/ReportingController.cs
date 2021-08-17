@@ -7,12 +7,16 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.ReportDto;
+using Learn2CodeAPI.Models;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Twilio.Clients;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -25,15 +29,16 @@ namespace Learn2CodeAPI.Controllers
             private readonly UserManager<AppUser> _userManager;
             private IMapper _mapper;
             private readonly AppDbContext db;
+        private readonly ITwilioRestClient _client;
 
-            public ReportingController(UserManager<AppUser> userManager, IMapper mapper,
-                AppDbContext _db)
+        public ReportingController(UserManager<AppUser> userManager, IMapper mapper,
+                AppDbContext _db, ITwilioRestClient client)
             {
 
                 _userManager = userManager;
                 _mapper = mapper;
                 db = _db;
-
+            _client = client;
             }
 
         #region AdminHome
@@ -179,6 +184,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetTotalTutorsessions")]
         public async Task<IActionResult> GetTotalTutorsessions([FromBody] TotalTutorSessionDto dto)
         {
+            var enddate = dto.EndDate.AddHours(23.99);
             var Tutorsessions = new List<TutorSessionDto>();
             string StartDate = dto.StartDate.ToString("MM/dd/yyyy");
             string EndDate = dto.EndDate.ToString("MM/dd/yyyy");
@@ -197,9 +203,78 @@ namespace Learn2CodeAPI.Controllers
                 Tutorsessions.Add(x);
             }
 
-            var list = Tutorsessions.Where(zz => zz.Date >= dto.StartDate && zz.Date <= dto.EndDate).ToList();
+            var list = Tutorsessions.Where(zz => zz.Date >= dto.StartDate && zz.Date <= enddate).ToList();
             return Ok(list);
         }
         #endregion
+
+        #region Salesreport
+        //for table
+        [HttpGet]
+        [Route("GetSalesReport")]
+        public async Task<IActionResult> GetSalesReport([FromBody] SalesParameterDto dto)
+        {
+          
+            var enddate = dto.EndDate.AddHours(23.99);
+            var sales = new List<SalesDto>();
+            DateTime convertedDate;
+            var payments = await db.Payment.ToListAsync();
+            foreach (var item in payments)
+            {
+                SalesDto x = new SalesDto();
+                x.Amount = item.PaymentAmount;
+                x.FullName = item.FullName;
+                if (item.PaymentDate.Length == 25) {
+                    string date = item.PaymentDate.Remove(5, 2);
+                    convertedDate = Convert.ToDateTime(date);
+                    x.Date = convertedDate;
+                }
+                else
+                {
+                    string date = item.PaymentDate.Remove(5, 3);
+                    convertedDate = Convert.ToDateTime(date);
+                    x.Date = convertedDate;
+                }
+
+                sales.Add(x);
+            }
+            var list = sales.Where(zz => zz.Date >= dto.StartDate && zz.Date <= enddate).ToList();
+            return Ok(list);
+        }
+
+        [HttpGet]
+        [Route("SubscriptionSales")]
+        public IActionResult SubscriptionSales()
+        {
+            var sub = db.EnrolLine.Include(zz => zz.Subscription).AsEnumerable().GroupBy(zz => zz.Subscription.SubscriptionName);
+            var subsales = new List<SubscriptionSalesDto>();
+            foreach (var group in sub)
+            {
+                SubscriptionSalesDto vm = new SubscriptionSalesDto();
+                vm.Subscription = group.Key;
+                vm.Amount = group.Sum(zz => zz.Subscription.price).ToString();
+                subsales.Add(vm);
+
+            }
+            return Ok(subsales);
+        }
+        #endregion
+
+
+
+        [HttpGet]
+        [Route("sms")]
+        public IActionResult SendSms(SmsMessage model)
+        {
+            string x = model.To.Substring(1);
+            string number = "+27"+x;
+            var message = MessageResource.Create(
+                to: new PhoneNumber(number),
+                from: new PhoneNumber("+17729348745"),
+                body: model.Message,
+                client: _client); // pass in the custom client
+            return Ok("Success");
+        }
     }
 }
+
