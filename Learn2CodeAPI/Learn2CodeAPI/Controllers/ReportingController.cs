@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Learn2CodeAPI.Data;
+using Learn2CodeAPI.Dtos.ExportDto;
 using Learn2CodeAPI.Dtos.ReportDto;
 using Learn2CodeAPI.Models;
 using Learn2CodeAPI.Models.Login.Identity;
@@ -14,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using Twilio.Clients;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
@@ -24,61 +27,96 @@ namespace Learn2CodeAPI.Controllers
     [ApiController]
     public class ReportingController : ControllerBase
     {
-        
 
-            private readonly UserManager<AppUser> _userManager;
-            private IMapper _mapper;
-            private readonly AppDbContext db;
+
+        private readonly UserManager<AppUser> _userManager;
+        private IMapper _mapper;
+        private readonly AppDbContext db;
         private readonly ITwilioRestClient _client;
 
         public ReportingController(UserManager<AppUser> userManager, IMapper mapper,
                 AppDbContext _db, ITwilioRestClient client)
-            {
+        {
 
-                _userManager = userManager;
-                _mapper = mapper;
-                db = _db;
+            _userManager = userManager;
+            _mapper = mapper;
+            db = _db;
             _client = client;
-            }
+        }
 
         #region AdminHome
-            [HttpGet]
-            [Route("TotalStudents")]
-            public async Task<IActionResult> TotalStudents()
-            {
-                int students = await db.Students.CountAsync();
-                return Ok(students);
-            }
+        [HttpGet]
+        [Route("TotalStudents")]
+        public async Task<IActionResult> TotalStudents()
+        {
+            int students = await db.Students.CountAsync();
+            return Ok(students);
+        }
 
-            [HttpGet]
-            [Route("TotalTutors")]
-            public async Task<IActionResult> TotalTutors()
-            {
-                int students = await db.Tutor.CountAsync();
-                return Ok(students);
-            }
+        [HttpGet]
+        [Route("TotalTutors")]
+        public async Task<IActionResult> TotalTutors()
+        {
+            int students = await db.Tutor.CountAsync();
+            return Ok(students);
+        }
 
-            [HttpGet]
-            [Route("TotalUniversities")]
-            public async Task<IActionResult> TotalUniversities()
+        [HttpGet]
+        [Route("TotalUniversities")]
+        public async Task<IActionResult> TotalUniversities()
+        {
+            int students = await db.University.CountAsync();
+            return Ok(students);
+        }
+        [HttpGet]
+        [Route("TotalDegrees")]
+        public async Task<IActionResult> TotalDegrees()
+        {
+            int students = await db.Degrees.CountAsync();
+            return Ok(students);
+        }
+        [HttpGet]
+        [Route("TotalModules")]
+        public async Task<IActionResult> TotalModules()
+        {
+            int students = await db.Degrees.CountAsync();
+            return Ok(students);
+        }
+
+        //for studentuniversitygraph
+        [HttpGet]
+        [Route("StudentsAtUniversity")]
+        public IActionResult StudentsAtUniversity()
+        {
+            var students = db.StudentModule.Include(zz => zz.Students).Include(zz => zz.Module.Degree.University).AsEnumerable().GroupBy(zz => zz.Module.Degree.University.UniversityName);
+            var uni = new List<UniversityStudentsDto>();
+            foreach (var group in students)
             {
-                int students = await db.University.CountAsync();
-                return Ok(students);
+                UniversityStudentsDto vm = new UniversityStudentsDto();
+                vm.Uni = group.Key;
+                vm.Amount = group.Count();
+                uni.Add(vm);
+
             }
-            [HttpGet]
-            [Route("TotalDegrees")]
-            public async Task<IActionResult> TotalDegrees()
+            return Ok(uni);
+        }
+
+        [HttpGet]
+        [Route("CoursePieChart")]
+        public IActionResult CoursePieChart()
+        {
+            var courses = db.CourseEnrolLine.Include(zz => zz.CourseSubCategory).AsEnumerable().GroupBy(zz => zz.CourseSubCategory.CourseSubCategoryName);
+            var numcourse = new List<CoursePieDto>();
+            foreach (var group in courses)
             {
-                int students = await db.Degrees.CountAsync();
-                return Ok(students);
+                CoursePieDto vm = new CoursePieDto();
+                vm.Course = group.Key;
+                vm.Amount = group.Count();
+                numcourse.Add(vm);
+
             }
-            [HttpGet]
-            [Route("TotalModules")]
-            public async Task<IActionResult> TotalModules()
-            {
-                int students = await db.Degrees.CountAsync();
-                return Ok(students);
-            }
+            return Ok(numcourse);
+        }
 
         #endregion
 
@@ -111,8 +149,8 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> AttendacSession()
         {
 
-            var Sessions = await db.BookingInstance.Where(zz => zz.AttendanceTaken == true 
-            && zz.TutorSession.SessionType.SessionTypeName == "Group" ).ToListAsync();
+            var Sessions = await db.BookingInstance.Where(zz => zz.AttendanceTaken == true
+            && zz.TutorSession.SessionType.SessionTypeName == "Group").ToListAsync();
             return Ok(Sessions);
         }
 
@@ -129,7 +167,7 @@ namespace Learn2CodeAPI.Controllers
         //use ng2
         [HttpGet]
         [Route("SessionAttendanceGraph/{BookingInstanceId}")]
-        public async Task <IActionResult> SessionAttendanceGraph(int BookingInstanceId)
+        public async Task<IActionResult> SessionAttendanceGraph(int BookingInstanceId)
         {
 
             var Attendance = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == BookingInstanceId).ToListAsync();
@@ -141,7 +179,7 @@ namespace Learn2CodeAPI.Controllers
             dto.Missed = Missed;
             return Ok(dto);
 
-            
+
 
         }
 
@@ -196,13 +234,13 @@ namespace Learn2CodeAPI.Controllers
             var Tutorsessions = new List<TutorSessionDto>();
             string StartDate = dto.StartDate.ToString("MM/dd/yyyy");
             string EndDate = dto.EndDate.ToString("MM/dd/yyyy");
-            var sessions = await db.BookingInstance.Include(zz => zz.Module).Include(zz =>zz.Tutor).Where(zz => zz.TutorId == dto.TutorId).ToListAsync();
+            var sessions = await db.BookingInstance.Include(zz => zz.Module).Include(zz => zz.Tutor).Where(zz => zz.TutorId == dto.TutorId).ToListAsync();
 
-            foreach(var item in sessions)
+            foreach (var item in sessions)
             {
                 TutorSessionDto x = new TutorSessionDto();
                 string[] formats = { "MM/dd/yyyy" };
-                x.Date= DateTime.ParseExact(item.Date, formats, new CultureInfo("en-US"), DateTimeStyles.None);
+                x.Date = DateTime.ParseExact(item.Date, formats, new CultureInfo("en-US"), DateTimeStyles.None);
                 x.TutorName = item.Tutor.TutorName;
                 x.TutorSurname = item.Tutor.TutorSurname;
                 x.TutorEmail = item.Tutor.TutorEmail;
@@ -222,7 +260,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetSalesReport")]
         public async Task<IActionResult> GetSalesReport([FromBody] SalesParameterDto dto)
         {
-          
+
             var enddate = dto.EndDate.AddHours(23.99);
             var sales = new List<SalesDto>();
             DateTime convertedDate;
@@ -266,6 +304,23 @@ namespace Learn2CodeAPI.Controllers
             }
             return Ok(subsales);
         }
+
+        [HttpGet]
+        [Route("CourseSales")]
+        public IActionResult CourseSales()
+        {
+            var sub = db.CourseEnrolLine.Include(zz => zz.CourseSubCategory).AsEnumerable().GroupBy(zz => zz.CourseSubCategory.CourseSubCategoryName);
+            var coursesales = new List<CourseSalesDto>();
+            foreach (var group in sub)
+            {
+                CourseSalesDto vm = new CourseSalesDto();
+                vm.Course = group.Key;
+                vm.Amount = group.Sum(zz => zz.CourseSubCategory.price).ToString();
+                coursesales.Add(vm);
+
+            }
+            return Ok(coursesales);
+        }
         #endregion
 
 
@@ -275,13 +330,41 @@ namespace Learn2CodeAPI.Controllers
         public IActionResult SendSms(SmsMessage model)
         {
             string x = model.To.Substring(1);
-            string number = "+27"+x;
+            string number = "+27" + x;
             var message = MessageResource.Create(
                 to: new PhoneNumber(number),
                 from: new PhoneNumber("+17729348745"),
                 body: model.Message,
                 client: _client); // pass in the custom client
             return Ok("Success");
+        }
+
+
+        [HttpGet]
+        [Route("export")]
+        public IActionResult Export()
+        {
+            var student = db.Students.ToList();
+            var exportstudent = new List<ExportStudentDto>();
+            foreach(var item in student)
+            {
+                ExportStudentDto x = new ExportStudentDto();
+                x.StudentCell = item.StudentCell;
+                x.StudentName = item.StudentName;
+                x.StudentSurname = item.StudentSurname;
+                exportstudent.Add(x);
+            }
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells.LoadFromCollection(exportstudent, true);
+                package.Save();
+            }
+            stream.Position = 0;
+            string excelname = "sss";
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelname);
         }
     }
 }
