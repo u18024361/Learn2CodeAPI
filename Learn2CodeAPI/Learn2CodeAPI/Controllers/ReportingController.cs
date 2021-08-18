@@ -341,7 +341,7 @@ namespace Learn2CodeAPI.Controllers
 
 
         [HttpGet]
-        [Route("export")]
+        [Route("ExportStudent")]
         public IActionResult Export()
         {
             var student = db.Students.ToList();
@@ -366,6 +366,67 @@ namespace Learn2CodeAPI.Controllers
             string excelname = "sss";
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelname);
         }
+
+
+
+        [HttpGet]
+        [Route("ExportSalesReport/{StartDate}/{EndDate}")]
+        public async Task<IActionResult> ExportSalesReport( DateTime StartDate, DateTime EndDate)
+        {
+            SalesParameterDto dto = new SalesParameterDto();
+            dto.StartDate = StartDate;
+            dto.EndDate = EndDate;
+            var enddate = dto.EndDate.AddHours(23.99);
+            var sales = new List<SalesDto>();
+            DateTime convertedDate;
+            var payments = await db.Payment.ToListAsync();
+            foreach (var item in payments)
+            {
+                SalesDto x = new SalesDto();
+                x.Amount = item.PaymentAmount;
+                x.FullName = item.FullName;
+                if (item.PaymentDate.Length == 25)
+                {
+                    string date = item.PaymentDate.Remove(5, 2);
+                    convertedDate = Convert.ToDateTime(date);
+                    x.Date = convertedDate;
+                }
+                else
+                {
+                    string date = item.PaymentDate.Remove(5, 3);
+                    convertedDate = Convert.ToDateTime(date);
+                    x.Date = convertedDate;
+                }
+
+                sales.Add(x);
+            }
+            var list = sales.Where(zz => zz.Date >= dto.StartDate && zz.Date <= enddate).ToList();
+            var exp = new List<ExportPaymentDto>();
+            foreach(var item in list)
+            {
+                ExportPaymentDto c = new ExportPaymentDto();
+                c.FullName = item.FullName;
+                c.PaymentAmount = item.Amount;
+                c.PaymentDate = item.Date.ToString("MM/dd/yyyy");
+                exp.Add(c);
+            }
+
+            var stream = new MemoryStream();
+
+            using (var package = new ExcelPackage(stream))
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Sheet1");
+                worksheet.Cells.LoadFromCollection(exp, true);
+                package.Save();
+            }
+            stream.Position = 0;
+            string excelname = "sss";
+            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelname);
+           
+        }
+
+
+
     }
 }
 
