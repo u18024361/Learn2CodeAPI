@@ -46,7 +46,7 @@ namespace Learn2CodeAPI.Controllers
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
             AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Models.Tutor.Message> _Mess,IGenRepository<Models.Tutor.Message> _Mes, 
             IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
-            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<University> UniversityGenRepo,
+            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<University> _UniversityGenRepo,
             IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
         {
             studentRepo = _studentRepo;
@@ -62,6 +62,7 @@ namespace Learn2CodeAPI.Controllers
             CourseBasketLineGenRepo = _CourseBasketLineGenRepo;
             SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
             _emailsender = emailsender;
+            UniversityGenRepo = _UniversityGenRepo;
 
         }
         [HttpGet]
