@@ -29,6 +29,18 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
         }
 
         #region Student
+
+        public async Task<IEnumerable<Degree>> GetDegree(int UniId)
+        {
+            var degree = await db.Degrees.Where(zz => zz.UniversityId == UniId).ToListAsync();
+            return degree;
+        }
+
+        public async Task<IEnumerable<Module>> GetModule(int DegreeId)
+        {
+            var Module = await db.Modules.Where(zz => zz.DegreeId == DegreeId).ToListAsync();
+            return Module;
+        }
         public async Task<Student> Register(AppUser userIdentity, RegistrationDto model)
         {
             var result = await _userManager.CreateAsync(userIdentity, model.Password);
@@ -358,6 +370,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             var myFeedback = await db.Feedback.Include(zz =>zz.BookingInstance).ThenInclude(zz => zz.Tutor).Where(zz => zz.StudentId == StudentId).ToListAsync();
             return myFeedback;
         }
+
+      
         #endregion
     }
 }

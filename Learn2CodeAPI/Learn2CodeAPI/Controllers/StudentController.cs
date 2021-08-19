@@ -35,6 +35,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<Tutor> TutorGenRepo;
         private IGenRepository<Models.Tutor.Message> Mess;
         private IGenRepository<Module> ModuleGenRepo;
+        private IGenRepository<University> UniversityGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
         private IGenRepository<Models.Tutor.Message> MessageGenRepo;
         private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
@@ -45,7 +46,8 @@ namespace Learn2CodeAPI.Controllers
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
             AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Models.Tutor.Message> _Mess,IGenRepository<Models.Tutor.Message> _Mes, 
             IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
-            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
+            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<University> UniversityGenRepo,
+            IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -117,6 +119,35 @@ namespace Learn2CodeAPI.Controllers
 
 
         }
+
+        [HttpGet]
+        [Route("GetUniRegister")]
+        public async Task<IActionResult> GetUniRegister()
+        {
+
+            var uni = await UniversityGenRepo.GetAll();
+            return Ok(uni);
+
+        }
+        [HttpGet]
+        [Route("GetDegreeRegister/{UniId}")]
+        public async Task<IActionResult> GetDegreeRegister(int UniId)
+        {
+
+            var uni = await UniversityGenRepo.GetAll();
+            return Ok(uni);
+
+        }
+        [HttpGet]
+        [Route("GetModuleRegister/{DegreeId}")]
+        public async Task<IActionResult> GetModuleRegister(int DegreeId)
+        {
+
+            var uni = await UniversityGenRepo.GetAll();
+            return Ok(uni);
+
+        }
+
 
         [HttpPut]
         [Route("updatestudent")]

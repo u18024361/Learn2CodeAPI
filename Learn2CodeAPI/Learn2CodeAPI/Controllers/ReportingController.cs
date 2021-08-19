@@ -10,6 +10,7 @@ using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.ExportDto;
 using Learn2CodeAPI.Dtos.ReportDto;
 using Learn2CodeAPI.Models;
+using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Login.Identity;
 using Learn2CodeAPI.Models.Student;
 using Microsoft.AspNetCore.Http;
@@ -160,7 +161,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> SessionAttendanceReport(int BookingInstanceId)
         {
 
-            var Attendance = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == BookingInstanceId).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
+            var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Where(zz => zz.BookingInstanceId == BookingInstanceId).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
             return Ok(Attendance);
         }
 
@@ -424,7 +425,6 @@ namespace Learn2CodeAPI.Controllers
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelname);
            
         }
-
 
 
     }
