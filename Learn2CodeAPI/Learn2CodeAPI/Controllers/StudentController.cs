@@ -135,7 +135,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetDegreeRegister(int UniId)
         {
 
-            var uni = await UniversityGenRepo.GetAll();
+            var uni = await studentRepo.GetDegree(UniId);
             return Ok(uni);
 
         }
@@ -144,7 +144,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetModuleRegister(int DegreeId)
         {
 
-            var uni = await UniversityGenRepo.GetAll();
+            var uni = await studentRepo.GetModule(DegreeId);
             return Ok(uni);
 
         }
