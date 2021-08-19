@@ -612,7 +612,8 @@ namespace Learn2CodeAPI.Controllers
             dynamic result = new ExpandoObject();
             var today = DateTime.Now;
             var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
-            && zz.EndDate >= today).ToListAsync();
+            && zz.TicketQuantity > 0 && zz.EndDate >= today && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual")).ToListAsync();
             var sessionmodulelist = new List<dynamic>();
             var individualsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == false).FirstOrDefaultAsync();
             foreach(var item in enrol)
@@ -661,7 +662,7 @@ namespace Learn2CodeAPI.Controllers
                 var today = DateTime.Now;
                 //check enroline quantity
                 var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
-               .Where(zz => zz.Enrollment.StudentId == dto.StudentId && zz.EndDate >= today && zz.ModuleId == dto.ModuleId && zz.Subscription.SubscriptionTutorSession
+               .Where(zz => zz.Enrollment.StudentId == dto.StudentId && zz.EndDate >= today && zz.ModuleId == dto.ModuleId && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession
                .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual"))
                .Select(zz => zz.Id).FirstOrDefaultAsync();
 
@@ -764,10 +765,11 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 string datestring = dto.date.ToString("MM/dd/yyyy");
+                var student = await db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == dto.StudentId).FirstOrDefaultAsync();
                 SessionTime time = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
                 BookingInstance email = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
                 string subject = "Change request: " + email.SessionTime.StartTime + "-" + email.SessionTime.EndTime + " " + email.Date;
-                string content = dto.Message + " " +"Time: " + time.StartTime + "-" + time.EndTime + " " +"Date: " + datestring;
+                string content = dto.Message + " " +"Time: " + time.StartTime + "-" + time.EndTime + " " +"Date: " + datestring + " " + student.Identity.Email;
 
                 var message = new Emailservice.Message(new string[] { email.Tutor.TutorEmail }, subject, content);
                 await _emailsender.SendEmailAsync(message);
@@ -792,6 +794,11 @@ namespace Learn2CodeAPI.Controllers
 
 
 
+
+
+        #endregion
+
+        #region MakeGroup
         //to get group
         [HttpGet]
         [Route("GetbookingGroup/{StudentId}")]
@@ -800,7 +807,8 @@ namespace Learn2CodeAPI.Controllers
             dynamic result = new ExpandoObject();
             var today = DateTime.Now;
             var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
-            && zz.EndDate >= today).ToListAsync();
+            && zz.EndDate >= today && zz.TicketQuantity >0 && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
             var sessionmodulelist = new List<dynamic>();
             var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
             foreach (var item in enrol)
@@ -811,6 +819,7 @@ namespace Learn2CodeAPI.Controllers
                 var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId && zz.TutorSessionId == groupsession.Id).FirstOrDefaultAsync();
                 modulesesion.TutorSessionId = session.TutorSessionId;
+                session.TutorSession.SubscriptionTutorSession = null;
                 modulesesion.TutorSession = session.TutorSession;
                 sessionmodulelist.Add(modulesesion);
 

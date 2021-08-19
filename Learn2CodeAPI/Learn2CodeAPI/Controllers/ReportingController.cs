@@ -161,7 +161,7 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> SessionAttendanceReport(int BookingInstanceId)
         {
 
-            var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Where(zz => zz.BookingInstanceId == BookingInstanceId).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
+            var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.Module).Where(zz => zz.BookingInstanceId == BookingInstanceId).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
             return Ok(Attendance);
         }
 

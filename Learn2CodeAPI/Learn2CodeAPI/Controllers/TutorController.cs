@@ -665,13 +665,39 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                var data = await TutorRepo.CreateBooking(dto);
-                result.data = data;
-                result.message = "Session created";
+                var BookingInstance = await TutorRepo.CreateBooking(dto);
+                var type = db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.SessionTypeName == "Group").FirstOrDefault();
+                if (BookingInstance.TutorSessionId == type.Id)
+                {
+                    //dynamic result = new ExpandoObject();
+                    var today = DateTime.Now;
+                    var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.ModuleId == BookingInstance.ModuleId && zz.TicketQuantity >0
+                    && zz.EndDate >= today && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
+                    var sessionmodulelist = new List<dynamic>();
+                    var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+                    foreach (var item in enrol)
+                    {
+                        var student = db.Students.Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
+                        RegisteredStudent regstudent = new RegisteredStudent();
+                        regstudent.BookingInstanceId = BookingInstance.Id;
+                        regstudent.StudentId = student.Id;
+                        db.RegisteredStudent.Add(regstudent);
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
+                    result.data = BookingInstance;
+                    result.message = "Individual Session created";
+                    return Ok(result);
+                }
+                result.data = BookingInstance;
+                result.message = "Group Session created";
                 return Ok(result);
             }
             catch
             {
+                //send emails
 
                 result.message = "Something went wrong creating the session";
                 return BadRequest(result.message);
