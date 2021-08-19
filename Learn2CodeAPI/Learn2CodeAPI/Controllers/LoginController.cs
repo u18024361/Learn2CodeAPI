@@ -148,8 +148,8 @@ namespace Learn2CodeAPI.Controllers
                 var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
                 if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 {
-                    result.message = "Invalid login details";
-                    return Ok(result);
+                    return BadRequest("Invalid login details");
+                    
                 }
                 var signingCredentials = _jwtHandler.GetSigningCredentials();
                 var claims = await _jwtHandler.GetClaims(user);

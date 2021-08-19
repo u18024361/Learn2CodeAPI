@@ -203,10 +203,28 @@ namespace Learn2CodeAPI.Controllers
 
         #region Resource
         [HttpGet]
-        [Route("GetAllModules")]
-        public async Task<IActionResult> GetAllResourceModules()
+        [Route("GetAllModulesForResources")]
+        public async Task<IActionResult> GetAllModulesForResources()
         {
             var entity = await TutorRepo.GetModules();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllUniversitiesForResources")]
+        public async Task<IActionResult> GetAllUniversitiesForResources()
+        {
+            var entity = await db.University.ToListAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetUniversityForResources/{UniversityId}")]
+        public async Task<IActionResult> GetUniversityForResources(int UniversityId)
+        {
+            var entity = await db.Modules.Include(zz => zz.Degree).Include(zz => zz.Degree.University).Where(zz => zz.Degree.University.Id == UniversityId).ToListAsync();
 
             return Ok(entity);
         }
@@ -220,6 +238,7 @@ namespace Learn2CodeAPI.Controllers
 
             return Ok(entity);
         }
+
 
         
 

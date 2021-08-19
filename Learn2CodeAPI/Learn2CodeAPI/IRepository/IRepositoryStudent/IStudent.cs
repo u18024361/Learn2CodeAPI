@@ -34,5 +34,8 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Feedback> CreateFeedback(Feedback feedback);
         Task<Feedback> DeleteFeedback(int StudentId, int BookingInstanceId);
         Task<IEnumerable<Feedback>> MyFeedback(int StudentId);
+
+        Task<IEnumerable<Degree>> GetDegree(int UniId);
+        Task<IEnumerable<Module>> GetModule(int DegreeId);
     }
 }
