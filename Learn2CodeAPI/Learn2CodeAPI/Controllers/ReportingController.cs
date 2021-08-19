@@ -228,6 +228,14 @@ namespace Learn2CodeAPI.Controllers
 
         #region totlatutorsession
         [HttpGet]
+        [Route("GetTutorsessionsTutor")]
+        public async Task<IActionResult> GetTutorsessionsTutor()
+        {
+            var list = await db.Tutor.ToListAsync();
+            return Ok(list);
+        }
+
+        [HttpGet]
         [Route("GetTotalTutorsessions")]
         public async Task<IActionResult> GetTotalTutorsessions([FromBody] TotalTutorSessionDto dto)
         {
