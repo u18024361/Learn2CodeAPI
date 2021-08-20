@@ -103,7 +103,8 @@ namespace Learn2CodeAPI
                 builder =>
                 {
                     builder.WithOrigins("http://localhost:44393",
-                                        "http://localhost:4200"
+                                        "http://localhost:4200",
+                                        "http://localhost:8100"
                                         )
                                         .AllowAnyHeader()
                                         .AllowAnyMethod();
