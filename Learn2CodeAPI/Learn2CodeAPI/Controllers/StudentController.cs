@@ -113,7 +113,7 @@ namespace Learn2CodeAPI.Controllers
             catch
             {
 
-                result.message = "Something went wrong creating the university";
+                result.message = "Something went wrong whith registartion";
                 return BadRequest(result.message);
             }
 
@@ -175,13 +175,13 @@ namespace Learn2CodeAPI.Controllers
 
                 var data = await studentRepo.UpdateProfile(dto);
                 result.data = data;
-                result.message = "university updated";
+                result.message = "Profile updated";
                 return Ok(result);
 
             }
             catch
             {
-                result.message = "Something went wrong updating the university";
+                result.message = "Something went wrong updating while updating your Profile";
                 return BadRequest(result.message);
 
             }
