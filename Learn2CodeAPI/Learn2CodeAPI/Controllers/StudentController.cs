@@ -865,6 +865,16 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetMyRegiseredSessions/{StudentId}")]
+        public async Task<IActionResult> GetMyRegiseredSessions(int StudentId)
+        {
+
+            var feedback = await studentRepo.GetmyReg(StudentId);
+            return Ok(feedback);
+
+        }
+
+        [HttpGet]
         [Route("GetMyFeedback/{StudentId}")]
         public async Task<IActionResult> GetMyFeedback(int StudentId)
         {

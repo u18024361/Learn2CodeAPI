@@ -371,7 +371,14 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return myFeedback;
         }
 
-      
+        public async Task<IEnumerable<RegisteredStudent>> GetmyReg(int StudentId)
+        {
+            var mysessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.BookingStatus)
+                .Where(zz => zz.StudentId == StudentId && zz.BookingInstance.BookingStatus.bookingStatus == "Finalized").ToListAsync();
+            return mysessions;
+        }
+
+
         #endregion
     }
 }
