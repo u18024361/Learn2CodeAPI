@@ -1185,6 +1185,26 @@ namespace Learn2CodeAPI.Controllers
           
 
         }
+
+        [HttpPost]
+        [Route("pic")]
+        public async Task<IActionResult> pic([FromForm(Name = "file")] IFormFile file)
+        {
+            var t = await db.Tutor.Where(zz => zz.Id == 4).FirstOrDefaultAsync();
+            using (var Filetarget = new MemoryStream())
+            {
+                file.CopyTo(Filetarget);
+                t.TutorPhoto = Filetarget.ToArray();
+
+
+            }
+           
+            await db.SaveChangesAsync();
+            return Ok();
+
+
+        }
+
     }
 }
 
