@@ -265,7 +265,7 @@ namespace Learn2CodeAPI.Controllers
 
         #region Salesreport
         //for table
-        [HttpGet]
+        [HttpPost]
         [Route("GetSalesReport")]
         public async Task<IActionResult> GetSalesReport([FromBody] SalesParameterDto dto)
         {
