@@ -21,13 +21,22 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Message> CreateMessage(MessageDto model);
 
         Task<IEnumerable<Tutor>> GetTutors();
+        Task<IEnumerable<Booking>> GetMyBookings(int StudentId);
         Task<IEnumerable<Resource>> GetResource(int ModuleId);
         Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId);
         Task<IEnumerable<Subscription>> GetSubscriptions();
         Task<Basket> GetBasket(int StudentId);
         Task<CourseBasketLine> BuyCourse(CourseBuyDto dto);
         Task<SubScriptionBasketLine> BuySubscription(SubscriptionBuyDto dto);
-        Task<Basket>Checkout(CheckoutDto dto);
+       Task<Basket>Checkout(CheckoutDto dto);
+        Task<BookingInstance> CancelBooking(int BookingInstanceId);
 
+        Task<Feedback> CreateFeedback(Feedback feedback);
+        Task<Feedback> DeleteFeedback(int StudentId, int BookingInstanceId);
+        Task<IEnumerable<Feedback>> MyFeedback(int StudentId);
+        Task<IEnumerable<RegisteredStudent>> GetmyReg(int StudentId);
+
+        Task<IEnumerable<Degree>> GetDegree(int UniId);
+        Task<IEnumerable<Module>> GetModule(int DegreeId);
     }
 }

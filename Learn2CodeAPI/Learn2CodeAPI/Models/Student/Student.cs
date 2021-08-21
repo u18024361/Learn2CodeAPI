@@ -27,6 +27,6 @@ namespace Learn2CodeAPI.Models.Student
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
         public ICollection<CourseEnrol> CourseEnrol { get; set; }
 
-       
+        public ICollection<Feedback> Feedback { get; set; }
     }
 }

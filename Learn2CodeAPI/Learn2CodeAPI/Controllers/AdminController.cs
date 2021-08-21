@@ -1052,7 +1052,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPut]
         [Route("EditContent")]
-        public async Task<IActionResult> EditContent([FromBody] CourseContentDto dto)
+        public async Task<IActionResult> EditContent([FromForm] CourseContentDto dto)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)

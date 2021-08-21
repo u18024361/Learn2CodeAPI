@@ -1,6 +1,7 @@
 ﻿using Learn2CodeAPI.Models.Admin;
 using Learn2CodeAPI.Models.Generic;
 using System;
+using System.Collections.Generic;
 
 namespace Learn2CodeAPI.Models.Student
 {
@@ -15,5 +16,6 @@ namespace Learn2CodeAPI.Models.Student
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int TicketQuantity { get; set; }
+        public ICollection<Ticket> Ticket { get; set; }
     }
 }

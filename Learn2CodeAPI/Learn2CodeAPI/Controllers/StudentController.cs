@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Emailservice;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -32,18 +33,21 @@ namespace Learn2CodeAPI.Controllers
         private readonly AppDbContext db;
         private IStudent studentRepo;
         private IGenRepository<Tutor> TutorGenRepo;
-        private IGenRepository<Message> Mess;
+        private IGenRepository<Models.Tutor.Message> Mess;
         private IGenRepository<Module> ModuleGenRepo;
+        private IGenRepository<University> UniversityGenRepo;
         private IGenRepository<CourseFolder> CourseFolderGenRepo;
-        private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<Models.Tutor.Message> MessageGenRepo;
         private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
         private IGenRepository<SubScriptionBasketLine> SubScriptionBasketLineGenRepo;
+        private readonly IEmailSender _emailsender;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
-            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Message>_Mess,IGenRepository<Message>_Mes, 
+            AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Models.Tutor.Message> _Mess,IGenRepository<Models.Tutor.Message> _Mes, 
             IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
-            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo)
+            IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<University> _UniversityGenRepo,
+            IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -57,6 +61,8 @@ namespace Learn2CodeAPI.Controllers
             CourseFolderGenRepo = _CourseFolderGenRepo;
             CourseBasketLineGenRepo = _CourseBasketLineGenRepo;
             SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
+            _emailsender = emailsender;
+            UniversityGenRepo = _UniversityGenRepo;
 
         }
         [HttpGet]
@@ -107,13 +113,42 @@ namespace Learn2CodeAPI.Controllers
             catch
             {
 
-                result.message = "Something went wrong creating the university";
+                result.message = "Something went wrong whith registartion";
                 return BadRequest(result.message);
             }
 
 
 
         }
+
+        [HttpGet]
+        [Route("GetUniRegister")]
+        public async Task<IActionResult> GetUniRegister()
+        {
+
+            var uni = await UniversityGenRepo.GetAll();
+            return Ok(uni);
+
+        }
+        [HttpGet]
+        [Route("GetDegreeRegister/{UniId}")]
+        public async Task<IActionResult> GetDegreeRegister(int UniId)
+        {
+
+            var uni = await studentRepo.GetDegree(UniId);
+            return Ok(uni);
+
+        }
+        [HttpGet]
+        [Route("GetModuleRegister/{DegreeId}")]
+        public async Task<IActionResult> GetModuleRegister(int DegreeId)
+        {
+
+            var uni = await studentRepo.GetModule(DegreeId);
+            return Ok(uni);
+
+        }
+
 
         [HttpPut]
         [Route("updatestudent")]
@@ -140,13 +175,13 @@ namespace Learn2CodeAPI.Controllers
 
                 var data = await studentRepo.UpdateProfile(dto);
                 result.data = data;
-                result.message = "university updated";
+                result.message = "Profile updated";
                 return Ok(result);
 
             }
             catch
             {
-                result.message = "Something went wrong updating the university";
+                result.message = "Something went wrong updating while updating your Profile";
                 return BadRequest(result.message);
 
             }
@@ -242,13 +277,13 @@ namespace Learn2CodeAPI.Controllers
                 var data = await MessageGenRepo.Delete(MessageId);
 
                 result.data = data;
-                result.message = "University deleted";
+                result.message = "Message deleted";
                 return Ok(result);
             }
             catch
             {
 
-                result.message = "Something went wrong deleting the university";
+                result.message = "Something went wrong deleting the message";
                 return BadRequest(result.message);
             }
 
@@ -458,7 +493,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                if(dto.Message != "Approved")
+                if (dto.Message != "Approved")
                 {
                     result.message = "Error when Checking out";
                     return Ok(result);
@@ -570,24 +605,29 @@ namespace Learn2CodeAPI.Controllers
 
         #region make individual
 
+        //for dropdown
         [HttpGet]
-        [Route("Getbookingmodules/{StudentId}")]
-        public async Task<IActionResult> Getbookingmodules(int StudentId)
+        [Route("GetbookingIndividual/{StudentId}")]
+        public async Task<IActionResult> GetbookingIndividual(int StudentId)
         {
             dynamic result = new ExpandoObject();
             var today = DateTime.Now;
             var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
-            && zz.EndDate >= today).ToListAsync();
+            && zz.TicketQuantity > 0 && zz.EndDate >= today && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual")).ToListAsync();
             var sessionmodulelist = new List<dynamic>();
+            var individualsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == false).FirstOrDefaultAsync();
             foreach(var item in enrol)
             {
                 dynamic modulesesion = new ExpandoObject();
-                modulesesion.moduelId = item.ModuleId;
-                modulesesion.Module = item.Module;
+                modulesesion.moduleId = item.ModuleId;
+                item.Module.EnrolLine = null;
+                modulesesion.module = item.Module;
                  var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
-                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId).FirstOrDefaultAsync();
-                modulesesion.TutorSessionId = session.TutorSessionId;
-                modulesesion.TutorSession = session.TutorSession;
+                    .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId && zz.TutorSessionId == individualsession.Id).FirstOrDefaultAsync();
+                modulesesion.tutorSessionId = session.TutorSessionId;
+                session.TutorSession.SubscriptionTutorSession = null;
+                modulesesion.tutorSession = session.TutorSession;
                 sessionmodulelist.Add(modulesesion);
 
             }
@@ -597,7 +637,279 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+
+        //displays list of  sessions to book
+        [HttpGet]
+        [Route("GetIndividualAvailable/{ModuleId}/{TutorSessionId}")]
+        public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
+        {
+            var available = await db.BookingInstance.Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
+            return Ok(available);
+        }
+
+
+        //to make a booking
+        [HttpPost]
+        [Route("CreateIndividualBooking")]
+        public async Task<IActionResult> CreateIndividualBooking([FromBody] BookIndividualDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var today = DateTime.Now;
+                //check enroline quantity
+                var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
+               .Where(zz => zz.Enrollment.StudentId == dto.StudentId && zz.EndDate >= today && zz.ModuleId == dto.ModuleId && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual"))
+               .Select(zz => zz.Id).FirstOrDefaultAsync();
+
+                //enrolmentid becomes enrollineid
+                var ticketlist = await db.Ticket.Include(zz => zz.TicketStatus)
+                    .Where(zz => zz.EnrolLineId == enrolineId && zz.TicketStatus.ticketStatus == true).ToListAsync();
+
+                if (ticketlist.Count > 0)
+                {
+                    var newBooking = new Booking();
+                    newBooking.StudentId = dto.StudentId;
+                    await db.Booking.AddAsync(newBooking);
+                    await db.SaveChangesAsync();
+
+                    int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).Select(zz => zz.Id).FirstOrDefaultAsync();
+                    int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
+                    var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                    instance.BookingStatusId = bookedstatus;
+                    instance.BookingId = newBooking.Id;
+                    instance.TicketId = ticketlist[0].Id;
+                    instance.Description = dto.Description;
+
+                    ticketlist[0].TicketStatusId = ticketstatus;
+                    var enrolinequantity = await db.EnrolLine.Where(zz => zz.Id == enrolineId).FirstOrDefaultAsync();
+                    int x = enrolinequantity.TicketQuantity - 1;
+                    enrolinequantity.TicketQuantity = x;
+                    await db.SaveChangesAsync();
+                    result.data = instance;
+                    result.message = "Booking successfull";
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest("no tickets");
+                }
+            }
+            catch
+            {
+                result.message = "Something went wrong while making the booking";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        //to display bookings made
+        [HttpGet]
+        [Route("GetMyBookings/{StudentId}")]
+        public async Task<IActionResult> GetMyBookings(int StudentId)
+        {
+
+            var myBookings = await studentRepo.GetMyBookings(StudentId);
+            return Ok(myBookings);
+
+        }
+
+        [HttpGet]
+        [Route("CancelMyBooking/{BookingInstanceId}")]
+        public async Task<IActionResult> CancelMyBooking(int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var session = db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefault();
+                DateTime oDate = Convert.ToDateTime(session.Date);
+                var start = DateTime.Now;
+                if ((oDate - start).TotalDays <= 1)
+                {
+                    result.message = "Can't cancel booking as there is less than 24 hours";
+                    return BadRequest(result.message);
+                }
+                var data = await studentRepo.CancelBooking(BookingInstanceId);
+                result.data = data;
+                result.message = "Cancellation successfull";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong while canceling the booking";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+        [HttpPost]
+        [Route("BookingChangeRequest")]
+        public async Task<IActionResult> BookingChangeRequest([FromBody] BookingChangeDto dto)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                string datestring = dto.date.ToString("MM/dd/yyyy");
+                var student = await db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == dto.StudentId).FirstOrDefaultAsync();
+                SessionTime time = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
+                BookingInstance email = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+                string subject = "Change request: " + email.SessionTime.StartTime + "-" + email.SessionTime.EndTime + " " + email.Date;
+                string content = dto.Message + " " +"Time: " + time.StartTime + "-" + time.EndTime + " " +"Date: " + datestring + " " + student.Identity.Email;
+
+                var message = new Emailservice.Message(new string[] { email.Tutor.TutorEmail }, subject, content);
+                await _emailsender.SendEmailAsync(message);
+
+                   
+                    result.message = "Booking successfull";
+                    return Ok(result);
+            
+            }
+            catch
+            {
+                result.message = "Something went wrong while making the booking";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
+
+
+
+
+
+
+
+
         #endregion
 
+        #region MakeGroup
+        //to get group
+        [HttpGet]
+        [Route("GetbookingGroup/{StudentId}")]
+        public async Task<IActionResult> GetbookingGroup(int StudentId)
+        {
+            dynamic result = new ExpandoObject();
+            var today = DateTime.Now;
+            var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.Enrollment.StudentId == StudentId
+            && zz.EndDate >= today && zz.TicketQuantity >0 && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
+            var sessionmodulelist = new List<dynamic>();
+            var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+            foreach (var item in enrol)
+            {
+                dynamic modulesesion = new ExpandoObject();
+                modulesesion.moduelId = item.ModuleId;
+                modulesesion.Module = item.Module;
+                var session = await db.SubscriptionTutorSession.Include(zz => zz.Subscription)
+                   .Include(zz => zz.TutorSession).Where(zz => zz.SubscriptionId == item.SubscriptionId && zz.TutorSessionId == groupsession.Id).FirstOrDefaultAsync();
+                modulesesion.TutorSessionId = session.TutorSessionId;
+                session.TutorSession.SubscriptionTutorSession = null;
+                modulesesion.TutorSession = session.TutorSession;
+                sessionmodulelist.Add(modulesesion);
+
+            }
+
+
+            return Ok(sessionmodulelist);
+
+        }
+
+        #endregion
+
+        #region feedback
+        [HttpPost]
+        [Route("CreateFeedback")]
+        public async Task<IActionResult> CreateFeedback([FromBody] Feedback feedback)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var user = db.Feedback.Where(zz => zz.StudentId == feedback.StudentId && zz.BookingInstanceId == feedback.BookingInstanceId).FirstOrDefault();
+                if (user != null)
+                {
+                    return BadRequest("Feedback already exists");
+                }
+                var data = await studentRepo.CreateFeedback(feedback);
+                result.data = data;
+                result.message = "Feedback submitted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong while submitting the feedback.";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        [HttpGet]
+        [Route("GetMyRegiseredSessions/{StudentId}")]
+        public async Task<IActionResult> GetMyRegiseredSessions(int StudentId)
+        {
+
+            var feedback = await studentRepo.GetmyReg(StudentId);
+            return Ok(feedback);
+
+        }
+
+        [HttpGet]
+        [Route("GetMyFeedback/{StudentId}")]
+        public async Task<IActionResult> GetMyFeedback(int StudentId)
+        {
+
+            var feedback = await studentRepo.MyFeedback(StudentId);
+            return Ok(feedback);
+
+        }
+
+        [HttpDelete]
+        [Route("DeleteMyFeedback/{StudentId}/{BookingInstanceId}")]
+        public async Task<IActionResult> DeleteMyFeedback(int StudentId, int BookingInstanceId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+
+                var feedback = await studentRepo.DeleteFeedback(StudentId, BookingInstanceId);
+                result.data = feedback;
+                result.message = "Feedback deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the feedback";
+                return BadRequest(result.message);
+            }
+
+        }
+
+        #endregion
     }
 }
