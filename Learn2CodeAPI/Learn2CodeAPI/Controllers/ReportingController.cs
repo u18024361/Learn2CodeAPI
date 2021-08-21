@@ -235,7 +235,7 @@ namespace Learn2CodeAPI.Controllers
             return Ok(list);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetTotalTutorsessions")]
         public async Task<IActionResult> GetTotalTutorsessions([FromBody] TotalTutorSessionDto dto)
         {
