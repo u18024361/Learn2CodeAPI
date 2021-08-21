@@ -128,6 +128,22 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return entity;
         }
 
+        public async Task<BookingInstance> UpdateBooking(BookingInstanceDto dto)
+        {
+            string timestring = dto.Date.ToString("MM/dd/yyyy");
+            var bookinginstance = await db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+            bookinginstance.Link = dto.Link;
+            bookinginstance.SessionTimeId = dto.SessionTimeId;
+            bookinginstance.Date = timestring;
+            bookinginstance.Title = dto.Title;
+            bookinginstance.Description = dto.Description;
+            await db.SaveChangesAsync();
+            return bookinginstance;
+
+
+
+        }
+
 
         #endregion
 
@@ -188,9 +204,11 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             await db.SaveChangesAsync();
             return tutor;
         }
-        #endregion
 
        
+        #endregion
+
+
 
     }
 }

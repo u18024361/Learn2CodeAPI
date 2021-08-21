@@ -323,6 +323,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             var myBookings = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
             var ticket = await db.Ticket.Where(zz => zz.Id == myBookings.TicketId).FirstOrDefaultAsync();
             var enroline = await db.EnrolLine.Where(zz => zz.Id == ticket.EnrolLineId).FirstOrDefaultAsync();
+            var z = myBookings.BookingId;
+            var bookings = await db.Booking.Where(zz => zz.Id == z).FirstOrDefaultAsync();
             int x = enroline.TicketQuantity + 1;
             enroline.TicketQuantity = x;
             ticket.TicketStatusId = ticketstatus;
@@ -330,6 +332,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             myBookings.TicketId = null;
             myBookings.Description = null;
             myBookings.BookingStatusId = bookedstatus;
+            await db.SaveChangesAsync();
+            db.Booking.Remove(bookings);
             await db.SaveChangesAsync();
             return myBookings;
         }
