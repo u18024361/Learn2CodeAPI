@@ -405,15 +405,15 @@ namespace Learn2CodeAPI.Migrations
                         {
                             Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "7f7e14a8-496d-477d-b504-d4c7eec1cfe2",
+                            ConcurrencyStamp = "cf341842-c60b-4234-8da4-bb757a6f41f4",
                             Email = "Admin@gmail.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAEAACcQAAAAEMGGKgSQI7aZl4YmMzb7aQU2rCxTvlIQqTJHePssXL7SHmquZDcohU/1twphmBoi0A==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEE30i7yiiELpfyz+C6EZIN+7jL6zQa8CYMAdrca9Gcb9pprnjjwVJYoE4TUmWq4pNw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "86c0259b-464e-4430-9d18-8b22df2130fa",
+                            SecurityStamp = "080ddfc3-1061-4f27-b0c2-f81dd629166f",
                             TwoFactorEnabled = false,
                             UserName = "Admin"
                         });
@@ -514,6 +514,40 @@ namespace Learn2CodeAPI.Migrations
                     b.ToTable("Enrollment");
                 });
 
+            modelBuilder.Entity("Learn2CodeAPI.Models.Student.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Ability")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BookingInstanceId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Friendliness")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Timliness")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingInstanceId");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Feedback");
+                });
+
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -596,6 +630,9 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("EnrolLineId")
+                        .HasColumnType("int");
+
                     b.Property<int>("EnrollmentId")
                         .HasColumnType("int");
 
@@ -615,6 +652,8 @@ namespace Learn2CodeAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EnrolLineId");
 
                     b.HasIndex("EnrollmentId");
 
@@ -701,6 +740,9 @@ namespace Learn2CodeAPI.Migrations
                     b.Property<int>("SessionTimeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("TicketId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
 
@@ -719,6 +761,8 @@ namespace Learn2CodeAPI.Migrations
                     b.HasIndex("ModuleId");
 
                     b.HasIndex("SessionTimeId");
+
+                    b.HasIndex("TicketId");
 
                     b.HasIndex("TutorId");
 
@@ -1404,6 +1448,25 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Student");
                 });
 
+            modelBuilder.Entity("Learn2CodeAPI.Models.Student.Feedback", b =>
+                {
+                    b.HasOne("Learn2CodeAPI.Models.Tutor.BookingInstance", "BookingInstance")
+                        .WithMany("Feedback")
+                        .HasForeignKey("BookingInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Learn2CodeAPI.Models.Student.Student", "Student")
+                        .WithMany("Feedback")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BookingInstance");
+
+                    b.Navigation("Student");
+                });
+
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Student", b =>
                 {
                     b.HasOne("Learn2CodeAPI.Models.Login.Identity.AppUser", "Identity")
@@ -1461,6 +1524,12 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Ticket", b =>
                 {
+                    b.HasOne("Learn2CodeAPI.Models.Student.EnrolLine", "EnrolLine")
+                        .WithMany("Ticket")
+                        .HasForeignKey("EnrolLineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Learn2CodeAPI.Models.Student.Enrollment", "Enrollment")
                         .WithMany("Ticket")
                         .HasForeignKey("EnrollmentId")
@@ -1490,6 +1559,8 @@ namespace Learn2CodeAPI.Migrations
                         .HasForeignKey("TutorSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("EnrolLine");
 
                     b.Navigation("Enrollment");
 
@@ -1537,6 +1608,10 @@ namespace Learn2CodeAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Learn2CodeAPI.Models.Student.Ticket", "Ticket")
+                        .WithMany()
+                        .HasForeignKey("TicketId");
+
                     b.HasOne("Learn2CodeAPI.Models.Tutor.Tutor", "Tutor")
                         .WithMany("BookingInstance")
                         .HasForeignKey("TutorId")
@@ -1556,6 +1631,8 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Module");
 
                     b.Navigation("SessionTime");
+
+                    b.Navigation("Ticket");
 
                     b.Navigation("Tutor");
 
@@ -1879,6 +1956,11 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("bookinginstances");
                 });
 
+            modelBuilder.Entity("Learn2CodeAPI.Models.Student.EnrolLine", b =>
+                {
+                    b.Navigation("Ticket");
+                });
+
             modelBuilder.Entity("Learn2CodeAPI.Models.Student.Enrollment", b =>
                 {
                     b.Navigation("EnrolLine");
@@ -1891,6 +1973,8 @@ namespace Learn2CodeAPI.Migrations
                     b.Navigation("Booking");
 
                     b.Navigation("CourseEnrol");
+
+                    b.Navigation("Feedback");
 
                     b.Navigation("message");
 
@@ -1913,6 +1997,8 @@ namespace Learn2CodeAPI.Migrations
 
             modelBuilder.Entity("Learn2CodeAPI.Models.Tutor.BookingInstance", b =>
                 {
+                    b.Navigation("Feedback");
+
                     b.Navigation("RegisteredStudent");
                 });
 

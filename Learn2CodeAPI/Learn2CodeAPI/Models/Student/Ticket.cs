@@ -10,6 +10,7 @@ namespace Learn2CodeAPI.Models.Student
 {
     public class Ticket : BaseEntity
     {
+        //add enrollineid remove subid and enrolmentid
         public int EnrollmentId { get; set; }
         [ForeignKey("EnrollmentId")]
         public Enrollment Enrollment { get; set; }
@@ -29,6 +30,10 @@ namespace Learn2CodeAPI.Models.Student
         public int TicketStatusId { get; set; }
         [ForeignKey("TicketStatusId")]
         public TicketStatus TicketStatus { get; set; }
+
+        public int EnrolLineId { get; set; }
+        [ForeignKey("EnrolLineId")]
+        public EnrolLine EnrolLine { get; set; }
 
         public DateTime ExpDate { get; set; }
     }

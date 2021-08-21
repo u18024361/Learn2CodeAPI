@@ -203,10 +203,28 @@ namespace Learn2CodeAPI.Controllers
 
         #region Resource
         [HttpGet]
-        [Route("GetAllModules")]
-        public async Task<IActionResult> GetAllResourceModules()
+        [Route("GetAllModulesForResources")]
+        public async Task<IActionResult> GetAllModulesForResources()
         {
             var entity = await TutorRepo.GetModules();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetAllUniversitiesForResources")]
+        public async Task<IActionResult> GetAllUniversitiesForResources()
+        {
+            var entity = await db.University.ToListAsync();
+
+            return Ok(entity);
+        }
+
+        [HttpGet]
+        [Route("GetUniversityForResources/{UniversityId}")]
+        public async Task<IActionResult> GetUniversityForResources(int UniversityId)
+        {
+            var entity = await db.Modules.Include(zz => zz.Degree).Include(zz => zz.Degree.University).Where(zz => zz.Degree.University.Id == UniversityId).ToListAsync();
 
             return Ok(entity);
         }
@@ -220,6 +238,7 @@ namespace Learn2CodeAPI.Controllers
 
             return Ok(entity);
         }
+
 
         
 
@@ -461,13 +480,13 @@ namespace Learn2CodeAPI.Controllers
                 var data = await MessageGenRepo.Delete(MessageId);
 
                 result.data = data;
-                result.message = "University deleted";
+                result.message = "Message deleted";
                 return Ok(result);
             }
             catch
             {
 
-                result.message = "Something went wrong deleting the university";
+                result.message = "Something went wrong deleting the message";
                 return BadRequest(result.message);
             }
 
@@ -646,13 +665,39 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                var data = await TutorRepo.CreateBooking(dto);
-                result.data = data;
-                result.message = "Session created";
+                var BookingInstance = await TutorRepo.CreateBooking(dto);
+                var type = db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.SessionTypeName == "Group").FirstOrDefault();
+                if (BookingInstance.TutorSessionId == type.Id)
+                {
+                    //dynamic result = new ExpandoObject();
+                    var today = DateTime.Now;
+                    var enrol = await db.EnrolLine.Include(zz => zz.Enrollment).Include(zz => zz.Module).Where(zz => zz.ModuleId == BookingInstance.ModuleId && zz.TicketQuantity >0
+                    && zz.EndDate >= today && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
+                    var sessionmodulelist = new List<dynamic>();
+                    var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+                    foreach (var item in enrol)
+                    {
+                        var student = db.Students.Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
+                        RegisteredStudent regstudent = new RegisteredStudent();
+                        regstudent.BookingInstanceId = BookingInstance.Id;
+                        regstudent.StudentId = student.Id;
+                        db.RegisteredStudent.Add(regstudent);
+                        db.SaveChanges();
+                    }
+                }
+                else
+                {
+                    result.data = BookingInstance;
+                    result.message = "Individual Session created";
+                    return Ok(result);
+                }
+                result.data = BookingInstance;
+                result.message = "Group Session created";
                 return Ok(result);
             }
             catch
             {
+                //send emails
 
                 result.message = "Something went wrong creating the session";
                 return BadRequest(result.message);
@@ -682,7 +727,7 @@ namespace Learn2CodeAPI.Controllers
                 }
 
                 var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
-                zz.Date == datestring && zz.Id != dto.Id).FirstOrDefault();
+                zz.Date == datestring && zz.Id != dto.Id && zz.TutorId == dto.TutorId).FirstOrDefault();
                 if (check != null)
                 {
                     result.message = "Session already exists on the provided date and time";
@@ -876,7 +921,10 @@ namespace Learn2CodeAPI.Controllers
             {
 
                 var data = await GroupSessionContentGenRepo.Delete(GroupSessionContentId);
-
+                int sessionid = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).Select(zz => zz.BookingInstanceId).FirstOrDefaultAsync();
+                var session = await db.BookingInstance.Where(zz => zz.Id == sessionid).FirstOrDefaultAsync();
+                session.ContentUploaded = false;
+                await db.SaveChangesAsync();
                 result.data = data;
                 result.message = "Content deleted";
                 return Ok(result);
@@ -895,8 +943,8 @@ namespace Learn2CodeAPI.Controllers
         [Route("DownloadNotes/{GroupSessionContentId}")]
         public async Task<FileStreamResult> DownloadNotes(int GroupSessionContentId)
         {
-            var entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).Select(zz => zz.Notes).FirstOrDefaultAsync();
-            MemoryStream ms = new MemoryStream(entity);
+            GroupSessionContent entity = await db.GroupSessionContent.Where(zz => zz.Id == GroupSessionContentId).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Notes);
             return new FileStreamResult(ms, "Application/pdf");
         }
 
@@ -1101,7 +1149,25 @@ namespace Learn2CodeAPI.Controllers
         #endregion
 
 
+        //test
+        [HttpPost]
+        [Route("File")]
+        public async Task<IActionResult> File([FromForm(Name = "file")] IFormFile file)
+        {
+            Models.Tutor.File x = new Models.Tutor.File();
+            using (var Filetarget = new MemoryStream())
+            {
+                file.CopyTo(Filetarget);
+                x.FileName = Filetarget.ToArray();
+                
+                
+            }
+            await db.File.AddAsync(x);
+            await db.SaveChangesAsync();
+            return Ok();
+          
 
+        }
     }
 }
 

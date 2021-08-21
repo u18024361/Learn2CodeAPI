@@ -18,6 +18,7 @@ using Learn2CodeAPI.Repository.RepositoryAdmin;
 using Learn2CodeAPI.Repository.RepositoryLogin;
 using Learn2CodeAPI.Repository.RepositoryStudent;
 using Learn2CodeAPI.Repository.RepositoryTutor;
+using Learn2CodeAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Twilio.Clients;
 
 namespace Learn2CodeAPI
 {
@@ -60,6 +62,7 @@ namespace Learn2CodeAPI
             services.AddScoped<IAdmin, AdminRepo>();
             services.AddScoped<ILogin, LoginRepo>();
             services.AddScoped<IEmailSender, EmailSender>();
+            services.AddHttpClient<ITwilioRestClient, TwilioClient>();
             var emailConfig = Configuration
            .GetSection("EmailConfiguration")
            .Get<Emailconfiguration>();
@@ -67,7 +70,10 @@ namespace Learn2CodeAPI
 
             services.AddScoped(typeof(IGenRepository<>), typeof(GenRepository<>));
             services.AddIdentity<AppUser, IdentityRole>()
-                     .AddEntityFrameworkStores<AppDbContext>();
+                     .AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+                     opt.TokenLifespan = TimeSpan.FromHours(2));
+
             var jwtSettings = Configuration.GetSection("JwtSettings");
             services.AddAuthentication(opt =>
             {
@@ -97,7 +103,8 @@ namespace Learn2CodeAPI
                 builder =>
                 {
                     builder.WithOrigins("http://localhost:44393",
-                                        "http://localhost:4200"
+                                        "http://localhost:4200",
+                                        "http://localhost:8100"
                                         )
                                         .AllowAnyHeader()
                                         .AllowAnyMethod();

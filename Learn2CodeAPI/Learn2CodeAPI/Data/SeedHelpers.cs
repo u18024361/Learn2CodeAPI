@@ -75,10 +75,10 @@ namespace Learn2CodeAPI.Data
 
                 context.Admin.Add(adminuser);
 
-                
 
-                context.SaveChangesAsync().Wait();
                 userManeger.AddToRoleAsync(appUser, "Admin");
+                context.SaveChangesAsync().Wait();
+               
             }
 
         }

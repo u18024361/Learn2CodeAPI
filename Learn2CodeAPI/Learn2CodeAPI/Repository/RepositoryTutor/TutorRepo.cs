@@ -110,7 +110,7 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
 
         public async Task<BookingInstance> CreateBooking(BookingInstanceDto model)
         {
-            string timestring = model.Date.ToString("MM / dd / yyyy");
+            string timestring = model.Date.ToString("MM/dd/yyyy");
             int idtutgroup = await db.TutorSession.Where(zz => zz.SessionType.SessionTypeName == "Group").Select(zz => zz.Id).FirstOrDefaultAsync();
             int idgroup = await db.BookingStatus.Where(zz => zz.bookingStatus == "Ongoing").Select(zz => zz.Id).FirstOrDefaultAsync();
             int idindividual = await db.BookingStatus.Where(zz => zz.bookingStatus == "Open").Select(zz => zz.Id).FirstOrDefaultAsync();
@@ -189,6 +189,8 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             return tutor;
         }
         #endregion
+
+       
 
     }
 }

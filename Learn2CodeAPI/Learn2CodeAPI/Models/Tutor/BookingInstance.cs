@@ -49,10 +49,17 @@ namespace Learn2CodeAPI.Models.Tutor
         public bool ContentUploaded { get; set; }
 
         public ICollection<RegisteredStudent> RegisteredStudent { get; set; }
+        public ICollection<Feedback> Feedback { get; set; }
+
 
         public int? BookingId { get; set; }
 
         [ForeignKey("BookingId")]
         public Booking Booking { get; set; }
+
+        public int? TicketId { get; set; }
+
+        [ForeignKey("TicketId")]
+        public Ticket Ticket { get; set; }
     }
 }

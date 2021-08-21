@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Emailservice;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.LoginDto;
 using Learn2CodeAPI.Dtos.LoginDto.IdentityDto;
@@ -15,6 +16,7 @@ using Learn2CodeAPI.Models.Login.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Learn2CodeAPI.Controllers
@@ -31,9 +33,10 @@ namespace Learn2CodeAPI.Controllers
         private IStudent studentRepo;
         private ILogin loginrepo;
         private readonly JwtHandler _jwtHandler;
+        private readonly IEmailSender _emailSender;
 
         public LoginController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper,
-            AppDbContext appDbContext, AppDbContext _db, ILogin _loginRepo, JwtHandler jwtHandler)
+            AppDbContext appDbContext, AppDbContext _db, ILogin _loginRepo, JwtHandler jwtHandler, IEmailSender emailSender)
         {
             studentRepo = _studentRepo;
             loginrepo = _loginRepo;
@@ -41,7 +44,8 @@ namespace Learn2CodeAPI.Controllers
             _mapper = mapper;
             _appDbContext = appDbContext;
             db = _db;
-            _jwtHandler = jwtHandler; 
+            _jwtHandler = jwtHandler;
+            _emailSender = emailSender;
         }
 
 
@@ -85,7 +89,47 @@ namespace Learn2CodeAPI.Controllers
 
         #endregion
 
+        #region resetpassword
+        
+        [HttpPost]
+        [Route("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
+            if (user == null)
+                return BadRequest("Invalid Request");
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var param = new Dictionary<string, string>
+    {
+        {"token", token },
+        {"email", forgotPasswordDto.Email }
+    };
+            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param);
+            var message = new Message(new string[] { user.Email }, "Reset password token", callback);
+            await _emailSender.SendEmailAsync(message);
+            return Ok();
+        }
 
+        [HttpPost]
+        [Route("ResetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody]ResetPasswordDto resetPasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email);
+            if (user == null)
+                return BadRequest("Invalid Request");
+            var resetPassResult = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.Password);
+            if (!resetPassResult.Succeeded)
+            {
+                var errors = resetPassResult.Errors.Select(e => e.Description);
+                return BadRequest(new { Errors = errors });
+            }
+            return Ok();
+        }
+        #endregion
 
         #region Login
         [HttpPost]
@@ -104,8 +148,8 @@ namespace Learn2CodeAPI.Controllers
                 var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
                 if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 {
-                    result.message = "Invalid login details";
-                    return Ok(result);
+                    return BadRequest("Invalid login details");
+                    
                 }
                 var signingCredentials = _jwtHandler.GetSigningCredentials();
                 var claims = await _jwtHandler.GetClaims(user);
