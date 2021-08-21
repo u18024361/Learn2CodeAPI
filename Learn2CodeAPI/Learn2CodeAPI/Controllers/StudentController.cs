@@ -527,6 +527,17 @@ namespace Learn2CodeAPI.Controllers
             return Ok(Courses);
 
         }
+
+        [HttpGet]
+        [Route("Getcourseontent/{courseSubId}")]
+        public async Task<IActionResult> Getcourseontent(int courseSubId)
+        {
+
+            var Coursescontent = await db.CourseContent.Include(zz => zz.ContentType).Include(zz =>zz.CourseSubCategory).Where(zz => zz.CourseSubCategoryId == courseSubId).ToListAsync();
+            return Ok(Coursescontent);
+
+        }
+
         [HttpGet]
         [Route("Video/{id}")]
         public async Task<FileStreamResult> Video(int id)

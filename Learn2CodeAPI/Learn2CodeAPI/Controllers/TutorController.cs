@@ -615,6 +615,16 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetsessionType")]
+        public async Task<IActionResult> GetsessionType()
+        {
+            var type = await db.TutorSession.Include(zz => zz.SessionType).ToListAsync();
+
+            return Ok(type);
+        }
+
+
+        [HttpGet]
         [Route("GetGroupSessions/{TutorId}")]
         public async Task<IActionResult> GetGroupSessions(int TutorId)
         {
@@ -644,6 +654,7 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+       
         [HttpPost]
         [Route("CreateBooking")]
         public async Task<IActionResult> CreateBooking([FromBody] BookingInstanceDto dto)
@@ -675,6 +686,7 @@ namespace Learn2CodeAPI.Controllers
                     && zz.EndDate >= today && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
                     var sessionmodulelist = new List<dynamic>();
                     var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+                    var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).FirstOrDefaultAsync();
                     foreach (var item in enrol)
                     {
                         var student = db.Students.Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
@@ -682,7 +694,14 @@ namespace Learn2CodeAPI.Controllers
                         regstudent.BookingInstanceId = BookingInstance.Id;
                         regstudent.StudentId = student.Id;
                         db.RegisteredStudent.Add(regstudent);
-                        db.SaveChanges();
+                        
+
+                        var tickets = await db.Ticket.Include(zz => zz.TicketStatus)
+                            .Where(zz => zz.EnrolLineId == item.Id && zz.TicketStatus.ticketStatus == true).FirstOrDefaultAsync();
+
+                        tickets.TicketStatusId = ticketstatus.Id;
+                        item.TicketQuantity = item.TicketQuantity - 1;
+                        await db.SaveChangesAsync();
                     }
                 }
                 else
@@ -705,6 +724,7 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        //edit
         [HttpPut]
         [Route("EditSession")]
         public async Task<IActionResult> EditSession([FromBody] BookingInstanceDto dto)
@@ -734,11 +754,8 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                
-                string timestring = dto.Date.ToString("MM/dd/yyyy");
-                BookingInstance entity = mapper.Map<BookingInstance>(dto);
-                entity.Date = timestring;
-                var data = await BookingInstanceGenRepo.Update(entity);
+               
+                var data = await TutorRepo.UpdateBooking(dto);
                 result.data = data;
                 result.message = "Session updated";
                 return Ok(result);
@@ -752,7 +769,7 @@ namespace Learn2CodeAPI.Controllers
             }
         }
 
-
+        // need to look
         [HttpDelete]
         [Route("DeleteSession/{SessionId}")]
         public async Task<IActionResult> DeleteSession(int SessionId)
