@@ -38,5 +38,6 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
 
         Task<IEnumerable<Degree>> GetDegree(int UniId);
         Task<IEnumerable<Module>> GetModule(int DegreeId);
+        Task<IEnumerable<RegisteredStudent>> Getmygroupsession(int StudentId);
     }
 }
