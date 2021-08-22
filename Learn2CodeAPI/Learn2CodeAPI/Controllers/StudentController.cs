@@ -192,6 +192,36 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        [HttpDelete]
+        [Route("DeleteStudent/{StudentId}")]
+        public async Task<IActionResult> DeleteStudent(int StudentId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var student = await db.Students.Where(zz => zz.Id == StudentId).FirstOrDefaultAsync();
+                var user = await db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefaultAsync();
+                db.Students.Remove(student);
+                db.Users.Remove(user);
+
+                await db.SaveChangesAsync();
+                result.message = "Student Deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the account";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
         #endregion
 
         #region Messaging
