@@ -323,8 +323,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in sub)
             {
                 CourseSalesDto vm = new CourseSalesDto();
-                vm.Course = group.Key;
-                vm.Amount = group.Sum(zz => zz.CourseSubCategory.price).ToString();
+                vm.name = group.Key;
+                vm.value = group.Sum(zz => zz.CourseSubCategory.price);
                 coursesales.Add(vm);
 
             }

@@ -872,6 +872,17 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        [HttpGet]
+        [Route("GetMyGroupSessions/{studentId}")]
+        public async Task<IActionResult> GetMyGroupSessions(int studentId)
+        {
+
+            var mygroup = await studentRepo.Getmygroupsession(studentId);
+            return Ok(mygroup);
+
+        }
+
+
         #endregion
 
         #region feedback

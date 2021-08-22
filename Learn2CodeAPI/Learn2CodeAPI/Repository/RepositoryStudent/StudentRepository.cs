@@ -383,6 +383,20 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
         }
 
 
+
+
+        #endregion
+
+        #region groupsession
+
+        public async Task<IEnumerable<RegisteredStudent>> Getmygroupsession(int StudentId)
+        {
+            var mygroup = await db.RegisteredStudent.Include(zz => zz.BookingInstance.Module)
+                .Include(zz => zz.BookingInstance.SessionTime).Include(zz =>zz.BookingInstance.Tutor)
+                .Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return mygroup;
+        }
+
         #endregion
     }
 }
