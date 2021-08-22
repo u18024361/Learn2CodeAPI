@@ -94,8 +94,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in students)
             {
                 UniversityStudentsDto vm = new UniversityStudentsDto();
-                vm.Uni = group.Key;
-                vm.Amount = group.Count();
+                vm.name = group.Key;
+                vm.value = group.Count();
                 uni.Add(vm);
 
             }
@@ -111,8 +111,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in courses)
             {
                 CoursePieDto vm = new CoursePieDto();
-                vm.Course = group.Key;
-                vm.Amount = group.Count();
+                vm.name = group.Key;
+                vm.value = group.Count();
                 numcourse.Add(vm);
 
             }
