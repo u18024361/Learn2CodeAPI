@@ -21,7 +21,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryStudent
         Task<Message> CreateMessage(MessageDto model);
 
         Task<IEnumerable<Tutor>> GetTutors();
-        Task<IEnumerable<Booking>> GetMyBookings(int StudentId);
+        Task<IEnumerable<BookingInstance>> GetMyBookings(int StudentId);
         Task<IEnumerable<Resource>> GetResource(int ModuleId);
         Task<IEnumerable<CourseSubCategory>> GetCourseSubCategory(int CourseFolderId);
         Task<IEnumerable<Subscription>> GetSubscriptions();

@@ -310,9 +310,10 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
         #region individualbookings
 
-        public async Task<IEnumerable<Booking>> GetMyBookings(int StudentId)
+        public async Task<IEnumerable<BookingInstance>> GetMyBookings(int StudentId)
         {
-            var bookings = await db.Booking.Include(zz => zz.bookinginstances).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            var bookings = await db.BookingInstance.Include(zz => zz.Module)
+                .Include(zz => zz.Tutor).Include(zz => zz.SessionTime).Where(zz => zz.Booking.StudentId == StudentId).ToListAsync();
             return bookings;
         }
 
