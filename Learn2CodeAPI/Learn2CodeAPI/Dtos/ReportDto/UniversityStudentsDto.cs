@@ -7,8 +7,8 @@ namespace Learn2CodeAPI.Dtos.ReportDto
 {
     public class UniversityStudentsDto
     {
-        public string Uni { get; set; }
+        public string name { get; set; }
 
-        public int Amount { get; set; }
+        public int value { get; set; }
     }
 }

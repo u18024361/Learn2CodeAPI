@@ -7,7 +7,7 @@ namespace Learn2CodeAPI.Dtos.ReportDto
 {
     public class CoursePieDto
     {
-        public string Course { get; set; }
-        public int Amount { get; set; }
+        public string name { get; set; }
+        public int value { get; set; }
     }
 }
