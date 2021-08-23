@@ -752,11 +752,11 @@ namespace Learn2CodeAPI.Controllers
 
         //to display bookings made
         [HttpGet]
-        [Route("GetMyBookings/{StudentId}")]
-        public async Task<IActionResult> GetMyBookings(int StudentId)
+        [Route("GetMyBookings/{UserId}")]
+        public async Task<IActionResult> GetMyBookings(string UserId)
         {
-
-            var myBookings = await studentRepo.GetMyBookings(StudentId);
+            var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var myBookings = await studentRepo.GetMyBookings(studentId.Id);
             return Ok(myBookings);
 
         }
@@ -873,11 +873,11 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
-        [Route("GetMyGroupSessions/{studentId}")]
-        public async Task<IActionResult> GetMyGroupSessions(int studentId)
+        [Route("GetMyGroupSessions/{UserId}")]
+        public async Task<IActionResult> GetMyGroupSessions(string UserId)
         {
-
-            var mygroup = await studentRepo.Getmygroupsession(studentId);
+            var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var mygroup = await studentRepo.Getmygroupsession(studentId.Id);
             return Ok(mygroup);
 
         }
