@@ -144,13 +144,14 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 var user = await _userManager.FindByEmailAsync(userForAuthentication.Email);
-                var typeid = await db.UserRoles.Where(zz => zz.UserId == user.Id).FirstOrDefaultAsync();
-                var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
+               
                 if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 {
                     return BadRequest("Invalid login details");
                     
                 }
+                var typeid = await db.UserRoles.Where(zz => zz.UserId == user.Id).FirstOrDefaultAsync();
+                var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
                 var signingCredentials = _jwtHandler.GetSigningCredentials();
                 var claims = await _jwtHandler.GetClaims(user);
                 var tokenOptions = _jwtHandler.GenerateTokenOptions(signingCredentials, claims);

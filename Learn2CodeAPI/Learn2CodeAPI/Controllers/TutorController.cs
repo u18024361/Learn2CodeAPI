@@ -1112,7 +1112,8 @@ namespace Learn2CodeAPI.Controllers
             { 
                 foreach(RegisteredStudent student in register)
                 {
-                    RegisteredStudent existreg = db.RegisteredStudent.Find(student.Id);
+                    int id = student.Id;
+                    RegisteredStudent existreg = db.RegisteredStudent.Find(id);
                     existreg.Attended = student.Attended;
                     var instance = await db.BookingInstance.Where(zz => zz.Id == student.BookingInstanceId).FirstOrDefaultAsync();
                     instance.AttendanceTaken = true;
