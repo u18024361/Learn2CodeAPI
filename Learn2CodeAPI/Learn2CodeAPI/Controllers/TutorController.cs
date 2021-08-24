@@ -781,7 +781,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                var session = db.BookingInstance.Where(zz => zz.Id == SessionId).FirstOrDefault();
+                var session = db.BookingInstance.Include(zz => zz.BookingStatus).Include(zz=> zz.Ticket).Where(zz => zz.Id == SessionId).FirstOrDefault();
                 DateTime oDate = Convert.ToDateTime(session.Date);
                 var start = DateTime.Now;
                 if ((oDate - start).TotalDays <= 1)
@@ -789,6 +789,36 @@ namespace Learn2CodeAPI.Controllers
                     result.message = "Can't delete as there is less than 24 hours";
                     return BadRequest(result.message);
                 }
+
+                if (session.BookingStatus.bookingStatus == "Booked")
+                {
+                    var ticket = await db.Ticket.Where(zz => zz.Id == session.TicketId).FirstOrDefaultAsync();
+                    var status = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
+                    ticket.TicketStatusId = status.Id;
+                    var booking = await db.Booking.Where(zz => zz.Id == session.BookingId).FirstOrDefaultAsync();
+                    db.Booking.Remove(booking);
+                    await db.SaveChangesAsync();
+                }
+                else if (session.BookingStatus.bookingStatus == "Ongoing")
+                {
+                    var reglist = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == session.Id).ToListAsync();
+                    var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
+                    foreach(var item in reglist)
+                    {
+                        var enroline = await db.EnrolLine.Include(zz => zz.Enrollment).
+                            Where(zz => zz.Enrollment.StudentId == item.StudentId && zz.ModuleId == session.ModuleId &&
+                            zz.EndDate >= start && zz.StartDate <= start && zz.Subscription.SubscriptionTutorSession
+                            .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).FirstOrDefaultAsync();
+                        var ticket = await db.Ticket.Include(zz => zz.TicketStatus).Where(zz => zz.TicketStatus.ticketStatus == false
+                        && zz.EnrolLineId == enroline.Id).FirstOrDefaultAsync();
+                        ticket.TicketStatusId = ticketstatus.Id;
+                        db.RegisteredStudent.Remove(item);
+                        await db.SaveChangesAsync();
+
+                    }
+                }
+
+
                 var data = await BookingInstanceGenRepo.Delete(SessionId);
 
                 result.data = data;
