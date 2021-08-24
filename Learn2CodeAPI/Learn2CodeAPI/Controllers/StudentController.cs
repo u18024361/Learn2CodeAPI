@@ -205,6 +205,11 @@ namespace Learn2CodeAPI.Controllers
             {
                 var student = await db.Students.Where(zz => zz.Id == StudentId).FirstOrDefaultAsync();
                 var user = await db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefaultAsync();
+                var reg = await db.RegisteredStudent.Where(zz => zz.StudentId == student.Id).ToListAsync();
+                foreach( var item in reg)
+                {
+                    db.RegisteredStudent.Remove(item);
+                }
                 db.Students.Remove(student);
                 db.Users.Remove(user);
 
