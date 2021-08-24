@@ -581,8 +581,8 @@ namespace Learn2CodeAPI.Controllers
         [Route("DownloadRContentPdf/{id}")]
         public async Task<FileStreamResult> DownloadRContentPdf(int id)
         {
-            var entity = await db.CourseContent.Where(zz => zz.Id == id).Select(zz => zz.Content).FirstOrDefaultAsync();
-            MemoryStream ms = new MemoryStream(entity);
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Content);
             return new FileStreamResult(ms, "Application/pdf");
         }
 

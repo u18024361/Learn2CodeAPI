@@ -70,7 +70,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetTutor/{UserId}")]
         public async Task<IActionResult> GetResourceCategorybyId(string UserId)
         {
-            var entity = await db.Tutor.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var entity = await db.Tutor.Include(zz => zz.Identity).Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
 
             return Ok(entity);
         }
