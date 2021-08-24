@@ -180,20 +180,19 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             tutor.TutorEmail = dto.TutorEmail;
             tutor.TutorAbout = dto.TutorAbout;
             tutor.TutorCell = dto.TutorCell;
-            using (var target = new MemoryStream())
+            if (dto.TutorPhoto != null)
             {
-                dto.TutorPhoto.CopyTo(target);
-                tutor.TutorPhoto = target.ToArray();
+                using (var target = new MemoryStream())
+                {
+                    dto.TutorPhoto.CopyTo(target);
+                    tutor.TutorPhoto = target.ToArray();
+                }
             }
+         
 
 
             //File
-            var File = await db.File.Where(zz => zz.Id == dto.FileId).FirstOrDefaultAsync();
-            using (var file = new MemoryStream())
-            {
-                dto.File.CopyTo(file);
-                File.FileName = file.ToArray();
-            }
+           
 
             //user table
             var user = await db.Users.Where(zz => zz.Id == dto.UserId).FirstOrDefaultAsync();
