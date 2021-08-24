@@ -792,10 +792,12 @@ namespace Learn2CodeAPI.Controllers
 
                 if (session.BookingStatus.bookingStatus == "Booked")
                 {
+
                     var ticket = await db.Ticket.Where(zz => zz.Id == session.TicketId).FirstOrDefaultAsync();
                     var status = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
                     ticket.TicketStatusId = status.Id;
                     var booking = await db.Booking.Where(zz => zz.Id == session.BookingId).FirstOrDefaultAsync();
+                    session.BookingId = null;
                     db.Booking.Remove(booking);
                     await db.SaveChangesAsync();
                 }
