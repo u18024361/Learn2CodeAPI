@@ -125,7 +125,8 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             else { entity.BookingStatusId = idindividual; }
             await db.BookingInstance.AddAsync(entity);
             await db.SaveChangesAsync();
-            return entity;
+            var booking = await db.BookingInstance.Include(zz => zz.Module).Include(zz => zz.SessionTime).Where(zz => zz.Id == entity.Id).FirstOrDefaultAsync();
+            return booking;
         }
 
         public async Task<BookingInstance> UpdateBooking(BookingInstanceDto dto)
@@ -136,7 +137,7 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             bookinginstance.SessionTimeId = dto.SessionTimeId;
             bookinginstance.Date = timestring;
             bookinginstance.Title = dto.Title;
-            bookinginstance.Description = dto.Description;
+           // bookinginstance.Description = dto.Description;
             await db.SaveChangesAsync();
             return bookinginstance;
 
