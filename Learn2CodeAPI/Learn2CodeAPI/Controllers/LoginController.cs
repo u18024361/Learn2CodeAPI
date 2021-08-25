@@ -106,7 +106,9 @@ namespace Learn2CodeAPI.Controllers
         {"token", token },
         {"email", forgotPasswordDto.Email }
     };
-            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param);
+
+            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param) +Environment.NewLine + Environment.NewLine+
+                "Please Use the link above to reset your password"+Environment.NewLine + Environment.NewLine+"Regards TutorDevOps";
             var message = new Message(new string[] { user.Email }, "Reset password token", callback);
             await _emailSender.SendEmailAsync(message);
             return Ok();

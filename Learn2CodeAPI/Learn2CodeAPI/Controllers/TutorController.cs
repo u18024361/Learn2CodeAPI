@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Emailservice;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.Generic;
@@ -27,7 +28,7 @@ namespace Learn2CodeAPI.Controllers
         private ITutor TutorRepo;
         private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<Module> ModuleRepo;
-        private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<Models.Tutor.Message> MessageGenRepo;
         private IGenRepository<Resource> ResourceGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
         private IGenRepository<BookingInstance> BookingInstanceGenRepo;
@@ -35,6 +36,7 @@ namespace Learn2CodeAPI.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
+        private readonly IEmailSender _emailsender;
 
         public TutorController(
             IMapper _mapper,
@@ -43,12 +45,13 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Student> _StudentGenRepo,
             IGenRepository<Tutor> _Tutor,
             IGenRepository<Module> _ModuleRepo,
-            IGenRepository<Message> _Message,
+            IGenRepository<Models.Tutor.Message> _Message,
             IGenRepository<GroupSessionContent> _GroupSessionContentGenRepo,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
             AppDbContext _db,
             IGenRepository<BookingInstance> _BookingInstanceGenRepo,
-            IGenRepository<Resource> _Resource
+            IGenRepository<Resource> _Resource,
+             IEmailSender emailsender
              )
 
         {
@@ -64,6 +67,7 @@ namespace Learn2CodeAPI.Controllers
             ResourceGenRepo = _Resource;
             GroupSessionContentGenRepo = _GroupSessionContentGenRepo;
             TutorGenRepo = _Tutor;
+            _emailsender = emailsender;
         }
 
         [HttpGet]
@@ -676,8 +680,20 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
+
                 var BookingInstance = await TutorRepo.CreateBooking(dto);
                 var type = db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.SessionTypeName == "Group").FirstOrDefault();
+                string subject = "Group Session:"+ BookingInstance.Module.ModuleCode;
+                string content = "Dear Student" + Environment.NewLine +
+                    "Please note that a gtoup session for " + BookingInstance.Module.ModuleCode + " has been scheduled for " + BookingInstance.Date + " from " + BookingInstance.SessionTime.StartTime
+                    + " to " + BookingInstance.SessionTime.EndTime
+                    + Environment.NewLine +
+                     Environment.NewLine +
+                    "Please use the following link to join:" + "" + BookingInstance.Link
+                     + Environment.NewLine +
+                      Environment.NewLine +
+                      "Regards TutorDevOps";
+
                 if (BookingInstance.TutorSessionId == type.Id)
                 {
                     //dynamic result = new ExpandoObject();
@@ -689,7 +705,7 @@ namespace Learn2CodeAPI.Controllers
                     var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).FirstOrDefaultAsync();
                     foreach (var item in enrol)
                     {
-                        var student = db.Students.Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
+                        var student = db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
                         RegisteredStudent regstudent = new RegisteredStudent();
                         regstudent.BookingInstanceId = BookingInstance.Id;
                         regstudent.StudentId = student.Id;
@@ -702,6 +718,9 @@ namespace Learn2CodeAPI.Controllers
                         tickets.TicketStatusId = ticketstatus.Id;
                         item.TicketQuantity = item.TicketQuantity - 1;
                         await db.SaveChangesAsync();
+
+                        var message = new Emailservice.Message(new string[] { student.Identity.Email }, subject, content);
+                        await _emailsender.SendEmailAsync(message);
                     }
                 }
                 else
@@ -1097,6 +1116,22 @@ namespace Learn2CodeAPI.Controllers
                 int status = await db.BookingStatus.Where(zz => zz.bookingStatus == "Finalized").Select(zz => zz.Id).FirstAsync();
                 var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
                 instance.BookingStatusId = status;
+                await db.SaveChangesAsync();
+                var reglist = await db.RegisteredStudent.Include(zz => zz.Student.Identity).Where(zz => zz.BookingInstanceId == instance.Id).ToListAsync();
+                string subject = "Group Session Finalized:";
+                string content = "Dear Student" + Environment.NewLine +
+                  "Please note that the "+instance.Title+ " group session gas been finalized (attendance has been taken & session content has been uploaded.)"
+                     + Environment.NewLine +
+                     "As a valued student we always appreciate your feedback when it comes to our amazing tutors and the session, so please dont hesitate to provide feedback by clicking on the feedback tab on your home screen"
+                     +Environment.NewLine +
+                      Environment.NewLine +
+                      "Regards TutorDevOps";
+                foreach (var item in reglist)
+                {
+                    var message = new Emailservice.Message(new string[] { item.Student.Identity.Email }, subject, content);
+                    await _emailsender.SendEmailAsync(message);
+                }
+
                 result.data = instance;
                 result.message = "Session finalized";
                 return Ok(result);
