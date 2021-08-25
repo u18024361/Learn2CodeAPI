@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -757,9 +758,9 @@ namespace Learn2CodeAPI.Controllers
             {
                 var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
                 string datestring = dto.Date.ToString("MM/dd/yyyy");
-                DateTime oDate = Convert.ToDateTime(session.Date);
+                DateTime oDate = DateTime.ParseExact(session.Date, "MM/dd/yyyy", CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1)
+                if ((oDate - start).TotalDays <= 1.5)
                 {
                     result.message = "Can't update as there is less than 24 hours";
                     return BadRequest(result.message);
@@ -801,9 +802,9 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 var session = db.BookingInstance.Include(zz => zz.BookingStatus).Include(zz=> zz.Ticket).Where(zz => zz.Id == SessionId).FirstOrDefault();
-                DateTime oDate = Convert.ToDateTime(session.Date);
+                DateTime oDate = DateTime.ParseExact(session.Date,"MM/dd/yyyy",CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1)
+                if ((oDate - start).TotalDays <= 1.5)
                 {
                     result.message = "Can't delete as there is less than 24 hours";
                     return BadRequest(result.message);
