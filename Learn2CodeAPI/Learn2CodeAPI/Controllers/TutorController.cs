@@ -690,7 +690,7 @@ namespace Learn2CodeAPI.Controllers
                     + " to " + BookingInstance.SessionTime.EndTime
                     + Environment.NewLine +
                      Environment.NewLine +
-                    "Please use the following link to join:" + "" + BookingInstance.Link
+                    "Please use the following link to join: " + " " + BookingInstance.Link
                      + Environment.NewLine +
                       Environment.NewLine +
                       "Regards TutorDevOps";
@@ -719,8 +719,8 @@ namespace Learn2CodeAPI.Controllers
                         tickets.TicketStatusId = ticketstatus.Id;
                         item.TicketQuantity = item.TicketQuantity - 1;
                         await db.SaveChangesAsync();
-
-                        var message = new Emailservice.Message(new string[] { student.Identity.Email }, subject, content);
+                        string email = student.Identity.Email;
+                        var message = new Emailservice.Message(new string[] {email}, subject, content);
                         await _emailsender.SendEmailAsync(message);
                     }
                 }
