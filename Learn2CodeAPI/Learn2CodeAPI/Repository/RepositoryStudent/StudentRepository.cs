@@ -277,6 +277,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
                     y.StartDate = DateTime.Now;
                     y.EndDate = DateTime.Now.AddMonths(duration.Duration);
                     await db.EnrolLine.AddAsync(y);
+                    await db.SaveChangesAsync();
                     db.SubScriptionBasketLine.Remove(sub);
 
                     for (int i = 0; i < ticketquantity.Quantity; i++)
