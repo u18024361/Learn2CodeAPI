@@ -689,7 +689,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetIndividualAvailable/{ModuleId}/{TutorSessionId}")]
         public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
         {
-            var available = await db.BookingInstance.Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
+            var available = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Include(zz => zz.Module).Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
             return Ok(available);
         }
 
