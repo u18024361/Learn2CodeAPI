@@ -129,13 +129,13 @@ namespace Learn2CodeAPI.Repository.RepositoryAdmin
             return Tutors;
         }
 
-        public async Task<Tutor> Reject(Tutor tutor)
+        public async Task<TutorDto> Reject(TutorDto tutor)
         {
             int idreject = await db.TutorStatus.Where(zz => zz.TutorStatusDesc == "Rejected").Select(zz => zz.Id).FirstOrDefaultAsync();
             var tutorreject = await db.Tutor.Where(zz => zz.Id == tutor.Id).FirstOrDefaultAsync();
             tutorreject.TutorStatusId = idreject;
            await db.SaveChangesAsync();
-           return tutorreject;
+           return tutor;
 
         }
 

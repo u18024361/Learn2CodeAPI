@@ -887,8 +887,8 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                Tutor entity = mapper.Map<Tutor>(dto);
-                var data = await AdminRepo.Reject(entity);
+                
+                var data = await AdminRepo.Reject(dto);
                 string subject = "Application Outcome:" ;
                 string content = "Dear Applicant" + Environment.NewLine +
                     "We regret to inform you that your application to become a tutor was unsuccessful. " +
