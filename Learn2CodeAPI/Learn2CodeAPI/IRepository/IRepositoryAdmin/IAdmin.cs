@@ -26,7 +26,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryAdmin
 
         Task<IEnumerable<Tutor>> GetAllApplications();
 
-        Task<Tutor> Reject(Tutor tutor);
+        Task<TutorDto> Reject(TutorDto tutor);
 
         Task<Tutor> CreateTutor(AppUser userIdentity,CreateTutorDto tutor);
 

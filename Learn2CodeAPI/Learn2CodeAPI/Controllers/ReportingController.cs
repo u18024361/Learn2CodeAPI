@@ -58,7 +58,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("TotalTutors")]
         public async Task<IActionResult> TotalTutors()
         {
-            int students = await db.Tutor.CountAsync();
+            int students = await db.Tutor.Where(zz => zz.TutorStatus.TutorStatusDesc == "Accepted").CountAsync();
             return Ok(students);
         }
 
