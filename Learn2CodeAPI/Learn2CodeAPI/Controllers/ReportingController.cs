@@ -94,8 +94,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in students)
             {
                 UniversityStudentsDto vm = new UniversityStudentsDto();
-                vm.Uni = group.Key;
-                vm.Amount = group.Count();
+                vm.name = group.Key;
+                vm.value = group.Count();
                 uni.Add(vm);
 
             }
@@ -111,8 +111,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in courses)
             {
                 CoursePieDto vm = new CoursePieDto();
-                vm.Course = group.Key;
-                vm.Amount = group.Count();
+                vm.name = group.Key;
+                vm.value = group.Count();
                 numcourse.Add(vm);
 
             }
@@ -235,7 +235,7 @@ namespace Learn2CodeAPI.Controllers
             return Ok(list);
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetTotalTutorsessions")]
         public async Task<IActionResult> GetTotalTutorsessions([FromBody] TotalTutorSessionDto dto)
         {
@@ -265,7 +265,7 @@ namespace Learn2CodeAPI.Controllers
 
         #region Salesreport
         //for table
-        [HttpGet]
+        [HttpPost]
         [Route("GetSalesReport")]
         public async Task<IActionResult> GetSalesReport([FromBody] SalesParameterDto dto)
         {
@@ -323,8 +323,8 @@ namespace Learn2CodeAPI.Controllers
             foreach (var group in sub)
             {
                 CourseSalesDto vm = new CourseSalesDto();
-                vm.Course = group.Key;
-                vm.Amount = group.Sum(zz => zz.CourseSubCategory.price).ToString();
+                vm.name = group.Key;
+                vm.value = group.Sum(zz => zz.CourseSubCategory.price);
                 coursesales.Add(vm);
 
             }
@@ -355,7 +355,7 @@ namespace Learn2CodeAPI.Controllers
         {
             var student = db.Students.ToList();
             var exportstudent = new List<ExportStudentDto>();
-            foreach(var item in student)
+            foreach (var item in student)
             {
                 ExportStudentDto x = new ExportStudentDto();
                 x.StudentCell = item.StudentCell;
@@ -378,13 +378,13 @@ namespace Learn2CodeAPI.Controllers
 
 
 
-        [HttpGet]
-        [Route("ExportSalesReport/{StartDate}/{EndDate}")]
-        public async Task<IActionResult> ExportSalesReport( DateTime StartDate, DateTime EndDate)
+        [HttpPost]
+        [Route("ExportSalesReport")]
+        public async Task<IActionResult> ExportSalesReport([FromBody] ExportSalesDto dtos)
         {
             SalesParameterDto dto = new SalesParameterDto();
-            dto.StartDate = StartDate;
-            dto.EndDate = EndDate;
+            dto.StartDate = dtos.StartDate;
+            dto.EndDate = dtos.EndDate;
             var enddate = dto.EndDate.AddHours(23.99);
             var sales = new List<SalesDto>();
             DateTime convertedDate;

@@ -192,6 +192,41 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        [HttpDelete]
+        [Route("DeleteStudent/{StudentId}")]
+        public async Task<IActionResult> DeleteStudent(int StudentId)
+        {
+            dynamic result = new ExpandoObject();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var student = await db.Students.Where(zz => zz.Id == StudentId).FirstOrDefaultAsync();
+                var user = await db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefaultAsync();
+                var reg = await db.RegisteredStudent.Where(zz => zz.StudentId == student.Id).ToListAsync();
+                foreach( var item in reg)
+                {
+                    db.RegisteredStudent.Remove(item);
+                }
+                db.Students.Remove(student);
+                db.Users.Remove(user);
+
+                await db.SaveChangesAsync();
+                result.message = "Student Deleted";
+                return Ok(result);
+            }
+            catch
+            {
+
+                result.message = "Something went wrong deleting the account";
+                return BadRequest(result.message);
+            }
+
+
+        }
+
         #endregion
 
         #region Messaging
@@ -527,6 +562,17 @@ namespace Learn2CodeAPI.Controllers
             return Ok(Courses);
 
         }
+
+        [HttpGet]
+        [Route("Getcourseontent/{courseSubId}")]
+        public async Task<IActionResult> Getcourseontent(int courseSubId)
+        {
+
+            var Coursescontent = await db.CourseContent.Include(zz => zz.ContentType).Include(zz =>zz.CourseSubCategory).Where(zz => zz.CourseSubCategoryId == courseSubId).ToListAsync();
+            return Ok(Coursescontent);
+
+        }
+
         [HttpGet]
         [Route("Video/{id}")]
         public async Task<FileStreamResult> Video(int id)
@@ -540,8 +586,8 @@ namespace Learn2CodeAPI.Controllers
         [Route("DownloadRContentPdf/{id}")]
         public async Task<FileStreamResult> DownloadRContentPdf(int id)
         {
-            var entity = await db.CourseContent.Where(zz => zz.Id == id).Select(zz => zz.Content).FirstOrDefaultAsync();
-            MemoryStream ms = new MemoryStream(entity);
+            var entity = await db.CourseContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Content);
             return new FileStreamResult(ms, "Application/pdf");
         }
 
@@ -643,7 +689,7 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetIndividualAvailable/{ModuleId}/{TutorSessionId}")]
         public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
         {
-            var available = await db.BookingInstance.Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
+            var available = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Include(zz => zz.Module).Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
             return Ok(available);
         }
 
@@ -711,11 +757,11 @@ namespace Learn2CodeAPI.Controllers
 
         //to display bookings made
         [HttpGet]
-        [Route("GetMyBookings/{StudentId}")]
-        public async Task<IActionResult> GetMyBookings(int StudentId)
+        [Route("GetMyBookings/{UserId}")]
+        public async Task<IActionResult> GetMyBookings(string UserId)
         {
-
-            var myBookings = await studentRepo.GetMyBookings(StudentId);
+            var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var myBookings = await studentRepo.GetMyBookings(studentId.Id);
             return Ok(myBookings);
 
         }
@@ -830,6 +876,17 @@ namespace Learn2CodeAPI.Controllers
             return Ok(sessionmodulelist);
 
         }
+
+        [HttpGet]
+        [Route("GetMyGroupSessions/{UserId}")]
+        public async Task<IActionResult> GetMyGroupSessions(string UserId)
+        {
+            var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var mygroup = await studentRepo.Getmygroupsession(studentId.Id);
+            return Ok(mygroup);
+
+        }
+
 
         #endregion
 

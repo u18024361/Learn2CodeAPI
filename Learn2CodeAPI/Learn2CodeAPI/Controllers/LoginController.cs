@@ -106,7 +106,9 @@ namespace Learn2CodeAPI.Controllers
         {"token", token },
         {"email", forgotPasswordDto.Email }
     };
-            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param);
+
+            var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientURI, param) +Environment.NewLine + Environment.NewLine+
+                "Please Use the link above to reset your password"+Environment.NewLine + Environment.NewLine+"Regards TutorDevOps";
             var message = new Message(new string[] { user.Email }, "Reset password token", callback);
             await _emailSender.SendEmailAsync(message);
             return Ok();
@@ -144,13 +146,14 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 var user = await _userManager.FindByEmailAsync(userForAuthentication.Email);
-                var typeid = await db.UserRoles.Where(zz => zz.UserId == user.Id).FirstOrDefaultAsync();
-                var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
+               
                 if (user == null || !await _userManager.CheckPasswordAsync(user, userForAuthentication.Password))
                 {
                     return BadRequest("Invalid login details");
                     
                 }
+                var typeid = await db.UserRoles.Where(zz => zz.UserId == user.Id).FirstOrDefaultAsync();
+                var type = await db.Roles.Where(zz => zz.Id == typeid.RoleId).FirstOrDefaultAsync();
                 var signingCredentials = _jwtHandler.GetSigningCredentials();
                 var claims = await _jwtHandler.GetClaims(user);
                 var tokenOptions = _jwtHandler.GenerateTokenOptions(signingCredentials, claims);

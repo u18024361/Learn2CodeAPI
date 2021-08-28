@@ -29,6 +29,7 @@ namespace Learn2CodeAPI.IRepository.IRepositoryTutor
         Task<IEnumerable<GroupSessionContent>> GroupSessionContent(int BookingInstanceId);
 
         Task<Tutor> UpdateTutor(UpdateTutorDto dto);
+        Task<BookingInstance> UpdateBooking(BookingInstanceDto dto);
 
 
     }

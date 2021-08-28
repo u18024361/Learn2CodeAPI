@@ -25,7 +25,7 @@ using CsvHelper;
 using System.Globalization;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
-
+using Emailservice;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -47,6 +47,7 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseContent> CourseContentRepo;
         private readonly AppDbContext db;
         private IAdmin AdminRepo;
+        private readonly IEmailSender _emailsender;
         public AdminController(
             UserManager<AppUser> userManager,
             IMapper _mapper,
@@ -61,7 +62,8 @@ namespace Learn2CodeAPI.Controllers
              IGenRepository<CourseContent> _CourseContentRepo,
             IGenRepository<Subscription> _SubscriptionGenRepo,
             IAdmin _AdminRepo,
-            AppDbContext _db
+            AppDbContext _db,
+            IEmailSender emailsender
 
             )
 
@@ -82,6 +84,7 @@ namespace Learn2CodeAPI.Controllers
             SessionContentCategoryRepo = _SessionContentCategoryRepo;
             SubscriptionGenRepo = _SubscriptionGenRepo;
             CourseContentRepo = _CourseContentRepo;
+            _emailsender = emailsender;
         }
 
         [HttpGet]
@@ -886,6 +889,16 @@ namespace Learn2CodeAPI.Controllers
             {
                 Tutor entity = mapper.Map<Tutor>(dto);
                 var data = await AdminRepo.Reject(entity);
+                string subject = "Application Outcome:" ;
+                string content = "Dear Applicant" + Environment.NewLine +
+                    "We regret to inform you that your application to become a tutor was unsuccessful. " +
+                    "Firstly we would like to say thank you for taking the time to apply and showing interest in TutorDevOps." + Environment.NewLine +
+                    "When screening through the applicants there are a variety of criteria that need to met and due to our strict standards it is not unusual for an application to be dismissed."
+                    + Environment.NewLine + "If you have any questions please feel free to eamil back" + Environment.NewLine +"Regards TutorDevOps";
+               
+                var message = new Emailservice.Message(new string[] { dto.TutorEmail}, subject, content);
+                await _emailsender.SendEmailAsync(message);
+
                 result.data = data;
                 result.message = "Tutor rejected";
                 return Ok(result);
@@ -921,6 +934,21 @@ namespace Learn2CodeAPI.Controllers
                 var userIdentity = mapper.Map<AppUser>(dto);
                 userIdentity.Email = dto.TutorEmail;
                 var data = await AdminRepo.CreateTutor(userIdentity, dto);
+                string subject = "Application Outcome:";
+                string content = "Dear Applicant" + Environment.NewLine +
+                    "Your application to become a tutor for TutorDevOps has been successfull! " + Environment.NewLine +
+                    "On behalf of the TutorDevOps team we would like to say welcome and thank you for wanting to help us achieve our goals" + Environment.NewLine +  Environment.NewLine +
+                   "Below are your temporary user/login details:"
+                    + Environment.NewLine +
+                    "Password:"+ dto.Password
+                    + Environment.NewLine +
+                    "Username:" + dto.UserName
+                     + Environment.NewLine +
+                      Environment.NewLine +
+                      "Regards TutorDevOps";
+
+                var message = new Emailservice.Message(new string[] { dto.TutorEmail }, subject, content);
+                await _emailsender.SendEmailAsync(message);
                 result.data = data;
                 result.message = "Tutor created";
                 return Ok(result);

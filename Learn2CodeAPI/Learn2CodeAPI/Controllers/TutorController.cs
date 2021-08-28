@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Emailservice;
 using Learn2CodeAPI.Data;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.Generic;
@@ -27,7 +29,7 @@ namespace Learn2CodeAPI.Controllers
         private ITutor TutorRepo;
         private IGenRepository<Student> StudentGenRepo;
         private IGenRepository<Module> ModuleRepo;
-        private IGenRepository<Message> MessageGenRepo;
+        private IGenRepository<Models.Tutor.Message> MessageGenRepo;
         private IGenRepository<Resource> ResourceGenRepo;
         private IGenRepository<ResourceCategory> ResourceCategoryGenRepo;
         private IGenRepository<BookingInstance> BookingInstanceGenRepo;
@@ -35,6 +37,7 @@ namespace Learn2CodeAPI.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private IGenRepository<Tutor> TutorGenRepo;
         private readonly AppDbContext db;
+        private readonly IEmailSender _emailsender;
 
         public TutorController(
             IMapper _mapper,
@@ -43,12 +46,13 @@ namespace Learn2CodeAPI.Controllers
             IGenRepository<Student> _StudentGenRepo,
             IGenRepository<Tutor> _Tutor,
             IGenRepository<Module> _ModuleRepo,
-            IGenRepository<Message> _Message,
+            IGenRepository<Models.Tutor.Message> _Message,
             IGenRepository<GroupSessionContent> _GroupSessionContentGenRepo,
             IGenRepository<ResourceCategory> _ResourceCategoryGenRepo,
             AppDbContext _db,
             IGenRepository<BookingInstance> _BookingInstanceGenRepo,
-            IGenRepository<Resource> _Resource
+            IGenRepository<Resource> _Resource,
+             IEmailSender emailsender
              )
 
         {
@@ -64,13 +68,14 @@ namespace Learn2CodeAPI.Controllers
             ResourceGenRepo = _Resource;
             GroupSessionContentGenRepo = _GroupSessionContentGenRepo;
             TutorGenRepo = _Tutor;
+            _emailsender = emailsender;
         }
 
         [HttpGet]
         [Route("GetTutor/{UserId}")]
         public async Task<IActionResult> GetResourceCategorybyId(string UserId)
         {
-            var entity = await db.Tutor.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var entity = await db.Tutor.Include(zz => zz.Identity).Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
 
             return Ok(entity);
         }
@@ -615,6 +620,16 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetsessionType")]
+        public async Task<IActionResult> GetsessionType()
+        {
+            var type = await db.TutorSession.Include(zz => zz.SessionType).ToListAsync();
+
+            return Ok(type);
+        }
+
+
+        [HttpGet]
         [Route("GetGroupSessions/{TutorId}")]
         public async Task<IActionResult> GetGroupSessions(int TutorId)
         {
@@ -644,6 +659,7 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+       
         [HttpPost]
         [Route("CreateBooking")]
         public async Task<IActionResult> CreateBooking([FromBody] BookingInstanceDto dto)
@@ -665,8 +681,20 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
+
                 var BookingInstance = await TutorRepo.CreateBooking(dto);
                 var type = db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.SessionTypeName == "Group").FirstOrDefault();
+                string subject = "Group Session:"+ BookingInstance.Module.ModuleCode;
+                string content = "Dear Student" + Environment.NewLine +
+                    "Please note that a gtoup session for " + BookingInstance.Module.ModuleCode + " has been scheduled for " + BookingInstance.Date + " from " + BookingInstance.SessionTime.StartTime
+                    + " to " + BookingInstance.SessionTime.EndTime
+                    + Environment.NewLine +
+                     Environment.NewLine +
+                    "Please use the following link to join: " + " " + BookingInstance.Link
+                     + Environment.NewLine +
+                      Environment.NewLine +
+                      "Regards TutorDevOps";
+
                 if (BookingInstance.TutorSessionId == type.Id)
                 {
                     //dynamic result = new ExpandoObject();
@@ -675,14 +703,25 @@ namespace Learn2CodeAPI.Controllers
                     && zz.EndDate >= today && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
                     var sessionmodulelist = new List<dynamic>();
                     var groupsession = await db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.IsGroup == true).FirstOrDefaultAsync();
+                    var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).FirstOrDefaultAsync();
                     foreach (var item in enrol)
                     {
-                        var student = db.Students.Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
+                        var student = db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == item.Enrollment.StudentId).FirstOrDefault();
                         RegisteredStudent regstudent = new RegisteredStudent();
                         regstudent.BookingInstanceId = BookingInstance.Id;
                         regstudent.StudentId = student.Id;
                         db.RegisteredStudent.Add(regstudent);
-                        db.SaveChanges();
+                        
+
+                        var tickets = await db.Ticket.Include(zz => zz.TicketStatus)
+                            .Where(zz => zz.EnrolLineId == item.Id && zz.TicketStatus.ticketStatus == true).FirstOrDefaultAsync();
+
+                        tickets.TicketStatusId = ticketstatus.Id;
+                        item.TicketQuantity = item.TicketQuantity - 1;
+                        await db.SaveChangesAsync();
+                        string email = student.Identity.Email;
+                        var message = new Emailservice.Message(new string[] {email}, subject, content);
+                        await _emailsender.SendEmailAsync(message);
                     }
                 }
                 else
@@ -705,6 +744,7 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        //edit
         [HttpPut]
         [Route("EditSession")]
         public async Task<IActionResult> EditSession([FromBody] BookingInstanceDto dto)
@@ -718,9 +758,9 @@ namespace Learn2CodeAPI.Controllers
             {
                 var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
                 string datestring = dto.Date.ToString("MM/dd/yyyy");
-                DateTime oDate = Convert.ToDateTime(session.Date);
+                DateTime oDate = DateTime.ParseExact(session.Date, "MM/dd/yyyy", CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1)
+                if ((oDate - start).TotalDays <= 1.5)
                 {
                     result.message = "Can't update as there is less than 24 hours";
                     return BadRequest(result.message);
@@ -734,11 +774,8 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-                
-                string timestring = dto.Date.ToString("MM/dd/yyyy");
-                BookingInstance entity = mapper.Map<BookingInstance>(dto);
-                entity.Date = timestring;
-                var data = await BookingInstanceGenRepo.Update(entity);
+               
+                var data = await TutorRepo.UpdateBooking(dto);
                 result.data = data;
                 result.message = "Session updated";
                 return Ok(result);
@@ -752,7 +789,7 @@ namespace Learn2CodeAPI.Controllers
             }
         }
 
-
+        // need to look
         [HttpDelete]
         [Route("DeleteSession/{SessionId}")]
         public async Task<IActionResult> DeleteSession(int SessionId)
@@ -764,14 +801,46 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                var session = db.BookingInstance.Where(zz => zz.Id == SessionId).FirstOrDefault();
-                DateTime oDate = Convert.ToDateTime(session.Date);
+                var session = db.BookingInstance.Include(zz => zz.BookingStatus).Include(zz=> zz.Ticket).Where(zz => zz.Id == SessionId).FirstOrDefault();
+                DateTime oDate = DateTime.ParseExact(session.Date,"MM/dd/yyyy",CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1)
+                if ((oDate - start).TotalDays <= 1.5)
                 {
                     result.message = "Can't delete as there is less than 24 hours";
                     return BadRequest(result.message);
                 }
+
+                if (session.BookingStatus.bookingStatus == "Booked")
+                {
+
+                    var ticket = await db.Ticket.Where(zz => zz.Id == session.TicketId).FirstOrDefaultAsync();
+                    var status = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
+                    ticket.TicketStatusId = status.Id;
+                    var booking = await db.Booking.Where(zz => zz.Id == session.BookingId).FirstOrDefaultAsync();
+                    session.BookingId = null;
+                    db.Booking.Remove(booking);
+                    await db.SaveChangesAsync();
+                }
+                else if (session.BookingStatus.bookingStatus == "Ongoing")
+                {
+                    var reglist = await db.RegisteredStudent.Where(zz => zz.BookingInstanceId == session.Id).ToListAsync();
+                    var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
+                    foreach(var item in reglist)
+                    {
+                        var enroline = await db.EnrolLine.Include(zz => zz.Enrollment).
+                            Where(zz => zz.Enrollment.StudentId == item.StudentId && zz.ModuleId == session.ModuleId &&
+                            zz.EndDate >= start && zz.StartDate <= start && zz.Subscription.SubscriptionTutorSession
+                            .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).FirstOrDefaultAsync();
+                        var ticket = await db.Ticket.Include(zz => zz.TicketStatus).Where(zz => zz.TicketStatus.ticketStatus == false
+                        && zz.EnrolLineId == enroline.Id).FirstOrDefaultAsync();
+                        ticket.TicketStatusId = ticketstatus.Id;
+                        db.RegisteredStudent.Remove(item);
+                        await db.SaveChangesAsync();
+
+                    }
+                }
+
+
                 var data = await BookingInstanceGenRepo.Delete(SessionId);
 
                 result.data = data;
@@ -1048,6 +1117,22 @@ namespace Learn2CodeAPI.Controllers
                 int status = await db.BookingStatus.Where(zz => zz.bookingStatus == "Finalized").Select(zz => zz.Id).FirstAsync();
                 var instance = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
                 instance.BookingStatusId = status;
+                await db.SaveChangesAsync();
+                var reglist = await db.RegisteredStudent.Include(zz => zz.Student.Identity).Where(zz => zz.BookingInstanceId == instance.Id).ToListAsync();
+                string subject = "Group Session Finalized:";
+                string content = "Dear Student" + Environment.NewLine +
+                  "Please note that the "+instance.Title+ " group session gas been finalized (attendance has been taken & session content has been uploaded.)"
+                     + Environment.NewLine +
+                     "As a valued student we always appreciate your feedback when it comes to our amazing tutors and the session, so please dont hesitate to provide feedback by clicking on the feedback tab on your home screen"
+                     +Environment.NewLine +
+                      Environment.NewLine +
+                      "Regards TutorDevOps";
+                foreach (var item in reglist)
+                {
+                    var message = new Emailservice.Message(new string[] { item.Student.Identity.Email }, subject, content);
+                    await _emailsender.SendEmailAsync(message);
+                }
+
                 result.data = instance;
                 result.message = "Session finalized";
                 return Ok(result);
@@ -1095,7 +1180,8 @@ namespace Learn2CodeAPI.Controllers
             { 
                 foreach(RegisteredStudent student in register)
                 {
-                    RegisteredStudent existreg = db.RegisteredStudent.Find(student.Id);
+                    int id = student.Id;
+                    RegisteredStudent existreg = db.RegisteredStudent.Find(id);
                     existreg.Attended = student.Attended;
                     var instance = await db.BookingInstance.Where(zz => zz.Id == student.BookingInstanceId).FirstOrDefaultAsync();
                     instance.AttendanceTaken = true;
@@ -1168,6 +1254,26 @@ namespace Learn2CodeAPI.Controllers
           
 
         }
+
+        [HttpPost]
+        [Route("pic")]
+        public async Task<IActionResult> pic([FromForm(Name = "file")] IFormFile file)
+        {
+            var t = await db.Tutor.Where(zz => zz.Id == 4).FirstOrDefaultAsync();
+            using (var Filetarget = new MemoryStream())
+            {
+                file.CopyTo(Filetarget);
+                t.TutorPhoto = Filetarget.ToArray();
+
+
+            }
+           
+            await db.SaveChangesAsync();
+            return Ok();
+
+
+        }
+
     }
 }
 

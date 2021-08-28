@@ -42,7 +42,7 @@ namespace Learn2CodeAPI.Migrations
                         principalTable: "Students",
                         principalColumn: "Id",
                         //check
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.UpdateData(

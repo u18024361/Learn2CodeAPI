@@ -125,7 +125,24 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             else { entity.BookingStatusId = idindividual; }
             await db.BookingInstance.AddAsync(entity);
             await db.SaveChangesAsync();
-            return entity;
+            var booking = await db.BookingInstance.Include(zz => zz.Module).Include(zz => zz.SessionTime).Where(zz => zz.Id == entity.Id).FirstOrDefaultAsync();
+            return booking;
+        }
+
+        public async Task<BookingInstance> UpdateBooking(BookingInstanceDto dto)
+        {
+            string timestring = dto.Date.ToString("MM/dd/yyyy");
+            var bookinginstance = await db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefaultAsync();
+            bookinginstance.Link = dto.Link;
+            bookinginstance.SessionTimeId = dto.SessionTimeId;
+            bookinginstance.Date = timestring;
+            bookinginstance.Title = dto.Title;
+           // bookinginstance.Description = dto.Description;
+            await db.SaveChangesAsync();
+            return bookinginstance;
+
+
+
         }
 
 
@@ -164,20 +181,19 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             tutor.TutorEmail = dto.TutorEmail;
             tutor.TutorAbout = dto.TutorAbout;
             tutor.TutorCell = dto.TutorCell;
-            using (var target = new MemoryStream())
+            if (dto.TutorPhoto != null)
             {
-                dto.TutorPhoto.CopyTo(target);
-                tutor.TutorPhoto = target.ToArray();
+                using (var target = new MemoryStream())
+                {
+                    dto.TutorPhoto.CopyTo(target);
+                    tutor.TutorPhoto = target.ToArray();
+                }
             }
+         
 
 
             //File
-            var File = await db.File.Where(zz => zz.Id == dto.FileId).FirstOrDefaultAsync();
-            using (var file = new MemoryStream())
-            {
-                dto.File.CopyTo(file);
-                File.FileName = file.ToArray();
-            }
+           
 
             //user table
             var user = await db.Users.Where(zz => zz.Id == dto.UserId).FirstOrDefaultAsync();
@@ -188,9 +204,11 @@ namespace Learn2CodeAPI.Repository.RepositoryTutor
             await db.SaveChangesAsync();
             return tutor;
         }
-        #endregion
 
        
+        #endregion
+
+
 
     }
 }

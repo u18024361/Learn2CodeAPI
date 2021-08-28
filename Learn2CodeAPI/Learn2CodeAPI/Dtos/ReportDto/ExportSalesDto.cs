@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Learn2CodeAPI.Dtos.ReportDto
 {
-    public class CoursePieDto
+    public class ExportSalesDto
     {
-        public string name { get; set; }
-        public int value { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

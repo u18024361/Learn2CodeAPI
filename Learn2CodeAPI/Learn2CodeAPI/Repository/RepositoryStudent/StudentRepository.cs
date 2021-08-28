@@ -277,6 +277,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
                     y.StartDate = DateTime.Now;
                     y.EndDate = DateTime.Now.AddMonths(duration.Duration);
                     await db.EnrolLine.AddAsync(y);
+                    await db.SaveChangesAsync();
                     db.SubScriptionBasketLine.Remove(sub);
 
                     for (int i = 0; i < ticketquantity.Quantity; i++)
@@ -310,9 +311,10 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
         #region individualbookings
 
-        public async Task<IEnumerable<Booking>> GetMyBookings(int StudentId)
+        public async Task<IEnumerable<BookingInstance>> GetMyBookings(int StudentId)
         {
-            var bookings = await db.Booking.Include(zz => zz.bookinginstances).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            var bookings = await db.BookingInstance.Include(zz => zz.Module)
+                .Include(zz => zz.Tutor).Include(zz => zz.SessionTime).Where(zz => zz.Booking.StudentId == StudentId).ToListAsync();
             return bookings;
         }
 
@@ -323,6 +325,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             var myBookings = await db.BookingInstance.Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
             var ticket = await db.Ticket.Where(zz => zz.Id == myBookings.TicketId).FirstOrDefaultAsync();
             var enroline = await db.EnrolLine.Where(zz => zz.Id == ticket.EnrolLineId).FirstOrDefaultAsync();
+            var z = myBookings.BookingId;
+            var bookings = await db.Booking.Where(zz => zz.Id == z).FirstOrDefaultAsync();
             int x = enroline.TicketQuantity + 1;
             enroline.TicketQuantity = x;
             ticket.TicketStatusId = ticketstatus;
@@ -330,6 +334,8 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             myBookings.TicketId = null;
             myBookings.Description = null;
             myBookings.BookingStatusId = bookedstatus;
+            await db.SaveChangesAsync();
+            db.Booking.Remove(bookings);
             await db.SaveChangesAsync();
             return myBookings;
         }
@@ -378,6 +384,20 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
             return mysessions;
         }
 
+
+
+
+        #endregion
+
+        #region groupsession
+
+        public async Task<IEnumerable<RegisteredStudent>> Getmygroupsession(int StudentId)
+        {
+            var mygroup = await db.RegisteredStudent.Include(zz => zz.BookingInstance.Module)
+                .Include(zz => zz.BookingInstance.SessionTime).Include(zz =>zz.BookingInstance.Tutor)
+                .Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return mygroup;
+        }
 
         #endregion
     }
