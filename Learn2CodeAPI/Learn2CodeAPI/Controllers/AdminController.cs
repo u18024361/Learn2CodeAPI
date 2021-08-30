@@ -620,11 +620,17 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
-                var data = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
-                db.Remove(data);
+                var student = db.Students.Where(zz => zz.UserId == userId).FirstOrDefault();
+                var user =  db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefault();
+                var reg = db.RegisteredStudent.Where(zz => zz.StudentId == student.Id).ToList();
+                foreach (var item in reg)
+                {
+                    db.RegisteredStudent.Remove(item);
+                }
+                db.Students.Remove(student);
+                db.Users.Remove(user);
                 db.SaveChanges();
-                result.data = data;
-                result.message = "Student deleted";
+                result.message = "Student Deleted";
                 return Ok(result);
             }
             catch

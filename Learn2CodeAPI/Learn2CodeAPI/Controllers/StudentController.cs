@@ -968,5 +968,67 @@ namespace Learn2CodeAPI.Controllers
         }
 
         #endregion
+
+        #region mysubscriptions
+
+        // list to display subscriptions based on studeng id
+        [HttpGet]
+        [Route("GetMySubscriptions/{StudentId}")]
+        public async Task<IActionResult> GetMySubscriptions(int StudentId)
+        {
+
+            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription).Where(zz => zz.Enrollment.StudentId == StudentId).ToListAsync();
+            return Ok(subscriptions);
+
+        }
+        #endregion
+
+        #region viewgroupSession content
+
+        //gets the booking instances student registered for based on student id
+        [HttpGet]
+        [Route("GetMyGroupSessions/{StudentId}")]
+        public async Task<IActionResult> GetMyGroupSessions(int StudentId)
+        {
+
+            var sessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            return Ok(sessions);
+
+        }
+
+        // when clciking on content button of specific bookinginstance sends id to this function which will display the content in card format
+        [HttpGet]
+        [Route("GetMyGroupContent/{BookingInstanceId}")]
+        public async Task<IActionResult> GetMyGroupContent(int BookingInstanceId)
+        {
+
+            var sessionscontent = await db.GroupSessionContent.Include(zz=> zz.BookingInstance)
+                .Include(zz => zz.SessionContentCategory).Where(zz=>zz.BookingInstanceId == BookingInstanceId).FirstOrDefaultAsync();
+            return Ok(sessionscontent);
+
+        }
+
+        //clicking the watch button sends the id of the groupsessioncontent to this function to watch video
+        [HttpGet]
+        [Route("VideoGroup/{id}")]
+        public async Task<FileStreamResult> VideoGroup(int id)
+        {
+            var entity = await db.GroupSessionContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Recording);
+            return new FileStreamResult(ms, "video/mp4");
+        }
+
+        //clicking the download button sends the id of the groupsessioncontent to this function to download notes
+        [HttpGet]
+        [Route("DownloadRContentPdfGroup/{id}")]
+        public async Task<FileStreamResult> DownloadRContentPdfGroup(int id)
+        {
+            var entity = await db.GroupSessionContent.Where(zz => zz.Id == id).FirstOrDefaultAsync();
+            MemoryStream ms = new MemoryStream(entity.Notes);
+            return new FileStreamResult(ms, "Application/pdf");
+        }
+
+
+        #endregion
     }
 }
