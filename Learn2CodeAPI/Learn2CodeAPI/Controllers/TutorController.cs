@@ -686,7 +686,7 @@ namespace Learn2CodeAPI.Controllers
                 var type = db.TutorSession.Include(zz => zz.SessionType).Where(zz => zz.SessionType.SessionTypeName == "Group").FirstOrDefault();
                 string subject = "Group Session:"+ BookingInstance.Module.ModuleCode;
                 string content = "Dear Student" + Environment.NewLine +
-                    "Please note that a gtoup session for " + BookingInstance.Module.ModuleCode + " has been scheduled for " + BookingInstance.Date + " from " + BookingInstance.SessionTime.StartTime
+                    "Please note that a group session for " + BookingInstance.Module.ModuleCode + " has been scheduled for " + BookingInstance.Date + " from " + BookingInstance.SessionTime.StartTime
                     + " to " + BookingInstance.SessionTime.EndTime
                     + Environment.NewLine +
                      Environment.NewLine +
