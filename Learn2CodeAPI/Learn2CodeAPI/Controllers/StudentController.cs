@@ -987,7 +987,7 @@ namespace Learn2CodeAPI.Controllers
 
         //gets the booking instances student registered for based on student id
         [HttpGet]
-        [Route("GetMyGroupSessions/{StudentId}")]
+        [Route("GetMyGroupSessionsContent/{StudentId}")]
         public async Task<IActionResult> GetMyGroupSessions(int StudentId)
         {
 
