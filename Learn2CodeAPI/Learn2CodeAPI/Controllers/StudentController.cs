@@ -976,8 +976,8 @@ namespace Learn2CodeAPI.Controllers
         [Route("GetMySubscriptions/{StudentId}")]
         public async Task<IActionResult> GetMySubscriptions(int StudentId)
         {
-
-            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription).Where(zz => zz.Enrollment.StudentId == StudentId).ToListAsync();
+            var datenow = DateTime.Now;
+            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription).Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate > datenow).ToListAsync();
             return Ok(subscriptions);
 
         }
@@ -991,7 +991,8 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetMyGroupSessions(int StudentId)
         {
 
-            var sessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Include(zz => zz.BookingInstance.Module).Include(zz => zz.BookingInstance.Tutor).Include(zz => zz.BookingInstance.SessionTime)
+            var sessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Include(zz => zz.BookingInstance.Module)
+                .Include(zz => zz.BookingInstance.Tutor).Include(zz => zz.BookingInstance.SessionTime)
                 .Where(zz => zz.StudentId == StudentId).ToListAsync();
             return Ok(sessions);
 
