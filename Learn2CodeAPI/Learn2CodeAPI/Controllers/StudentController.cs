@@ -991,7 +991,8 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetMyGroupSessions(int StudentId)
         {
 
-            var sessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Where(zz => zz.StudentId == StudentId).ToListAsync();
+            var sessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).Include(zz => zz.BookingInstance.Module).Include(zz => zz.BookingInstance.Tutor).Include(zz => zz.BookingInstance.SessionTime)
+                .Where(zz => zz.StudentId == StudentId).ToListAsync();
             return Ok(sessions);
 
         }
