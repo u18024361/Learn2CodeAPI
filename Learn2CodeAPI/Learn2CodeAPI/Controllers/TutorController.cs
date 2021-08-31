@@ -761,7 +761,7 @@ namespace Learn2CodeAPI.Controllers
                 string datestring = dto.Date.ToString("MM/dd/yyyy");
                 DateTime oDate = DateTime.ParseExact(session.Date, "MM/dd/yyyy", CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1.5)
+                if ((oDate - start).TotalDays <= 1.5 && (oDate - start).TotalDays > 0)
                 {
                     result.message = "Can't update as there is less than 24 hours";
                     return BadRequest(result.message);

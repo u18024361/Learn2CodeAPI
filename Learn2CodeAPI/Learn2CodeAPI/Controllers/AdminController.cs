@@ -1046,7 +1046,7 @@ namespace Learn2CodeAPI.Controllers
             try
             {
 
-                var check = await db.CourseContent.Where(zz => zz.FileName == dto.Content.FileName).FirstOrDefaultAsync();
+                var check = await db.CourseContent.Where(zz => zz.FileName == dto.Content.FileName && zz.CourseSubCategoryId == dto.CourseSubCategoryId).FirstOrDefaultAsync();
                 if (check != null)
                 {
                     result.message = "Content already exists";
