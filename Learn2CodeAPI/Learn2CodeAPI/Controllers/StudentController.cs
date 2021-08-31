@@ -203,6 +203,39 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var individualbooking = await db.BookingInstance.Where(zz => zz.Booking.StudentId == StudentId).ToListAsync();
+                var tickets = await db.Ticket.Where(zz => zz.Enrollment.StudentId == StudentId).ToListAsync();
+                var datelist = new List<deleteindividualDto>();
+                var datenow = DateTime.Now;
+                foreach (var item in individualbooking)
+                {
+                    deleteindividualDto dlist = new deleteindividualDto();
+                    DateTime oDate = Convert.ToDateTime(item.Date);
+                    dlist.date = oDate;
+                    datelist.Add(dlist);
+                }
+
+                var individualcheck =  datelist.Where(zz => zz.date > datenow).ToList();
+                if(individualcheck.Count > 0)
+                {
+                    return BadRequest("Please cancel current individual bookings before deleteing your account");
+                }
+
+                foreach(var item in individualbooking)
+                {
+                    item.BookingId = null;
+                    item.TicketId = null;
+                    db.BookingInstance.Remove(item);
+                }
+                await db.SaveChangesAsync();
+                foreach (var item in tickets)
+                {
+                    db.Ticket.Remove(item);
+                }
+                await db.SaveChangesAsync();
+
+
+
                 var student = await db.Students.Where(zz => zz.Id == StudentId).FirstOrDefaultAsync();
                 var user = await db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefaultAsync();
                 var reg = await db.RegisteredStudent.Where(zz => zz.StudentId == student.Id).ToListAsync();
