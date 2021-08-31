@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Emailservice;
 using Learn2CodeAPI.Data;
+using Learn2CodeAPI.Dtos.StudentDto;
 using Learn2CodeAPI.Dtos.TutorDto;
 using Learn2CodeAPI.IRepository.Generic;
 using Learn2CodeAPI.IRepository.IRepositoryTutor;
@@ -804,13 +805,13 @@ namespace Learn2CodeAPI.Controllers
                 var session = db.BookingInstance.Include(zz => zz.BookingStatus).Include(zz=> zz.Ticket).Where(zz => zz.Id == SessionId).FirstOrDefault();
                 DateTime oDate = DateTime.ParseExact(session.Date,"MM/dd/yyyy",CultureInfo.CurrentCulture);
                 var start = DateTime.Now;
-                if ((oDate - start).TotalDays <= 1.5)
+                if ((oDate - start).TotalDays <= 1.5 && (oDate - start).TotalDays >=  0)
                 {
                     result.message = "Can't delete as there is less than 24 hours";
-                    return BadRequest(result.message);
+                    return BadRequest(result.message); 
                 }
 
-                if (session.BookingStatus.bookingStatus == "Booked")
+                if (session.BookingStatus.bookingStatus == "Booked" && oDate > start)
                 {
 
                     var ticket = await db.Ticket.Where(zz => zz.Id == session.TicketId).FirstOrDefaultAsync();
@@ -1081,6 +1082,30 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var sessions = await db.BookingInstance.Where(zz => zz.TutorId == TutorId).ToListAsync();
+                var messages = await db.Message.Where(zz => zz.TutorId == TutorId).ToListAsync();
+                var datelist = new List<deleteindividualDto>();
+                var datenow = DateTime.Now;
+                foreach (var item in sessions)
+                {
+                    deleteindividualDto dlist = new deleteindividualDto();
+                    DateTime oDate = Convert.ToDateTime(item.Date);
+                    dlist.date = oDate;
+                    datelist.Add(dlist);
+                }
+
+                var individualcheck = datelist.Where(zz => zz.date > datenow).ToList();
+                if (individualcheck.Count > 0)
+                {
+                    return BadRequest("Unable to delete profile as you have upcoming sessions");
+                }
+
+                foreach (var item in messages)
+                {
+
+                    db.Message.Remove(item);
+                }
+                await db.SaveChangesAsync();
                 var tutor = await db.Tutor.Where(zz => zz.Id == TutorId).FirstOrDefaultAsync();
                 var file = await db.File.Where(zz => zz.Id == tutor.FileId).FirstOrDefaultAsync();
 
