@@ -26,6 +26,7 @@ using System.Globalization;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using Emailservice;
+using Learn2CodeAPI.Dtos.StudentDto;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -206,7 +207,16 @@ namespace Learn2CodeAPI.Controllers
                 return BadRequest(ModelState);
             }
             try
-            {
+            {  
+                var tutors = await db.TutorModule.Where(zz => zz.Module.Degree.University.Id == UniversityId).ToListAsync();
+                if (tutors.Count > 0) { return BadRequest("Cant delete this university as there are tutors registered for it"); };
+
+                var students = await db.StudentModule.Where(zz => zz.Module.Degree.University.Id == UniversityId).ToListAsync();
+                if (students.Count > 0) { return BadRequest("Cant delete this university as there are students registered for it"); };
+
+                var enrolinee = await db.EnrolLine.Where(zz => zz.Module.Degree.University.Id == UniversityId).ToListAsync();
+                if (enrolinee.Count > 0) { return BadRequest("Cant delete this university as there are Active subscriptions for its corresponding modules"); };
+
                 var data = await universityGenRepo.Delete(UniversityId);
                 result.data = data;
                 result.message = "University deleted";
@@ -337,6 +347,14 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var tutors = await db.TutorModule.Where(zz => zz.Module.Degree.Id == DegreeId).ToListAsync();
+                if (tutors.Count > 0) { return BadRequest("Cant delete this Degree as there are tutors registered for it"); };
+
+                var students = await db.StudentModule.Where(zz => zz.Module.Degree.Id == DegreeId).ToListAsync();
+                if (students.Count > 0) { return BadRequest("Cant delete this Degree as there are students registered for it"); };
+
+                var enrolinee = await db.EnrolLine.Where(zz => zz.Module.Degree.Id == DegreeId).ToListAsync();
+                if (enrolinee.Count > 0) { return BadRequest("Cant delete this Degree as there are Active subscriptions for it corresponding module"); };
                 var data = await DegreeGenRepo.Delete(DegreeId);
                 result.data = data;
                 result.message = "Degree deleted";
@@ -464,6 +482,14 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var tutors = await db.TutorModule.Where(zz => zz.ModuleId == ModuleId).ToListAsync();
+                if (tutors.Count > 0) { return BadRequest("Cant delete this Module as there are tutors registered for it"); };
+
+                var students = await db.StudentModule.Where(zz => zz.ModuleId == ModuleId).ToListAsync();
+                if (students.Count > 0) { return BadRequest("Cant delete this Module as there are students registered for it"); };
+
+                var enrolinee = await db.EnrolLine.Where(zz => zz.ModuleId == ModuleId).ToListAsync();
+                if (enrolinee.Count > 0) { return BadRequest("Cant delete this Module as there are Active subscriptions for it "); };
                 var data = await ModuleGenRepo.Delete(ModuleId);
                 result.data = data;
                 result.message = "Module deleted";
@@ -577,6 +603,8 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var courseenroline = await db.CourseEnrolLine.Where(zz => zz.CourseSubCategory.CourseFolderId == CourseFolderId).ToListAsync();
+                if (courseenroline.Count > 0) { return BadRequest("cant delete this course folder as there are purchased courses"); };
                 var data = await CourseFolderGenRepo.Delete(CourseFolderId);
                 result.data = data;
                 result.message = "Module deleted";
@@ -621,7 +649,22 @@ namespace Learn2CodeAPI.Controllers
            
             try
             {
+               
+
                 var student = db.Students.Where(zz => zz.UserId == userId).FirstOrDefault();
+                var enrol = db.EnrolLine.Where(zz => zz.Enrollment.StudentId == student.Id).ToList();
+                var enrolcourse = db.CourseEnrolLine.Where(zz => zz.CourseEnrol.StudentId == student.Id).ToList();
+                if (enrol.Count > 0 )
+                {
+                    return BadRequest("cant delete student as the student is enrolled in a subscription");
+                }
+
+                if (enrolcourse.Count > 0)
+                {
+                    return BadRequest("cant delete student as the student  has bought courses");
+                }
+
+
                 var user =  db.Users.Where(zz => zz.Id == student.UserId).FirstOrDefault();
                 var reg = db.RegisteredStudent.Where(zz => zz.StudentId == student.Id).ToList();
                 foreach (var item in reg)
@@ -838,6 +881,8 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var courseenroline = await db.CourseEnrolLine.Where(zz => zz.CourseSubCategoryId == CourseSubCategoryId).ToListAsync();
+                if (courseenroline.Count > 0) { return BadRequest("cant delete this course sub category as there are purchased courses"); };
                 var data = await CourseSubCategoryGenRepo.Delete(CourseSubCategoryId);
                 result.data = data;
                 result.message = "Subcategory deleted";
@@ -995,9 +1040,34 @@ namespace Learn2CodeAPI.Controllers
             {
                 var user = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();
                 var tutor = db.Tutor.Where(zz => zz.UserId == userId).FirstOrDefault();
+                var sessions =  db.BookingInstance.Where(zz => zz.TutorId == tutor.Id).ToList();
+                var messages =  db.Message.Where(zz => zz.TutorId == tutor.Id).ToList();
+                var datelist = new List<deleteindividualDto>();
+                var datenow = DateTime.Now;
+                foreach (var item in sessions)
+                {
+                    deleteindividualDto dlist = new deleteindividualDto();
+                    DateTime oDate = Convert.ToDateTime(item.Date);
+                    dlist.date = oDate;
+                    datelist.Add(dlist);
+                }
+
+                var individualcheck = datelist.Where(zz => zz.date > datenow).ToList();
+                if (individualcheck.Count > 0)
+                {
+                    return BadRequest("Unable to delete tutor as he/she has upcoming sessions");
+                }
+
+
+                foreach (var item in messages)
+                {
+
+                    db.Message.Remove(item);
+                }
+                db.SaveChanges();
                 var x = db.File.Where(zz => zz.Id == tutor.FileId).FirstOrDefault();
-                db.Remove(user);
-                db.Remove(x);
+                db.Users.Remove(user);
+                db.File.Remove(x);
                 db.SaveChanges();
                 result.data = tutor;
                 result.message = "Tutor deleted";
@@ -1272,7 +1342,9 @@ namespace Learn2CodeAPI.Controllers
                 return BadRequest(ModelState);
             }
             try
-            {
+            { var date = DateTime.Now;
+                var enroline = await db.EnrolLine.Where(zz => zz.SubscriptionId == SubscriptionId && zz.EndDate > date).ToListAsync();
+                if (enroline.Count > 0) { return BadRequest("cant delete this subscription as there are active subscriptions"); };
                 var data = await SubscriptionGenRepo.Delete(SubscriptionId);
                 result.data = data;
                 result.message = "Subscription deleted";
