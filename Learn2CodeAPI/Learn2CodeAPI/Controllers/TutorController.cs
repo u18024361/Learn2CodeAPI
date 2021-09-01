@@ -819,6 +819,8 @@ namespace Learn2CodeAPI.Controllers
                     ticket.TicketStatusId = status.Id;
                     var booking = await db.Booking.Where(zz => zz.Id == session.BookingId).FirstOrDefaultAsync();
                     session.BookingId = null;
+                    var enrol = await db.EnrolLine.Where(zz => zz.Id == ticket.EnrolLineId).FirstOrDefaultAsync();
+                    enrol.TicketQuantity = enrol.TicketQuantity + 1;
                     db.Booking.Remove(booking);
                     await db.SaveChangesAsync();
                 }
@@ -835,6 +837,7 @@ namespace Learn2CodeAPI.Controllers
                         var ticket = await db.Ticket.Include(zz => zz.TicketStatus).Where(zz => zz.TicketStatus.ticketStatus == false
                         && zz.EnrolLineId == enroline.Id).FirstOrDefaultAsync();
                         ticket.TicketStatusId = ticketstatus.Id;
+                        enroline.TicketQuantity = enroline.TicketQuantity + 1;
                         db.RegisteredStudent.Remove(item);
                         await db.SaveChangesAsync();
 
@@ -960,7 +963,7 @@ namespace Learn2CodeAPI.Controllers
                     dto.Recording.CopyTo(video);
                     content.Recording = video.ToArray();
                 }
-                await db.GroupSessionContent.AddAsync(content);
+                //await db.GroupSessionContent.AddAsync(content);
                 await db.SaveChangesAsync();
                 var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
                 instance.ContentUploaded = true;
@@ -1146,7 +1149,7 @@ namespace Learn2CodeAPI.Controllers
                 var reglist = await db.RegisteredStudent.Include(zz => zz.Student.Identity).Where(zz => zz.BookingInstanceId == instance.Id).ToListAsync();
                 string subject = "Group Session Finalized:";
                 string content = "Dear Student" + Environment.NewLine +
-                  "Please note that the "+instance.Title+ " group session gas been finalized (attendance has been taken & session content has been uploaded.)"
+                  "Please note that the "+instance.Title+ " group session has been finalized (attendance has been taken & session content has been uploaded.)"
                      + Environment.NewLine +
                      "As a valued student we always appreciate your feedback when it comes to our amazing tutors and the session, so please dont hesitate to provide feedback by clicking on the feedback tab on your home screen"
                      +Environment.NewLine +
