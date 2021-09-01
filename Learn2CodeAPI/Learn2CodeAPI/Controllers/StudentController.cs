@@ -20,6 +20,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Emailservice;
+using Twilio.Clients;
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace Learn2CodeAPI.Controllers
 {
@@ -41,13 +44,14 @@ namespace Learn2CodeAPI.Controllers
         private IGenRepository<CourseBasketLine> CourseBasketLineGenRepo;
         private IGenRepository<SubScriptionBasketLine> SubScriptionBasketLineGenRepo;
         private readonly IEmailSender _emailsender;
+        private readonly ITwilioRestClient _client;
 
 
         public StudentController(IStudent _studentRepo, UserManager<AppUser> userManager, IMapper mapper, AppDbContext appDbContext,
             AppDbContext _db, IGenRepository<Tutor> _TutorGenRepo, IGenRepository<Models.Tutor.Message> _Mess,IGenRepository<Models.Tutor.Message> _Mes, 
             IGenRepository<Module> _ModuleGenRepo, IGenRepository<CourseFolder> _CourseFolderGenRepo,
             IGenRepository<CourseBasketLine> _CourseBasketLineGenRepo, IGenRepository<University> _UniversityGenRepo,
-            IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender)
+            IGenRepository<SubScriptionBasketLine> _SubScriptionBasketLineGenRepo,IEmailSender emailsender, ITwilioRestClient client)
         {
             studentRepo = _studentRepo;
             _userManager = userManager;
@@ -63,6 +67,7 @@ namespace Learn2CodeAPI.Controllers
             SubScriptionBasketLineGenRepo = _SubScriptionBasketLineGenRepo;
             _emailsender = emailsender;
             UniversityGenRepo = _UniversityGenRepo;
+            _client = client;
 
         }
         [HttpGet]
@@ -759,7 +764,9 @@ namespace Learn2CodeAPI.Controllers
 
                     int ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == false).Select(zz => zz.Id).FirstOrDefaultAsync();
                     int bookedstatus = await db.BookingStatus.Where(zz => zz.bookingStatus == "Booked").Select(zz => zz.Id).FirstOrDefaultAsync();
-                    var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                    var instance = await db.BookingInstance.Where(zz => zz.Id == dto.BookingInstanceId).Include(zz=> zz.Tutor).Include(zz => zz.SessionTime).FirstOrDefaultAsync();
+                    var cellremove = instance.Tutor.TutorCell.Substring(1);
+                    var cell = "+27" + cellremove;
                     instance.BookingStatusId = bookedstatus;
                     instance.BookingId = newBooking.Id;
                     instance.TicketId = ticketlist[0].Id;
@@ -770,6 +777,12 @@ namespace Learn2CodeAPI.Controllers
                     int x = enrolinequantity.TicketQuantity - 1;
                     enrolinequantity.TicketQuantity = x;
                     await db.SaveChangesAsync();
+                    var body = "Hi " + instance.Tutor.TutorName + " your individual session at " + instance.SessionTime.StartTime + "-" + instance.SessionTime.EndTime + " on " + instance.Date +  " has been booked";
+                    var message = MessageResource.Create(
+                   to: new PhoneNumber(cell),
+                   from: new PhoneNumber("+17729348745"),
+                   body: body,
+                   client: _client);
                     result.data = instance;
                     result.message = "Booking successfull";
                     return Ok(result);
@@ -855,7 +868,7 @@ namespace Learn2CodeAPI.Controllers
                 await _emailsender.SendEmailAsync(message);
 
                    
-                    result.message = "Booking successfull";
+                    result.message = "Email sent";
                     return Ok(result);
             
             }

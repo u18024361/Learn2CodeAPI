@@ -618,6 +618,7 @@ namespace Learn2CodeAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
+           
             try
             {
                 var student = db.Students.Where(zz => zz.UserId == userId).FirstOrDefault();
@@ -988,6 +989,8 @@ namespace Learn2CodeAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            
             try
             {
                 var user = db.Users.Where(zz => zz.Id == userId).FirstOrDefault();

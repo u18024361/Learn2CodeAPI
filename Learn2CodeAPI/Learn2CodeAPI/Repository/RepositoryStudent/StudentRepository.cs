@@ -379,7 +379,7 @@ namespace Learn2CodeAPI.Repository.RepositoryStudent
 
         public async Task<IEnumerable<RegisteredStudent>> GetmyReg(int StudentId)
         {
-            var mysessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.BookingStatus)
+            var mysessions = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.BookingStatus).Include(zz => zz.BookingInstance.Tutor)
                 .Where(zz => zz.StudentId == StudentId && zz.BookingInstance.BookingStatus.bookingStatus == "Finalized").ToListAsync();
             return mysessions;
         }
