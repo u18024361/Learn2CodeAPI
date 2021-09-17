@@ -10139,11 +10139,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
+      "projectUniqueName": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
       "projectName": "Learn2CodeAPI",
-      "projectPath": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
+      "projectPath": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI.csproj",
       "packagesPath": "C:\\Users\\Roberto\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\obj\\",
+      "outputPath": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Learn2CodeAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Roberto\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -10159,8 +10159,8 @@
       "frameworks": {
         "netcoreapp3.1": {
           "projectReferences": {
-            "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {
-              "projectPath": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj"
+            "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {
+              "projectPath": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj"
             }
           }
         }

@@ -491,6 +491,13 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var basket = db.CourseBasketLine.Where(zz => zz.BasketId == dto.BasketId && zz.CourseSubCategoryId == dto.CourseSubCategoryId).FirstOrDefault();
+                if (basket != null)
+                {
+                    return BadRequest("Short course already exists in basket");
+                }
+
+
                 var data = await studentRepo.BuyCourse(dto);
                 result.data = data;
                 result.message = "Course added";
@@ -516,6 +523,11 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var basket = db.SubScriptionBasketLine.Where(zz => zz.BasketId == dto.BasketId && zz.ModuleId == dto.ModuleId && zz.SubscriptionId == dto.SubscriptionId).FirstOrDefault();
+                if (basket != null)
+                {
+                    return BadRequest("Subscription for the specific module already exists in basket");
+                }
                 var data = await studentRepo.BuySubscription(dto);
                 result.data = data;
                 result.message = "Subscription added";
@@ -542,6 +554,8 @@ namespace Learn2CodeAPI.Controllers
             return Ok(courses);
 
         }
+
+
         //forsubscriptions
         [HttpGet]
         [Route("GetBasketSubscriptions/{BasketId}")]
@@ -550,6 +564,26 @@ namespace Learn2CodeAPI.Controllers
 
             var Subscriptions = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.Module).Include(zz => zz.Subscription).ToListAsync();
             return Ok(Subscriptions);
+
+        }
+
+        [HttpGet]
+        [Route("GetCouesePrice/{BasketId}")]
+        public async Task<IActionResult> GetCouesePrice(int BasketId)
+        {
+
+            var course = await db.CourseBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.CourseSubCategory).SumAsync(zz => zz.CourseSubCategory.price);
+            return Ok(course);
+
+        }
+
+        [HttpGet]
+        [Route("GetsubPrice/{BasketId}")]
+        public async Task<IActionResult> GetsubPrice(int BasketId)
+        {
+
+            var course = await db.SubScriptionBasketLine.Where(zz => zz.BasketId == BasketId).Include(zz => zz.Subscription).SumAsync(zz => zz.Subscription.price);
+            return Ok(course);
 
         }
         #endregion
