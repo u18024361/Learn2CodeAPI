@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {}
+    "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {
+    "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj",
+        "projectUniqueName": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj",
         "projectName": "Emailservice",
-        "projectPath": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj",
+        "projectPath": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\Emailservice.csproj",
         "packagesPath": "C:\\Users\\Roberto\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Roberto\\Desktop\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\obj\\",
+        "outputPath": "C:\\Users\\Roberto\\Desktop\\370\\Learn2CodeAPI\\Learn2CodeAPI\\Emailservice\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Roberto\\AppData\\Roaming\\NuGet\\NuGet.Config",
