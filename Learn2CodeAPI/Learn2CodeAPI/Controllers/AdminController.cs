@@ -1402,6 +1402,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                dynamic results = new ExpandoObject();
                 var list = new List<Payment>();
                 using (var stream = new MemoryStream())
                 {
@@ -1419,6 +1420,12 @@ namespace Learn2CodeAPI.Controllers
                             records.RemoveAt(records.Count - 1);
                             foreach (var item in records)
                             {
+                                var pay = db.Payment.Where(zz => zz.FullName == item.FullName && zz.PaymentDate == item.PaymentDate).FirstOrDefault();
+                                if(pay != null)
+                                {
+                                    result.message = "CSV file has already been uploaded";
+                                    return BadRequest(result.message);
+                                }
                                 db.Payment.Add(item);
                                 db.SaveChanges();
                             }
