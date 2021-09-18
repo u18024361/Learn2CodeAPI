@@ -513,7 +513,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPost]
         [Route("TutorApplication")]
-        public async Task<IActionResult> TutorApplication([FromForm] TutorDtoo model)
+        public async Task<IActionResult> TutorApplication([FromBody] TutorDtoo model)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
@@ -530,7 +530,7 @@ namespace Learn2CodeAPI.Controllers
                     return BadRequest(result.message);
                 }
 
-               
+
                 Models.Tutor.File file = new Models.Tutor.File();
                 using (var Filetarget = new MemoryStream())
                 {
@@ -557,12 +557,18 @@ namespace Learn2CodeAPI.Controllers
 
                 await db.Tutor.AddAsync(tutor);
                 await db.SaveChangesAsync();
-
-                TutorModule tutorModule = new TutorModule();
-                tutorModule.TutorId = tutor.Id;
-                tutorModule.ModuleId = model.ModuleId;
-                await db.TutorModule.AddAsync(tutorModule);
-                await db.SaveChangesAsync();
+                foreach(var item in model.ModuleId)
+                {
+                    TutorModule tutorModule = new TutorModule();
+                    tutorModule.TutorId = tutor.Id;
+                    tutorModule.ModuleId = item;
+                    await db.TutorModule.AddAsync(tutorModule);
+                    await db.SaveChangesAsync();
+                }
+               
+               
+               
+                
 
                 result.data = tutor;
                 result.message = "Application sent";
@@ -672,7 +678,35 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                var x = "";
+                var sessiontime = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
+                if(sessiontime.StartTime.Length == 3)
+                {
+                     x = sessiontime.StartTime.Substring(0, 1);
+                }
+                else
+                {
+                     x = sessiontime.StartTime.Substring(0, 2);
+                }
+
                 
+                var hour = Convert.ToInt32(x);
+                var todayy = DateTime.Today;
+                var time = new DateTime(todayy.Year, todayy.Month, todayy.Day, hour, 0, 0);
+
+                if (time < DateTime.Now)
+                {
+                    result.message = "Selected Time has already passed";
+                    return BadRequest(result.message);
+                }
+
+
+                if (dto.Date < DateTime.Now)
+                {
+                    result.message = "Provided date has already passed";
+                    return BadRequest(result.message);
+                }
+
                 string timestring = dto.Date.ToString("MM/dd/yyyy");
                 var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
                 zz.Date == timestring && zz.TutorId == dto.TutorId).FirstOrDefault();
