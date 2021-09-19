@@ -513,7 +513,7 @@ namespace Learn2CodeAPI.Controllers
 
         [HttpPost]
         [Route("TutorApplication")]
-        public async Task<IActionResult> TutorApplication([FromBody] TutorDtoo model)
+        public async Task<IActionResult> TutorApplication([FromForm] TutorDtoo model)
         {
             dynamic result = new ExpandoObject();
             if (!ModelState.IsValid)
@@ -561,7 +561,8 @@ namespace Learn2CodeAPI.Controllers
                 {
                     TutorModule tutorModule = new TutorModule();
                     tutorModule.TutorId = tutor.Id;
-                    tutorModule.ModuleId = item;
+                    int moduleid = Int32.Parse(item);
+                    tutorModule.ModuleId = moduleid;
                     await db.TutorModule.AddAsync(tutorModule);
                     await db.SaveChangesAsync();
                 }
@@ -678,6 +679,14 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                dto.Date = dto.Date.AddDays(1);
+
+                if (dto.Date < DateTime.Now)
+                {
+                    result.message = "Provided date has already passed";
+                    return BadRequest(result.message);
+                }
+
                 var x = "";
                 var sessiontime = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
                 if(sessiontime.StartTime.Length == 3)
@@ -691,21 +700,23 @@ namespace Learn2CodeAPI.Controllers
 
                 
                 var hour = Convert.ToInt32(x);
-                var todayy = DateTime.Today;
+                var todayy = dto.Date;
                 var time = new DateTime(todayy.Year, todayy.Month, todayy.Day, hour, 0, 0);
 
-                if (time < DateTime.Now)
+                if(dto.Date.Day == DateTime.Today.Day)
                 {
-                    result.message = "Selected Time has already passed";
-                    return BadRequest(result.message);
+                    if (time < DateTime.Now )
+                    {
+                        result.message = "Selected Time has already passed";
+                        return BadRequest(result.message);
+                    }
+
                 }
 
+              
 
-                if (dto.Date < DateTime.Now)
-                {
-                    result.message = "Provided date has already passed";
-                    return BadRequest(result.message);
-                }
+
+               
 
                 string timestring = dto.Date.ToString("MM/dd/yyyy");
                 var check = db.BookingInstance.Where(zz => zz.SessionTimeId == dto.SessionTimeId &&
