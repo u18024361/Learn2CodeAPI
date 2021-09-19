@@ -679,6 +679,8 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                dto.Date = dto.Date.AddDays(1);
+
                 if (dto.Date < DateTime.Now)
                 {
                     result.message = "Provided date has already passed";
