@@ -529,7 +529,7 @@ namespace Learn2CodeAPI.Controllers
                 CourseFolder entity = mapper.Map<CourseFolder>(dto);
                 var data = await CourseFolderGenRepo.Add(entity);
                 result.data = data;
-                result.message = "Course Folder created";
+                result.message = "Course Folder created, please go and create sub categories for this content folder";
                 return Ok(result);
             }
             catch
@@ -825,7 +825,7 @@ namespace Learn2CodeAPI.Controllers
                 CourseSubCategory entity = mapper.Map<CourseSubCategory>(dto);
                 var data = await CourseSubCategoryGenRepo.Add(entity);
                 result.data = data;
-                result.message = "course subcategory created";
+                result.message = "course subcategory created, please add content for this category";
                 return Ok(result);
             }
             catch
