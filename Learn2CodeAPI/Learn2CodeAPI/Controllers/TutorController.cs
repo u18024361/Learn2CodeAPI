@@ -676,6 +676,15 @@ namespace Learn2CodeAPI.Controllers
             return Ok(entity);
         }
 
+        [HttpGet]
+        [Route("GetBookedStudent/{BookingInstanceId}")]
+        public async Task<IActionResult> GetBookedStudent(int BookingInstanceId)
+        {
+            var entity = await db.BookingInstance.Include(zz => zz.BookingStatus).Include(zz => zz.Booking.Student.Identity).Where(zz => zz.Id == BookingInstanceId).FirstOrDefaultAsync();
+
+            return Ok(entity);
+        }
+
 
         [HttpPost]
         [Route("CreateBooking")]
