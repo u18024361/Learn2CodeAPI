@@ -1057,8 +1057,19 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetMySubscriptions(int StudentId)
         {
             var datenow = DateTime.Now;
-            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription).Include(zz =>zz.Module)
-                .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate > datenow).ToListAsync();
+            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription ).Include(zz =>zz.Module)
+                .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate > datenow && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).ToListAsync();
+            return Ok(subscriptions);
+
+        }
+
+        [HttpGet]
+        [Route("GetMyIndividualSubscriptions/{StudentId}")]
+        public async Task<IActionResult> GetMyIndividualSubscriptions(int StudentId)
+        {
+            var datenow = DateTime.Now;
+            var subscriptions = await db.EnrolLine.Include(zz => zz.Subscription).Include(zz => zz.Module)
+                .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate > datenow && zz.Subscription.SubscriptionTutorSession.Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual")).ToListAsync();
             return Ok(subscriptions);
 
         }
