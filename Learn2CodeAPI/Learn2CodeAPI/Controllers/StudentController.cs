@@ -765,6 +765,18 @@ namespace Learn2CodeAPI.Controllers
             return Ok(available);
         }
 
+        [HttpGet]
+        [Route("Ticketsleft/{ModuleId}/{StudentId}")]
+        public async Task<IActionResult> Ticketsleft(int ModuleId,  int StudentId)
+        {
+            var today = DateTime.Now;
+            var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
+               .Where(zz => zz.Enrollment.StudentId == StudentId && zz.EndDate >= today && zz.ModuleId == ModuleId && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Individual"))
+               .Select(zz => zz.TicketQuantity).FirstOrDefaultAsync();
+            return Ok(enrolineId);
+        }
+
 
         //to make a booking
         [HttpPost]
@@ -812,11 +824,11 @@ namespace Learn2CodeAPI.Controllers
                     enrolinequantity.TicketQuantity = x;
                     await db.SaveChangesAsync();
                     var body = "Hi " + instance.Tutor.TutorName + " your individual session at " + instance.SessionTime.StartTime + "-" + instance.SessionTime.EndTime + " on " + instance.Date +  " has been booked";
-                    var message = MessageResource.Create(
-                   to: new PhoneNumber(cell),
-                   from: new PhoneNumber("+17729348745"),
-                   body: body,
-                   client: _client);
+                   // var message = MessageResource.Create(
+                   //to: new PhoneNumber(cell),
+                   //from: new PhoneNumber("+17729348745"),
+                   //body: body,
+                   //client: _client);
                     result.data = instance;
                     result.message = "Booking successfull";
                     return Ok(result);
