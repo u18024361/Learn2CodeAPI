@@ -762,7 +762,25 @@ namespace Learn2CodeAPI.Controllers
         public async Task<IActionResult> GetbookingIndividual(int ModuleId, int TutorSessionId)
         {
             var available = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Tutor).Include(zz => zz.Module).Where(zz => zz.ModuleId == ModuleId && zz.TutorSessionId == TutorSessionId && zz.BookingStatus.bookingStatus == "Open").ToListAsync();
-            return Ok(available);
+            var sessionmodulelist = new List<Individuallist>();
+            foreach (var item in available)
+            {
+                var modulesesion = new Individuallist();
+                modulesesion.title = item.Title;
+                modulesesion.endTime = item.SessionTime.EndTime;
+                modulesesion.startTime = item.SessionTime.StartTime;
+                modulesesion.tutorName = item.Tutor.TutorName;
+                modulesesion.tutorSurname = item.Tutor.TutorSurname;
+                modulesesion.moduleCode = item.Module.ModuleCode;
+                modulesesion.date = DateTime.Parse(item.Date) ;
+
+                modulesesion.id = item.Id;
+                sessionmodulelist.Add(modulesesion);
+
+            }
+
+            var list = sessionmodulelist.Where(zz => zz.date.Day >= DateTime.Now.Day).ToList();
+            return Ok(list);
         }
 
         [HttpGet]
@@ -791,6 +809,33 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 var today = DateTime.Now;
+                var check = await db.BookingInstance.Include(zz => zz.SessionTime).Where(zz => zz.Id == dto.BookingInstanceId).FirstOrDefaultAsync();
+                var xx = "";
+                var sessiontime = await db.SessionTime.Where(zz => zz.Id == check.SessionTimeId).FirstOrDefaultAsync();
+                if (sessiontime.StartTime.Length == 3)
+                {
+                    xx = sessiontime.StartTime.Substring(0, 1);
+                }
+                else
+                {
+                    xx = sessiontime.StartTime.Substring(0, 2);
+                }
+
+                var hour = Convert.ToInt32(xx);
+                var todayy = DateTime.Parse(check.Date); 
+                var time = new DateTime(todayy.Year, todayy.Month, todayy.Day, hour, 0, 0);
+
+                if (time.Day == DateTime.Today.Day)
+                {
+                    if (time < DateTime.Now)
+                    {
+                        result.message = "Unable to book as session time has passed";
+                        return BadRequest(result.message);
+                    }
+
+                }
+
+
                 //check enroline quantity
                 var enrolineId = await db.EnrolLine.Include(zz => zz.Subscription.SubscriptionTutorSession)
                .Where(zz => zz.Enrollment.StudentId == dto.StudentId && zz.EndDate >= today && zz.ModuleId == dto.ModuleId && zz.TicketQuantity > 0 && zz.Subscription.SubscriptionTutorSession
@@ -854,7 +899,26 @@ namespace Learn2CodeAPI.Controllers
         {
             var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
             var myBookings = await studentRepo.GetMyBookings(studentId.Id);
-            return Ok(myBookings);
+            var sessionmodulelist = new List<Individuallist>();
+            foreach (var item in myBookings)
+            {
+                var modulesesion = new Individuallist();
+                modulesesion.title = item.Title;
+                modulesesion.endTime = item.SessionTime.EndTime;
+                modulesesion.startTime = item.SessionTime.StartTime;
+                modulesesion.tutorName = item.Tutor.TutorName;
+                modulesesion.tutorSurname = item.Tutor.TutorSurname;
+                modulesesion.moduleCode = item.Module.ModuleCode;
+                modulesesion.date = DateTime.Parse(item.Date);
+                modulesesion.link = item.Link;
+                modulesesion.id = item.Id;
+                sessionmodulelist.Add(modulesesion);
+
+            }
+
+            var list = sessionmodulelist.Where(zz => zz.date.Day >= DateTime.Now.Day).ToList();
+
+            return Ok(list);
 
         }
 
@@ -903,6 +967,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                dto.date = dto.date.AddDays(1);
                 string datestring = dto.date.ToString("MM/dd/yyyy");
                 var student = await db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == dto.StudentId).FirstOrDefaultAsync();
                 SessionTime time = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
