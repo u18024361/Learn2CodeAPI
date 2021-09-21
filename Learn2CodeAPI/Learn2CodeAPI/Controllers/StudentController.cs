@@ -968,6 +968,13 @@ namespace Learn2CodeAPI.Controllers
             try
             {
                 dto.date = dto.date.AddDays(1);
+                if (dto.date < DateTime.Now || dto.date.Day == DateTime.Now.Day)
+                {
+                    result.message = "Please choose a date that has not passed and that is not todays date";
+                    return BadRequest(result.message);
+                }
+
+
                 string datestring = dto.date.ToString("MM/dd/yyyy");
                 var student = await db.Students.Include(zz => zz.Identity).Where(zz => zz.Id == dto.StudentId).FirstOrDefaultAsync();
                 SessionTime time = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
