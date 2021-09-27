@@ -658,11 +658,35 @@ namespace Learn2CodeAPI.Controllers
         }
 
         [HttpGet]
+        [Route("GetCalendarSessions/{TutorId}")]
+        public async Task<IActionResult> GetCalendarSessions(int TutorId)
+        {
+            var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus).Include(zz => zz.TutorSession.SessionType)
+                 .Where(zz => zz.TutorId == TutorId ).ToListAsync();
+
+            List<calendarDTO> calendar = new List<calendarDTO>();
+            foreach (var item in entity)
+            {
+                DateTime dt = DateTime.Parse(item.Date);
+                calendarDTO cal = new calendarDTO();
+                cal.start = dt.ToString("yyyy-MM-dd"); 
+                cal.title = item.TutorSession.SessionType.SessionTypeName + ": "+  item.Title + " " + item.SessionTime.StartTime + "-" + item.SessionTime.EndTime;
+                
+                calendar.Add(cal);
+            }
+
+            return Ok(calendar);
+        }
+
+
+
+        [HttpGet]
         [Route("GetAllSessions/{TutorId}")]
         public async Task<IActionResult> GetAllSessions(int TutorId)
         {
             var entity = await db.BookingInstance.Include(zz => zz.SessionTime).Include(zz => zz.Module).Include(zz => zz.BookingStatus)
                  .Where(zz => zz.TutorId == TutorId).ToListAsync();
+
 
             return Ok(entity);
         }
@@ -820,6 +844,7 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                dto.Date = dto.Date.AddDays(1);
                 var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
                 string datestring = dto.Date.ToString("MM/dd/yyyy");
                 DateTime oDate = DateTime.ParseExact(session.Date, "MM/dd/yyyy", CultureInfo.CurrentCulture);
