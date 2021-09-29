@@ -912,7 +912,9 @@ namespace Learn2CodeAPI.Controllers
                 modulesesion.date = DateTime.Parse(item.Date);
                 modulesesion.link = item.Link;
                 modulesesion.id = item.Id;
+                modulesesion.description = item.Description;
                 sessionmodulelist.Add(modulesesion);
+                
 
             }
 
@@ -1048,6 +1050,33 @@ namespace Learn2CodeAPI.Controllers
             var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
             var mygroup = await studentRepo.Getmygroupsession(studentId.Id);
             return Ok(mygroup);
+
+        }
+
+        [HttpGet]
+        [Route("GetMyGroupSessionsIonic/{UserId}")]
+        public async Task<IActionResult> GetMyGroupSessionsIonic(string UserId)
+        {
+            var studentId = await db.Students.Where(zz => zz.UserId == UserId).FirstOrDefaultAsync();
+            var z = studentId.Id;
+            var list = new List<groupionic>();
+            var x = await db.RegisteredStudent.Include(zz => zz.BookingInstance.SessionTime).Include(zz => zz.BookingInstance.Module).Include(zz => zz.BookingInstance.Tutor).Where(zz => zz.StudentId == z).ToListAsync();
+            foreach (var item in x)
+            {
+                var modulesesion = new groupionic();
+                modulesesion.date = item.BookingInstance.Date;
+                modulesesion.link = item.BookingInstance.Link;
+                modulesesion.title = item.BookingInstance.Title;
+                modulesesion.tutorName = item.BookingInstance.Tutor.TutorName;
+                modulesesion.tutorName = item.BookingInstance.Tutor.TutorSurname;
+                modulesesion.startTime = item.BookingInstance.SessionTime.StartTime;
+                modulesesion.endTime = item.BookingInstance.SessionTime.EndTime;
+                modulesesion.moduleCode = item.BookingInstance.Module.ModuleCode;
+                list.Add(modulesesion);
+
+
+            }
+            return Ok(list);
 
         }
 
