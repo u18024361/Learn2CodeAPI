@@ -917,8 +917,8 @@ namespace Learn2CodeAPI.Controllers
                 
 
             }
-
-            var list = sessionmodulelist.Where(zz => zz.date.Day >= DateTime.Now.Day).ToList();
+            
+            var list = sessionmodulelist.Where(zz => zz.date.Day >= DateTime.Now.Day && zz.date.Month >= DateTime.Now.Month).ToList();
 
             return Ok(list);
 
