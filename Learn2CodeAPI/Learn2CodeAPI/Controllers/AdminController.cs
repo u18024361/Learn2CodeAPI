@@ -1025,6 +1025,27 @@ namespace Learn2CodeAPI.Controllers
 
         }
 
+        [HttpGet]
+        [Route("GetAllTutorsfast")]
+        public async Task<IActionResult> GetAllTutorsfast()
+        {
+            var Tutors = await AdminRepo.GetAllTutors();
+          
+            var fast = new List<TutorsFast>();
+            foreach(var item in Tutors)
+            {
+                TutorsFast x = new TutorsFast();
+                x.userId = item.UserId;
+                x.TutorName = item.TutorName;
+                x.TutorSurname = item.TutorSurname;
+                x.Email = item.TutorEmail;
+                 fast.Add(x);
+                
+            }
+            return Ok(fast);
+
+        }
+
         [HttpDelete]
         [Route("DeleteTutor/{userId}")]
         public IActionResult DeleteTutor(string userId)
