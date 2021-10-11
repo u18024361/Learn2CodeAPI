@@ -824,6 +824,17 @@ namespace Learn2CodeAPI.Controllers
                 var hour = Convert.ToInt32(xx);
                 var todayy = DateTime.Parse(check.Date); 
                 var time = new DateTime(todayy.Year, todayy.Month, todayy.Day, hour, 0, 0);
+                var timez = time.AddMinutes(600);
+               
+
+                if (timez < DateTime.Now)
+                {
+                   
+                        result.message = "Unable to book as session date has passed";
+                        return BadRequest(result.message);
+                    
+
+                }
 
                 if (time.Day == DateTime.Today.Day)
                 {
