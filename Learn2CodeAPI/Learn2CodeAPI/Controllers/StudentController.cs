@@ -880,11 +880,11 @@ namespace Learn2CodeAPI.Controllers
                     enrolinequantity.TicketQuantity = x;
                     await db.SaveChangesAsync();
                     var body = "Hi " + instance.Tutor.TutorName + " your individual session at " + instance.SessionTime.StartTime + "-" + instance.SessionTime.EndTime + " on " + instance.Date +  " has been booked";
-                   // var message = MessageResource.Create(
-                   //to: new PhoneNumber(cell),
-                   //from: new PhoneNumber("+17729348745"),
-                   //body: body,
-                   //client: _client);
+                    var message = MessageResource.Create(
+                   to: new PhoneNumber(cell),
+                   from: new PhoneNumber("+17729348745"),
+                   body: body,
+                   client: _client);
                     result.data = instance;
                     result.message = "Booking successfull";
                     return Ok(result);
