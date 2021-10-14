@@ -844,7 +844,46 @@ namespace Learn2CodeAPI.Controllers
             }
             try
             {
+                
+
                 dto.Date = dto.Date.AddDays(1);
+
+                if (dto.Date < DateTime.Now)
+                {
+                    result.message = "Provided date has already passed";
+                    return BadRequest(result.message);
+                }
+
+                var x = "";
+                var sessiontime = await db.SessionTime.Where(zz => zz.Id == dto.SessionTimeId).FirstOrDefaultAsync();
+                if (sessiontime.StartTime.Length == 3)
+                {
+                    x = sessiontime.StartTime.Substring(0, 1);
+                }
+                else
+                {
+                    x = sessiontime.StartTime.Substring(0, 2);
+                }
+
+
+                var hour = Convert.ToInt32(x);
+                var todayy = dto.Date;
+                var time = new DateTime(todayy.Year, todayy.Month, todayy.Day, hour, 0, 0);
+
+                if (dto.Date.Day == DateTime.Today.Day)
+                {
+                    if (time < DateTime.Now)
+                    {
+                        result.message = "Selected Time has already passed";
+                        return BadRequest(result.message);
+                    }
+
+                }
+
+
+
+
+
                 var session = db.BookingInstance.Where(zz => zz.Id == dto.Id).FirstOrDefault();
                 string datestring = dto.Date.ToString("MM/dd/yyyy");
                 DateTime oDate = DateTime.ParseExact(session.Date, "MM/dd/yyyy", CultureInfo.CurrentCulture);
@@ -918,6 +957,7 @@ namespace Learn2CodeAPI.Controllers
                     var ticketstatus = await db.TicketStatus.Where(zz => zz.ticketStatus == true).FirstOrDefaultAsync();
                     foreach(var item in reglist)
                     {
+                        
                         var enroline = await db.EnrolLine.Include(zz => zz.Enrollment).
                             Where(zz => zz.Enrollment.StudentId == item.StudentId && zz.ModuleId == session.ModuleId &&
                             zz.EndDate >= start && zz.StartDate <= start && zz.Subscription.SubscriptionTutorSession
@@ -1202,6 +1242,8 @@ namespace Learn2CodeAPI.Controllers
 
                 var data = await TutorGenRepo.Delete(TutorId);
                 db.File.Remove(file);
+                var user = await db.Users.Where(zz => zz.Email == tutor.TutorEmail).FirstOrDefaultAsync();
+                db.Users.Remove(user);
                 await db.SaveChangesAsync();
                 result.data = data;
                 result.message = "Account deleted";

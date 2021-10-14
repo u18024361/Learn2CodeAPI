@@ -164,6 +164,24 @@ namespace Learn2CodeAPI.Controllers
             var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.Module).Where(zz => zz.BookingInstanceId == BookingInstanceId).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
             return Ok(Attendance);
         }
+        //attended
+        [HttpGet]
+        [Route("SessionAttendanceReportattended/{BookingInstanceId}")]
+        public async Task<IActionResult> SessionAttendanceReportattended(int BookingInstanceId)
+        {
+
+            var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.Module).Where(zz => zz.BookingInstanceId == BookingInstanceId && zz.Attended == true).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
+            return Ok(Attendance);
+        }
+        //abcent
+        [HttpGet]
+        [Route("SessionAttendanceReportabcent/{BookingInstanceId}")]
+        public async Task<IActionResult> SessionAttendanceReportabcent(int BookingInstanceId)
+        {
+
+            var Attendance = await db.RegisteredStudent.Include(zz => zz.BookingInstance).ThenInclude(zz => zz.Module).Where(zz => zz.BookingInstanceId == BookingInstanceId && zz.Attended == false).Include(zz => zz.Student).ThenInclude(zz => zz.Identity).ToListAsync();
+            return Ok(Attendance);
+        }
 
         //use ng2
         [HttpGet]
@@ -261,6 +279,39 @@ namespace Learn2CodeAPI.Controllers
             var list = Tutorsessions.Where(zz => zz.Date >= dto.StartDate && zz.Date <= enddate).ToList();
             return Ok(list);
         }
+
+
+
+        [HttpPost]
+        [Route("GetTotalTutorsessionsmodule")]
+        public async Task<IActionResult> GetTotalTutorsessionsmodule([FromBody] TotalTutorSessionDto dto)
+        {
+            var enddate = dto.EndDate.AddHours(23.99);
+            var Tutorsessions = new List<TutorSessionDto>();
+            string StartDate = dto.StartDate.ToString("MM/dd/yyyy");
+            string EndDate = dto.EndDate.ToString("MM/dd/yyyy");
+            var sessions = await db.BookingInstance.Include(zz => zz.Module).Include(zz => zz.Tutor).Where(zz => zz.TutorId == dto.TutorId).ToListAsync();
+
+            foreach (var item in sessions)
+            {
+                TutorSessionDto x = new TutorSessionDto();
+                string[] formats = { "MM/dd/yyyy" };
+                x.Date = DateTime.ParseExact(item.Date, formats, new CultureInfo("en-US"), DateTimeStyles.None);
+                x.TutorName = item.Tutor.TutorName;
+                x.TutorSurname = item.Tutor.TutorSurname;
+                x.TutorEmail = item.Tutor.TutorEmail;
+                x.ModuleCode = item.Module.ModuleCode;
+                x.Title = item.Title;
+                Tutorsessions.Add(x);
+            }
+
+            var list = Tutorsessions.Where(zz => zz.Date >= dto.StartDate && zz.Date <= enddate).ToList();
+            var modules = list.GroupBy(zz => zz.ModuleCode).ToList();
+            
+            return Ok(modules);
+        }
+
+
         #endregion
 
         #region Salesreport
@@ -432,6 +483,14 @@ namespace Learn2CodeAPI.Controllers
             string excelname = "sss";
             return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelname);
            
+        }
+
+        [HttpGet]
+        [Route("moduleattendance/{id}")]
+        public IActionResult moduleattendance(int id)
+        {
+            var x = db.BookingInstance.Where(zz => zz.Id == id).FirstOrDefault();
+            return Ok(x);
         }
 
 
