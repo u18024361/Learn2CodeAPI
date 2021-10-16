@@ -528,6 +528,15 @@ namespace Learn2CodeAPI.Controllers
                 {
                     return BadRequest("Subscription for the specific module already exists in basket");
                 }
+
+                var studentbasket = await db.Basket.Where(zz => zz.Id == dto.BasketId).FirstOrDefaultAsync();
+                var student = await db.EnrolLine.Where(zz => zz.Enrollment.StudentId == studentbasket.StudentId && zz.SubscriptionId == dto.SubscriptionId && zz.ModuleId == dto.ModuleId && zz.EndDate >= DateTime.Now && zz.Subscription.SubscriptionTutorSession
+               .Any(zz => zz.TutorSession.SessionType.SessionTypeName == "Group")).FirstOrDefaultAsync();
+                     if (student != null)
+                {
+                    return BadRequest("You already have an active subscription for this module");
+                }
+              
                 var data = await studentRepo.BuySubscription(dto);
                 result.data = data;
                 result.message = "Subscription added";
